@@ -1834,36 +1834,32 @@ async function renderPFUVA() {
   try {
     const res = await fetch('https://api.argentinadatos.com/v1/finanzas/tasas/plazoFijoPrecancelable');
     const data = await res.json();
-    const nacion = data.filter(d => d.entidad && d.entidad.toLowerCase().includes('naci'));
-    if (!nacion.length) {
+    if (!data.length) {
       el.innerHTML = '<div style="color:var(--text-sub);font-size:14px;padding:20px 0;">Sin datos disponibles.</div>';
       return;
     }
-    // Ordenar por plazo mínimo ascendente
-    nacion.sort((a, b) => (a.plazoMinimo || a.plazo || 0) - (b.plazoMinimo || b.plazo || 0));
-    const fecha = nacion[0].fecha ? nacion[0].fecha.slice(0,10).split('-').reverse().join('/') : '';
-    if (fecha) disc.textContent = `Actualizado al ${fecha} · Ajustan por inflación (UVA) + TNA adicional`;
-    const logoUrl = 'https://www.google.com/s2/favicons?sz=256&domain=bna.com.ar';
-    el.innerHTML = nacion.map(d => {
+    // Ordenar: Nación primero, luego por plazo mínimo
+    data.sort((a, b) => {
+      if (a.id === 'bna') return -1;
+      if (b.id === 'bna') return 1;
+      return (a.plazoMinDias || 0) - (b.plazoMinDias || 0);
+    });
+    el.innerHTML = data.map(d => {
       const tna = d.tna != null ? (d.tna * 100).toFixed(2) : '—';
-      // Rango de días
-      let rango = '';
-      if (d.plazoMinimo != null && d.plazoMaximo != null) {
-        rango = `[${d.plazoMinimo}-${d.plazoMaximo}]`;
-      } else if (d.plazo != null) {
-        rango = `[${d.plazo}]`;
-      }
+      let plazoTexto = '';
+      if (d.plazoMinDias && d.plazoMaxDias) plazoTexto = `Plazo: ${d.plazoMinDias} a ${d.plazoMaxDias} días`;
+      else if (d.plazoMinDias) plazoTexto = `Plazo mínimo: ${d.plazoMinDias} días`;
+      const limiteTag = d.montoMaximo
+        ? `<div style="font-size:11.5px;color:#ff6b6b;font-weight:600;margin-top:4px;">Límite: $${(d.montoMaximo/1000000).toFixed(0)}M</div>`
+        : '';
       return `
         <div class="wallet-item" style="cursor:default;align-items:flex-start;padding:14px;">
-          <img src="${logoUrl}" alt="BNA"
+          <img src="${d.logo}" alt="${d.entidad}"
                style="width:44px;height:44px;border-radius:12px;background:#fff;object-fit:contain;flex-shrink:0;margin-right:13px;margin-top:2px;" />
           <div style="flex:1;min-width:0;">
-            <div style="font-size:14.5px;font-weight:700;color:var(--text-main);line-height:1.2;">
-              Banco Nación <span style="color:var(--text-sub);font-weight:500;">${rango}</span>
-            </div>
-            <div style="margin-top:6px;">
-              <span style="font-size:11px;font-weight:600;color:var(--accent-text);background:rgba(0,232,255,0.1);border:1px solid rgba(0,232,255,0.2);border-radius:6px;padding:2px 8px;">PF UVA precancelable</span>
-            </div>
+            <div style="font-size:14.5px;font-weight:700;color:var(--text-main);line-height:1.2;">${d.entidad.replace('Banco de la Nación Argentina','Banco Nación').replace('Banco de la Provincia de Buenos Aires','Banco Provincia').replace('BBVA Banco Argentina','BBVA')}</div>
+            <div style="font-size:12px;color:var(--text-sub);margin-top:3px;">${plazoTexto}</div>
+            ${limiteTag}
           </div>
           <div style="text-align:right;flex-shrink:0;margin-left:10px;">
             <div style="font-size:19px;font-weight:800;color:var(--accent-text);">${tna}%</div>
