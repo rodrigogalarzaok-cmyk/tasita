@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tasita</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      background-color: #4b88ff; /* color inferior del degradado — evita blanco en overscroll de iOS */
+      overscroll-behavior: none;
+    }
+
+    :root {
+      --bg-1: #010609;
+      --bg-2: #060e1c;
+      --bg-3: #0a2040;
+      --card:  rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --accent-btn:  #b0eeff;
+      --accent-text: #00e8ff;
+      --text-main: #dce4f0;
+      --text-sub:  rgba(255,255,255,0.42);
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #000810 0%, #070e1a 60%, #4b88ff 100%);
+      background-attachment: fixed;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 48px;
+    }
+
+    .app { width: 100%; max-width: 460px; }
+
+    /* ─── Header ─── */
+    .header {
+      display: flex; align-items: center;
+      justify-content: space-between; padding: 8px 0 28px;
+    }
+    .logo { display: flex; align-items: center; gap: 11px; }
+    .logo-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+    .menu-btn {
+      background: none; border: none;
+      color: var(--text-sub); cursor: pointer;
+      padding: 4px; border-radius: 6px; transition: color .2s;
+    }
+    .menu-btn:hover { color: var(--text-main); }
+
+    /* ─── Tabs ─── */
+    .tab-bar {
+      display: flex; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 4px; margin-bottom: 30px;
+    }
+    .tab {
+      flex: 1; padding: 10px 4px; text-align: center;
+      font-size: 11.5px; font-weight: 700; letter-spacing: 0.6px;
+      cursor: pointer; border-radius: 9px;
+      transition: background .22s, color .22s;
+      color: rgba(255,255,255,0.82); user-select: none;
+    }
+    .tab.active { background: var(--accent-btn); color: #010609; }
+
+    /* ─── Tab content ─── */
+    .tab-content { display: none; animation: fadein .22s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadein { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    /* ─── Section header ─── */
+    .sec-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 18px;
+    }
+    .sec-title {
+      font-size: 18px; font-weight: 700;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .sec-title svg { color: var(--accent-text); flex-shrink: 0; }
+    .sec-emoji { font-size: 20px; line-height: 1; flex-shrink: 0; }
+    .sec-updated { font-size: 12.5px; color: var(--text-sub); }
+    .sec-updated span { color: var(--accent-text); font-weight: 600; }
+
+    /* ─── Wallet / Bank list ─── */
+    .wallet-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+
+    .wallet-item {
+      display: flex; align-items: center; padding: 15px 14px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; cursor: pointer;
+      transition: background .18s, border-color .18s;
+    }
+    .wallet-item:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .rank { font-size: 13px; color: var(--text-sub); width: 20px; flex-shrink: 0; }
+
+    .avatar {
+      width: 44px; height: 44px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff;
+      margin: 0 14px 0 10px; flex-shrink: 0; letter-spacing: 0.3px;
+      overflow: hidden;
+    }
+    /* Avatar con logo real */
+    .avatar.has-logo {
+      background: #ffffff;
+      padding: 5px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    }
+    .avatar.has-logo img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+    }
+
+    .wallet-info { flex: 1; min-width: 0; }
+    .wallet-name {
+      font-size: 14.5px; font-weight: 600; margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .wallet-sub { font-size: 11.5px; color: var(--text-sub); }
+
+    .wallet-rate {
+      display: flex; flex-direction: column; align-items: flex-end;
+      flex-shrink: 0; gap: 2px;
+    }
+    .wallet-rate-num {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 16px; font-weight: 700; color: var(--accent-text);
+    }
+    .wallet-rate-tag {
+      font-size: 10.5px; color: var(--text-sub); font-weight: 500; letter-spacing: 0.4px;
+    }
+    .limit-badge {
+      display: inline-block; margin-top: 5px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.2px;
+      color: #ff6b6b; background: rgba(255,80,80,0.13);
+      border: 1px solid rgba(255,80,80,0.35);
+      border-radius: 6px; padding: 2px 7px;
+    }
+
+    /* ─── Summary cards ─── */
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px;
+    }
+    .card-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+    .card-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 7px;
+    }
+    .card-row:last-of-type { margin-bottom: 0; }
+    .card-label { font-size: 12px; color: var(--text-sub); }
+    .card-value { font-size: 12px; font-weight: 500; }
+    .card-link {
+      display: inline-block; margin-top: 13px; font-size: 12px;
+      font-weight: 700; color: var(--accent-text);
+      cursor: pointer; background: none; border: none; padding: 0;
+    }
+    .card-link:hover { opacity: 0.75; }
+
+    /* ─── Source badge ─── */
+    .source-badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; margin-bottom: 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; font-size: 11.5px; color: var(--text-sub);
+    }
+    .source-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; background: var(--text-sub);
+      transition: background .4s, box-shadow .4s;
+    }
+    .source-dot.live {
+      background: var(--accent-text);
+      box-shadow: 0 0 7px var(--accent-text);
+    }
+    .source-dot.cached { background: rgba(255,255,255,0.25); }
+    .badge-text { font-size: 11.5px; }
+    .badge-text b { color: var(--accent-text); font-weight: 600; }
+
+    /* ─── Loading state ─── */
+    .loading-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 0; gap: 16px;
+      color: var(--text-sub);
+    }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--accent-text);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state p { font-size: 13px; }
+
+    /* ─── Info/Error state ─── */
+    .info-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 0; gap: 14px;
+      color: var(--text-sub); text-align: center;
+    }
+    .info-state svg { opacity: 0.25; }
+    .info-state p { font-size: 14px; line-height: 1.6; }
+    .retry-btn {
+      margin-top: 4px; padding: 9px 22px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--accent-text);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background .18s;
+    }
+    .retry-btn:hover { background: rgba(255,255,255,0.08); }
+
+    /* ─── Dollar items ─── */
+    .dollar-item {
+      display: flex; align-items: center; padding: 16px 18px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; cursor: default; gap: 14px;
+      transition: background .18s, border-color .18s;
+    }
+    .dollar-item:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .dollar-name-wrap { flex: 1; }
+    .dollar-name {
+      font-size: 15px; font-weight: 700;
+      color: var(--text-main); letter-spacing: 0.2px;
+    }
+    .dollar-col {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px; flex-shrink: 0;
+    }
+    .dollar-col-label {
+      font-size: 11px; color: var(--text-sub);
+      font-weight: 500; letter-spacing: 0.3px;
+    }
+    .dollar-price-compra { font-size: 14px; font-weight: 600; color: var(--accent-btn); }
+    .dollar-price-venta  { font-size: 18px; font-weight: 700; color: var(--accent-text); }
+    .dollar-sep {
+      width: 1px; height: 38px;
+      background: var(--border); flex-shrink: 0;
+    }
+
+    @media (max-width: 400px) {
+      .tab { font-size: 10px; }
+      .wallet-rate { font-size: 14.5px; }
+    }
+
+    /* ─── Menú hamburguesa dropdown ─── */
+    .menu-wrap { position: relative; }
+    .menu-dropdown {
+      position: absolute; top: 42px; right: 0;
+      background: #0a1a2e; border: 1px solid var(--border);
+      border-radius: 14px; padding: 6px; min-width: 170px;
+      z-index: 300; display: none;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+    }
+    .menu-dropdown.open { display: block; animation: fadein .18s ease; }
+    .menu-option {
+      display: flex; align-items: center; gap: 11px;
+      padding: 11px 14px; border-radius: 9px;
+      cursor: pointer; font-size: 14px; font-weight: 600;
+      color: var(--text-main); transition: background .15s;
+      user-select: none;
+    }
+    .menu-option:hover { background: rgba(255,255,255,0.07); }
+    .menu-option svg { color: var(--accent-text); flex-shrink: 0; }
+
+    /* ─── Broker overlay (pantalla completa) ─── */
+    .broker-overlay {
+      position: fixed; inset: 0;
+      background: linear-gradient(to bottom, #000810 0%, #070e1a 60%, #4b88ff 100%);
+      z-index: 250; display: none; overflow-y: auto;
+      padding: 24px 16px 80px;
+    }
+    .broker-overlay.open { display: block; animation: fadein .22s ease; }
+    .broker-inner { width: 100%; max-width: 460px; margin: 0 auto; }
+    .broker-back {
+      display: flex; align-items: center; gap: 8px;
+      background: none; border: none; color: var(--text-sub);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      padding: 4px 0 28px; transition: color .18s;
+    }
+    .broker-back:hover { color: var(--text-main); }
+
+    /* Broker cards */
+    .broker-item {
+      display: flex; align-items: center; padding: 14px 14px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; gap: 10px; cursor: pointer;
+      transition: background .18s, border-color .18s; margin-bottom: 6px;
+    }
+    .broker-item:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .broker-info { flex: 1; min-width: 0; }
+    .broker-name {
+      font-size: 14.5px; font-weight: 700; margin-bottom: 7px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .broker-bar-wrap {
+      width: 100%; height: 4px;
+      background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden;
+    }
+    .broker-bar { height: 100%; border-radius: 4px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+    .broker-pct-col { text-align: center; flex-shrink: 0; }
+    .broker-pct-badge {
+      display: inline-block;
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      padding: 3px 9px;
+      font-size: 15px; font-weight: 800;
+    }
+    .broker-pct-sub { font-size: 10.5px; color: var(--text-sub); margin-top: 4px; }
+    .broker-pct-badge { cursor: pointer; transition: opacity .15s; }
+    .broker-pct-badge:hover { opacity: 0.75; }
+    .calc-hint { font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 10px; opacity: 0.7; }
+
+    /* Banderita ranking top 3 */
+    .broker-ribbon {
+      width: 22px; height: 34px; flex-shrink: 0;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 5px;
+      font-size: 11px; font-weight: 900; color: #fff;
+      clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+    .broker-disclaimer {
+      font-size: 11.5px; color: var(--text-sub); line-height: 1.5;
+      text-align: center; margin-top: 18px; padding: 0 8px;
+    }
+
+    /* ─── Footer redes sociales ─── */
+    .social-footer {
+      display: flex; justify-content: center; align-items: center;
+      gap: 18px; padding: 28px 0 8px;
+      border-top: 1px solid var(--border); margin-top: 28px;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: 7px;
+      color: var(--text-sub); text-decoration: none;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
+      transition: color .18s;
+    }
+    .social-link:hover { color: var(--text-main); }
+    .social-link.ig { color: #e1306c; }
+    .social-link.tt { color: #ffffff; }
+    .social-link.ig:hover { opacity: 0.8; }
+    .social-link.tt:hover { opacity: 0.8; }
+
+    /* ─── Calculadora flotante ─── */
+    .calc-fab {
+      position: fixed; bottom: 24px; left: 24px;
+      width: 54px; height: 54px; border-radius: 14px;
+      background: var(--accent-btn); color: #010609;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 22px rgba(0,232,255,0.35);
+      transition: transform .18s, box-shadow .18s;
+      z-index: 400;
+    }
+    .calc-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(0,232,255,0.5); }
+
+    /* Backdrop transparente — cubre todo cuando la calc está abierta */
+    .calc-backdrop {
+      display: none; position: fixed; inset: 0;
+      z-index: 398; /* justo debajo de la calc (399) */
+      background: transparent;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .calc-backdrop.open { display: block; }
+
+    .calc-panel {
+      position: fixed; bottom: 90px; left: 16px;
+      width: 300px; background: #060e1c;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 22px 20px;
+      z-index: 399; box-shadow: 0 10px 50px rgba(0,0,0,0.7);
+      display: none;
+    }
+    .calc-panel.open { display: block; animation: fadein .2s ease; }
+
+    .calc-title {
+      font-size: 14px; font-weight: 700; color: var(--accent-text);
+      margin-bottom: 18px; letter-spacing: 0.2px;
+    }
+    .calc-label {
+      font-size: 11.5px; color: var(--text-sub);
+      font-weight: 500; margin-bottom: 6px; display: block;
+    }
+    .calc-input-wrap {
+      display: flex; align-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 12px; margin-bottom: 14px;
+      transition: border-color .18s;
+    }
+    .calc-input-wrap:focus-within { border-color: rgba(0,232,255,0.4); }
+    .calc-sym { font-size: 14px; color: var(--text-sub); font-weight: 600; flex-shrink: 0; }
+    .calc-input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text-main); font-size: 15px; font-weight: 600;
+      padding: 11px 8px;
+    }
+    .calc-input::placeholder { color: rgba(255,255,255,0.2); font-weight: 400; }
+
+    .calc-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .calc-result-row {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 10px;
+    }
+    .calc-result-row:last-child { margin-bottom: 0; }
+    .calc-result-label { font-size: 12px; color: var(--text-sub); }
+    .calc-result-val { font-size: 14px; font-weight: 700; color: var(--accent-text); }
+    .calc-result-row.main .calc-result-label { font-size: 12.5px; color: var(--text-main); font-weight: 600; }
+    .calc-result-row.main .calc-result-val { font-size: 17px; color: var(--accent-btn); }
+    .calc-placeholder {
+      font-size: 12px; color: var(--text-sub);
+      text-align: center; padding: 10px 0;
+    }
+
+    /* ─── Speech bubble de la calculadora ─── */
+    .calc-bubble {
+      position: fixed; bottom: 90px; left: 14px;
+      background: #060e1c;
+      border: 1.5px solid rgba(176,238,255,0.4);
+      border-radius: 14px; padding: 10px 16px;
+      font-size: 13px; font-weight: 700;
+      color: var(--accent-btn); white-space: nowrap;
+      z-index: 401; cursor: pointer;
+      box-shadow: 0 4px 24px rgba(0,232,255,0.15);
+      opacity: 0; pointer-events: none;
+      transform: translateY(6px) scale(0.95);
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .calc-bubble.show {
+      opacity: 1; transform: translateY(0) scale(1); pointer-events: all;
+    }
+    /* Cola apuntando hacia abajo (al botón FAB) */
+    .calc-bubble::before {
+      content: ''; position: absolute; bottom: -9px; left: 20px;
+      width: 0; height: 0;
+      border-left: 8px solid transparent; border-right: 8px solid transparent;
+      border-top: 9px solid rgba(176,238,255,0.4);
+    }
+    .calc-bubble::after {
+      content: ''; position: absolute; bottom: -7px; left: 21px;
+      width: 0; height: 0;
+      border-left: 7px solid transparent; border-right: 7px solid transparent;
+      border-top: 7px solid #060e1c;
+    }
+
+    /* ─── Gráfico histórico dólar ─── */
+    .dollar-item { cursor: pointer !important; }
+    .dollar-chevron {
+      width: 100%; text-align: center;
+      font-size: 10px; color: rgba(255,255,255,0.18);
+      padding-top: 2px; letter-spacing: 1px;
+      transition: transform .22s;
+    }
+    .dollar-item.chart-open .dollar-chevron { transform: rotate(180deg); }
+    .dollar-item.chart-open {
+      border-radius: 16px 16px 0 0;
+      border-bottom-color: transparent;
+    }
+    .dolar-chart {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease, padding .35s ease;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 0 0 16px 16px; margin-top: -6px;
+      border-top: none; padding: 0 14px;
+    }
+    .dolar-chart.open { max-height: 180px; padding: 10px 14px 14px; }
+    .chart-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .chart-range { font-size: 11px; color: var(--text-sub); }
+    .chart-change { font-size: 12px; font-weight: 700; }
+    .chart-labels {
+      display: flex; justify-content: space-between;
+      font-size: 10.5px; color: var(--text-sub); margin-top: 5px;
+    }
+    .chart-loading, .chart-empty {
+      font-size: 12px; color: var(--text-sub);
+      text-align: center; padding: 18px 0;
+    }
+
+    /* ─── FAQ Acordeón ─── */
+    .faq-section {
+      margin-top: 36px; padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .faq-section-title {
+      font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,0.22);
+      letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 13px 2px; cursor: pointer;
+      font-size: 13px; font-weight: 600; color: var(--text-sub);
+      user-select: none; transition: color .18s; gap: 12px;
+    }
+    .faq-q:hover { color: var(--text-main); }
+    .faq-icon {
+      font-size: 18px; color: var(--accent-text); flex-shrink: 0;
+      transition: transform .22s; line-height: 1;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .32s ease, padding .32s ease;
+      font-size: 12.5px; line-height: 1.7; color: rgba(255,255,255,0.38);
+      padding: 0 2px;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 2px 14px; }
+
+    /* ─── Footer legal ─── */
+    .legal-footer {
+      display: flex; justify-content: center; align-items: center;
+      flex-wrap: wrap; gap: 4px 10px;
+      padding: 16px 0 6px;
+      font-size: 11px; color: rgba(255,255,255,0.18); text-align: center;
+    }
+    .legal-link {
+      color: rgba(255,255,255,0.28); text-decoration: none;
+      font-weight: 600; cursor: pointer; background: none; border: none;
+      font-size: 11px; font-family: inherit; padding: 0;
+      transition: color .18s;
+    }
+    .legal-link:hover { color: var(--text-sub); }
+
+    /* ─── Modal bottom sheet ─── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72); z-index: 600;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; animation: fadein .2s ease; }
+    .modal-sheet {
+      background: #060e1c; border: 1px solid var(--border);
+      border-radius: 24px 24px 0 0; padding: 20px 22px 44px;
+      width: 100%; max-width: 460px; max-height: 82vh; overflow-y: auto;
+    }
+    .modal-handle {
+      width: 38px; height: 4px; background: rgba(255,255,255,0.12);
+      border-radius: 4px; margin: 0 auto 20px;
+    }
+    .modal-heading {
+      font-size: 16px; font-weight: 800; margin-bottom: 14px; color: var(--text-main);
+    }
+    .modal-body {
+      font-size: 12.5px; line-height: 1.7; color: var(--text-sub);
+    }
+    .modal-body p { margin-bottom: 11px; }
+    .modal-body p:last-child { margin-bottom: 0; }
+    .modal-close {
+      display: block; width: 100%; margin-top: 20px;
+      padding: 13px; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--accent-text); font-size: 14px; font-weight: 700;
+      cursor: pointer; text-align: center; transition: background .18s; font-family: inherit;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.07); }
+  </style>
+</head>
+<body>
+<!-- Gradient defs for branded icons -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <radialGradient id="ig-bg" cx="25%" cy="115%" r="145%">
+      <stop offset="0%"   stop-color="#ffd600"/>
+      <stop offset="22%"  stop-color="#ff6930"/>
+      <stop offset="42%"  stop-color="#fe3b72"/>
+      <stop offset="68%"  stop-color="#c913b9"/>
+      <stop offset="100%" stop-color="#3d52f4"/>
+    </radialGradient>
+  </defs>
+</svg>
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <!-- Base: Tabler Icons "coffee" (estilo café francés elegante) + barras internas -->
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none"
+           stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="cc">
+            <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
+          </clipPath>
+        </defs>
+
+        <!-- Vapor: dos S-curves elegantes -->
+        <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+        <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+
+        <!-- Cuerpo de la taza (redondeado, estilo espresso) -->
+        <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+
+        <!-- Asa circular pequeña y elegante -->
+        <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
+
+        <!-- Barras ascendentes (un solo celeste, clipeadas dentro de la taza) -->
+        <g clip-path="url(#cc)">
+          <rect x="4"    y="16.5" width="3" height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
+          <rect x="8.5"  y="14"   width="3" height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
+          <rect x="13"   y="11.5" width="3" height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
+        </g>
+      </svg>
+      <span class="logo-name">Tasita</span>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" aria-label="Menú" onclick="toggleMenu(event)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="menu-dropdown" id="menuDropdown">
+        <div class="menu-option" onclick="openBrokers()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+          Brokers
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ Broker overlay ══ -->
+  <div class="broker-overlay" id="brokerOverlay">
+    <div class="broker-inner">
+
+      <!-- Logo Tasita (toca → vuelve al inicio) -->
+      <div class="header" style="padding-bottom:16px; cursor:pointer;" onclick="closeBrokers()">
+        <div class="logo">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"
+               stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <clipPath id="cc2">
+                <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
+              </clipPath>
+            </defs>
+            <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+            <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
+            <g clip-path="url(#cc2)">
+              <rect x="4"   y="16.5" width="3" height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="8.5" y="14"   width="3" height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="13"  y="11.5" width="3" height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
+            </g>
+          </svg>
+          <span class="logo-name">Tasita</span>
+        </div>
+      </div>
+
+      <!-- Botón volver -->
+      <button class="broker-back" onclick="closeBrokers()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Volver
+      </button>
+      <div class="sec-header">
+        <h2 class="sec-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+          Brokers
+        </h2>
+        <p style="margin:4px 0 0; font-size:13px; color:var(--text-sub);">Mejores comisiones</p>
+      </div>
+      <div id="brokers-list" class="wallet-list"></div>
+      <p class="broker-disclaimer">Comisiones para acciones y CEDEARs operadas online · Vigentes mayo 2026 · Se suma IVA (21%) y derechos de mercado (BYMA)</p>
+      <footer class="social-footer">
+        <a class="social-link ig" href="https://www.instagram.com/rodrigogalarza__" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5.5" fill="url(#ig-bg)"/>
+            <rect x="4.5" y="4.5" width="15" height="15" rx="4" stroke="white" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="3.8" stroke="white" stroke-width="1.8"/>
+            <circle cx="17.2" cy="6.8" r="1.3" fill="white"/>
+          </svg>
+          @rodrigogalarza__
+        </a>
+        <a class="social-link tt" href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5" fill="#010101"/>
+            <path transform="translate(1.5,0)" fill="#ee1d52" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path transform="translate(-1.5,0)" fill="#69c9d0" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path fill="white" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+          </svg>
+          @rodrigogalarzaa
+        </a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar" role="tablist">
+    <div class="tab active" data-tab="billeteras" role="tab">BILLETERAS</div>
+    <div class="tab"        data-tab="plazos"     role="tab">PLAZOS FIJOS</div>
+    <div class="tab"        data-tab="dolar"      role="tab">DÓLAR</div>
+  </nav>
+
+  <!-- ══════════════════════════════
+       BILLETERAS
+  ══════════════════════════════ -->
+  <section class="tab-content active" id="tab-billeteras" role="tabpanel">
+
+    <div class="sec-header">
+      <h2 class="sec-title">
+        <svg width="24" height="22" viewBox="0 0 48 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- billete verde asomando -->
+          <rect x="15" y="1" width="18" height="14" rx="2.5" fill="#6aaa48"/>
+          <rect x="17" y="3" width="14" height="10" rx="1.5" fill="#7cbf58"/>
+          <circle cx="24" cy="8" r="2.5" fill="#5a9a3a"/>
+          <!-- cuerpo billetera marrón -->
+          <rect x="3" y="11" width="42" height="30" rx="5" fill="#c47a3a"/>
+          <!-- tapa superior más oscura -->
+          <rect x="3" y="11" width="42" height="11" rx="5" fill="#a8622a"/>
+          <rect x="3" y="17" width="42" height="5" fill="#a8622a"/>
+          <!-- broche dorado -->
+          <circle cx="40" cy="26" r="3" fill="#e8a040"/>
+          <circle cx="40" cy="26" r="1.5" fill="#c47a3a"/>
+          <!-- costura -->
+          <rect x="7" y="15" width="34" height="22" rx="3" fill="none" stroke="#a05820" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.6"/>
+        </svg>
+        Billeteras virtuales
+      </h2>
+    </div>
+
+    <div id="billeteras-list" class="wallet-list"></div>
+
+
+  </section>
+
+  <!-- ══════════════════════════════
+       PLAZOS FIJOS
+  ══════════════════════════════ -->
+  <section class="tab-content" id="tab-plazos" role="tabpanel">
+
+    <div class="sec-header">
+      <h2 class="sec-title">
+        <span class="sec-emoji">🏦</span>
+        Plazos fijos
+      </h2>
+    </div>
+
+
+    <!-- Dynamic list populated by JS -->
+    <div id="plazos-list" class="wallet-list">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando datos…</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════
+       DÓLAR
+  ══════════════════════════════ -->
+  <section class="tab-content" id="tab-dolar" role="tabpanel">
+
+    <div class="sec-header">
+      <h2 class="sec-title">
+        <span class="sec-emoji">💵</span>
+        Cotización del dólar
+      </h2>
+    </div>
+
+    <!-- Lista dinámica -->
+    <div id="dolar-list" class="wallet-list">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando cotizaciones…</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <p class="faq-section-title">Preguntas frecuentes</p>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Qué es una billetera virtual?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Una billetera virtual es una app que te permite guardar, enviar y recibir dinero digitalmente. A diferencia de un banco, ofrecen rendimientos automáticos sobre tu saldo en pesos desde el primer día, sin plazos mínimos ni penalidades por retirar.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cuál es la diferencia entre TNA y TEA?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">La TNA (Tasa Nominal Anual) es la tasa base publicada. La TEA (Tasa Efectiva Anual) incluye el efecto del interés compuesto: como los rendimientos se acreditan diariamente y se reinvierten automáticamente, la ganancia real en 12 meses es mayor que la TNA. Por ejemplo, una TNA del 40% equivale a una TEA de aproximadamente 49,1%.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cómo funcionan los plazos fijos?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Un plazo fijo es un depósito bancario a un plazo determinado (generalmente 30 días) con una tasa garantizada. El dinero queda inmovilizado hasta el vencimiento, pero la tasa suele ser competitiva y está respaldada por el banco y el BCRA. Al vencimiento recibís el capital más los intereses.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Qué es un broker?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Un broker es una sociedad de bolsa habilitada para operar en el mercado de capitales en tu nombre. A través de un broker podés comprar y vender acciones, CEDEARs, bonos y otros instrumentos financieros. La diferencia principal con una billetera virtual es que el broker te da acceso a inversiones más complejas, mientras que la billetera rinde sobre tu saldo en pesos de forma automática.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cómo puedo calcular cuánto voy a ganar?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Usá la calculadora integrada: tocá el botón 🧮 en la esquina inferior izquierda, ingresá el monto que querés invertir y la TNA de la billetera o plazo fijo que elegiste. La app te muestra al instante cuánto ganás por día, por mes y en un año.</div>
+    </div>
+  </section>
+
+  <!-- Footer legal -->
+  <div class="legal-footer">
+    <span>© 2025 Tasita</span>
+    <span>·</span>
+    <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer financiero</button>
+    <span>·</span>
+    <button class="legal-link" onclick="openModal('privacy')">Privacidad</button>
+  </div>
+
+  <!-- Footer redes -->
+  <footer class="social-footer">
+    <a class="social-link ig" href="https://www.instagram.com/rodrigogalarza__" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0.5" y="0.5" width="23" height="23" rx="5.5" fill="url(#ig-bg)"/>
+        <rect x="4.5" y="4.5" width="15" height="15" rx="4" stroke="white" stroke-width="1.8"/>
+        <circle cx="12" cy="12" r="3.8" stroke="white" stroke-width="1.8"/>
+        <circle cx="17.2" cy="6.8" r="1.3" fill="white"/>
+      </svg>
+      @rodrigogalarza__
+    </a>
+    <a class="social-link tt" href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0.5" y="0.5" width="23" height="23" rx="5" fill="#010101"/>
+        <path transform="translate(1.5,0)" fill="#ee1d52" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+        <path transform="translate(-1.5,0)" fill="#69c9d0" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+        <path fill="white" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+      </svg>
+      @rodrigogalarzaa
+    </a>
+  </footer>
+
+</div>
+
+<!-- Modales: Disclaimer y Privacidad -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-heading" id="modalHeading"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <button class="modal-close" onclick="closeModalDirect()">Cerrar</button>
+  </div>
+</div>
+
+<!-- Backdrop: toque fuera de la calc → la cierra -->
+<div class="calc-backdrop" id="calcBackdrop" onclick="closeCalc()"></div>
+
+<!-- ── Calculadora flotante ── -->
+<button class="calc-fab" id="calcBtn" onclick="toggleCalc()" aria-label="Calculadora de rendimiento">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="2" width="16" height="20" rx="3"/>
+    <line x1="8" y1="6" x2="16" y2="6"/>
+    <line x1="8" y1="10" x2="9" y2="10"/><line x1="12" y1="10" x2="13" y2="10"/><line x1="16" y1="10" x2="17" y2="10"/>
+    <line x1="8" y1="14" x2="9" y2="14"/><line x1="12" y1="14" x2="13" y2="14"/><line x1="16" y1="14" x2="17" y2="14"/>
+    <line x1="8" y1="18" x2="9" y2="18"/><line x1="12" y1="18" x2="13" y2="18"/><line x1="16" y1="18" x2="17" y2="18"/>
+  </svg>
+</button>
+
+<!-- Speech bubble de la calc -->
+<div class="calc-bubble" id="calcBubble"></div>
+
+<div class="calc-panel" id="calcPanel">
+  <div class="calc-title">Calculadora de rendimiento</div>
+
+  <label class="calc-label">¿Cuánto vas a invertir?</label>
+  <div class="calc-input-wrap">
+    <span class="calc-sym">$</span>
+    <input class="calc-input" id="calcMonto" type="text" inputmode="numeric" placeholder="1.000.000" oninput="fmtMontoInput(this)">
+  </div>
+
+  <label class="calc-label">Tasa anual (TNA %)</label>
+  <div class="calc-input-wrap">
+    <input class="calc-input" id="calcTasa" type="number" placeholder="45.50" step="0.01" min="0" oninput="calcular()">
+    <span class="calc-sym">%</span>
+  </div>
+
+  <div id="calcResults">
+    <p class="calc-placeholder">Completá los campos para ver tu rendimiento</p>
+  </div>
+</div>
+
+<!-- ── Calculadora de comisiones (brokers) ── -->
+<div class="calc-panel" id="calcBrokerPanel">
+  <div class="calc-title">Calculadora de comisiones</div>
+
+  <label class="calc-label">Monto a operar</label>
+  <div class="calc-input-wrap">
+    <span class="calc-sym">$</span>
+    <input class="calc-input" id="calcBrokerMonto" type="text" inputmode="numeric" placeholder="1.000.000" oninput="fmtBrokerMontoInput(this)">
+  </div>
+
+  <label class="calc-label">Comisión del broker</label>
+  <div class="calc-input-wrap">
+    <input class="calc-input" id="calcBrokerPct" type="text" inputmode="numeric" placeholder="0,15" oninput="fmtBrokerPctInput(this)">
+    <span class="calc-sym">%</span>
+  </div>
+
+  <div id="calcBrokerResults">
+    <p class="calc-placeholder">Completá los campos para calcular</p>
+  </div>
+  <p class="calc-hint">Tocá el % de un broker para completar automáticamente</p>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════ */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c =>
+    c.classList.toggle('active', c.id === 'tab-' + name));
+  if (name === 'plazos' && !plazosLoaded) loadPlazos();
+  if (name === 'dolar'  && !dolarLoaded)  loadDolar();
+}
+document.querySelectorAll('.tab').forEach(t =>
+  t.addEventListener('click', () => switchTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b =>
+  b.addEventListener('click', () => switchTab(b.dataset.goto)));
+
+/* ════════════════════════════════════════════════════════
+   AVATAR HELPERS
+════════════════════════════════════════════════════════ */
+const KNOWN = {
+  'nacion':      'linear-gradient(135deg,#1a5a28,#277a38)',
+  'galicia':     'linear-gradient(135deg,#1a3d6e,#2a5ea8)',
+  'bbva':        'linear-gradient(135deg,#0f2a6a,#1a3d9a)',
+  'provincia':   'linear-gradient(135deg,#2a1a6e,#4030a0)',
+  'supervielle': 'linear-gradient(135deg,#6e1a28,#9a2838)',
+  'santander':   'linear-gradient(135deg,#6e1a1a,#9a2828)',
+  'hipotecario': 'linear-gradient(135deg,#5a3010,#8a5020)',
+  'macro':       'linear-gradient(135deg,#1a4060,#2a6090)',
+  'icbc':        'linear-gradient(135deg,#0d5a38,#1a8050)',
+  'patagonia':   'linear-gradient(135deg,#3a2a60,#5a4090)',
+  'ciudad':      'linear-gradient(135deg,#1a3050,#2a5080)',
+  'comafi':      'linear-gradient(135deg,#501a60,#7a2890)',
+  'credicoop':   'linear-gradient(135deg,#1a5048,#2a7068)',
+  'brubank':     'linear-gradient(135deg,#6a1a50,#9a2878)',
+  'meridian':    'linear-gradient(135deg,#1a4a3a,#2a6a5a)',
+  'mariva':      'linear-gradient(135deg,#4a1a3a,#6a2a5a)',
+  'naranja':     'linear-gradient(135deg,#7a3510,#b05020)',
+  'reba':        'linear-gradient(135deg,#3a1a5a,#5a2a8a)',
+  'bibank':      'linear-gradient(135deg,#1a3a5a,#2a5a8a)',
+  'bica':        'linear-gradient(135deg,#4a3a1a,#6a5a2a)',
+  'masventas':   'linear-gradient(135deg,#1a4a2a,#2a6a3a)',
+  'cmf':         'linear-gradient(135deg,#3a1a4a,#5a2a6a)',
+  'sol':         'linear-gradient(135deg,#5a4a1a,#7a6a2a)',
+  'credito':     'linear-gradient(135deg,#1a2a5a,#2a3a8a)',
+  'voii':        'linear-gradient(135deg,#2a1a5a,#4a2a8a)',
+};
+const PALETTE = [
+  'linear-gradient(135deg,#1a3d6e,#2a5ea8)',
+  'linear-gradient(135deg,#4a2d7a,#6b40b0)',
+  'linear-gradient(135deg,#1a5a28,#277a38)',
+  'linear-gradient(135deg,#6e1a28,#9a2838)',
+  'linear-gradient(135deg,#1a4060,#2a6090)',
+  'linear-gradient(135deg,#5a3010,#8a5020)',
+  'linear-gradient(135deg,#501a60,#7a2890)',
+  'linear-gradient(135deg,#1a5048,#2a7068)',
+];
+function getBankColor(name) {
+  const k = name.toLowerCase();
+  for (const [kw, col] of Object.entries(KNOWN))
+    if (k.includes(kw)) return col;
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+  return PALETTE[h % PALETTE.length];
+}
+function getInitials(name) {
+  const words = name
+    .replace(/BANCO\s*/gi,'').replace(/S\.A\..*$/i,'')
+    .replace(/CÍA\..*$/i,'').replace(/CIA\..*$/i,'')
+    .replace(/COMPAÑ.*$/i,'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
+  if (!words.length) return '?';
+  if (words.length === 1) return words[0].slice(0,2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+/* Mapa de nombres largos (API) → nombres cortos para mostrar */
+const NAME_MAP = [
+  [/cr[eé]dito\s+regional.*/i,                        'Crédito Regional'],
+  [/\breba\b.*/i,                                      'Reba'],
+  [/banco\s+de\s+la\s+naci[oó]n\s+argentina/i,        'Banco Nación'],
+  [/banco\s+naci[oó]n\s+argentina/i,                   'Banco Nación'],
+  [/banco\s+de\s+galicia.*/i,                          'Banco Galicia'],
+  [/galicia\s+y\s+buenos\s+aires.*/i,                  'Banco Galicia'],
+  [/banco\s+comafi.*/i,                                'Banco Comafi'],
+  [/banco\s+credicoop.*/i,                             'Banco Credicoop'],
+  [/banco\s+santander.*/i,                             'Banco Santander'],
+  [/banco\s+julio.*/i,                                 'Banco Julio'],
+  [/banco\s+de\s+la\s+provincia\s+de\s+buenos\s+aires/i, 'Banco Provincia'],
+  [/banco\s+provincia\s+de\s+buenos\s+aires/i,         'Banco Provincia'],
+];
+
+function cleanName(raw) {
+  for (const [re, short] of NAME_MAP) {
+    if (re.test(raw)) return short;
+  }
+  return raw
+    .replace(/\bS\.A\.U?\b.*/i,'').replace(/\bS\.A\b.*/i,'')
+    .replace(/\bCoop\..*/i,'').replace(/\bLtdo\..*/i,'')
+    .replace(/\bCía\..*/i,'').replace(/\bCompañía\b.*/i,'')
+    .replace(/\s+/g,' ').trim();
+}
+
+/* ─── Logos reales de bancos ─── */
+const wiki  = f => `https://upload.wikimedia.org/wikipedia/commons/${f}`;
+const gplay = h => `https://play-lh.googleusercontent.com/${h}=w512-h512`;
+const bv    = f => `https://billeterasvirtuales.com.ar/assets/images/${f}.png`;
+const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
+
+// Cada entrada: { url, bg, full? }
+//   bg   → color de fondo del avatar
+//   full → true = icono a full bleed (sin padding, object-fit:cover)
+const BANK_LOGOS = {
+  // ── Wikimedia SVG (vectorial, máxima calidad) ──────────────────────────────
+  'galicia':     { url: wiki('3/31/Logo_Banco_Galicia.svg'),                    bg: '#fff' },
+  'macro':       { url: wiki('c/c3/Logo_Banco_Macro.svg'),                      bg: '#fff' },
+  'bbva':        { url: wiki('9/98/BBVA_logo_2025.svg'),                        bg: '#fff' },
+  'santander':   { url: wiki('b/b8/Banco_Santander_Logotipo.svg'),              bg: '#fff' },
+  'provincia':   { url: wiki('f/f4/Banco_Provincia_%28Bs.As.%2C_2021%29.svg'), bg: '#fff' },
+  'hipotecario': { url: wiki('0/0c/Logo_Banco_Hipotecario.svg'),                bg: '#fff' },
+  'ciudad':      { url: wiki('4/4e/Logo_Banco_Ciudad.svg'),                     bg: '#fff' },
+  'credicoop':   { url: wiki('4/4a/Logo_Banco_Credicoop.svg'),                  bg: '#fff' },
+  'patagonia':   { url: wiki('8/8b/Logo_Banco_Patagonia.svg'),                  bg: '#fff' },
+  'supervielle': { url: wiki('0/0f/Logo_Banco_Supervielle.svg'),                bg: '#fff' },
+  'icbc':        { url: wiki('6/69/ICBC_Argentina.png'),                        bg: '#fff' },
+  'nacion':      { url: wiki('2/20/Logo_Banco_de_la_Nacion_Argentina.svg'),     bg: '#fff' },
+
+  // ── Sitios oficiales ───────────────────────────────────────────────────────
+  'meridian':    { url: 'https://www.bancomeridian.com/img/logo.png',                                  bg: '#fff' },
+  'masventas':   { url: 'https://www.vectorlogo.es/wp-content/uploads/2021/04/logo-vector-banco-masventas.jpg', bg: '#fff' },
+  'mariva':      { url: 'https://www.mariva.com.ar/sites/all/themes/mariva/images/mariva_act.png',     bg: '#fff' },
+  'bica':        { url: 'https://www.bancobica.com.ar/images/logo-white.png',                          bg: '#0c1f3f' }, // logo blanco
+  'bibank':      { url: 'https://bibank.com.ar/wp-content/uploads/2023/10/Logo-blanco.webp',           bg: '#0c1f3f' }, // logo blanco
+
+  // ── Google Play icons (bancos sin logo web accesible, full bleed) ─────────
+  'reba':        { url: gplay('BhdcdU2uUP8UTAne1HYqDIxTasQVJkJW8k8DckwkqHecnVfnm4K_lIIlPOVQRWOsj2M'), bg: 'transparent', full: true },
+  'sol':         { url: gplay('HPKsZxDXWaXkFRUjDy2V6K57VDAkhl0PEuxG0bse01Vj0_Dl-HZqjAQN7CqnSeuaQdzG'), bg: 'transparent', full: true },
+  'cmf':         { url: gplay('N35vbjiC8tWpOqW6bi50invKb_B1k2qI5CkguRcgqiL6g2Ejb82zIqtU4e6Zcb1pH2E'),  bg: 'transparent', full: true },
+
+  // ── Billeteras virtuales (billeterasvirtuales.com.ar) ──────────────────────
+  'fiwind':      { url: bv('fiwind'),      bg: '#fff' },
+  'carrefour':   { url: bv('carrefour'),   bg: '#fff' },
+  'ualá':        { url: bv('uala'),        bg: '#fff' },
+  'ual':         { url: bv('uala'),        bg: '#fff' },
+  'brubank':     { url: bv('brubank'),     bg: '#fff' },
+  'cocos pay':   { url: bv('cocospay'),    bg: '#fff' },
+  'cocos cap':   { url: gplay('b5jAawm636pmjPudBifu_jxGomx4xfOG7P7cKuJpJF8nnHw_86y6adH0pUp1ZZe_Jsw'), bg: 'transparent', full: true },
+  'naranja':     { url: bv('naranja'),     bg: '#fff' },
+  'mercado':     { url: bv('mercadopago'), bg: '#fff' },
+  'personal':    { url: bv('personal'),    bg: '#fff' },
+  'prex':        { url: bv('prex'),        bg: '#fff' },
+  'taca':        { url: bv('tacataca'),    bg: '#fff' },
+  'claro':       { url: bv('claro'),       bg: '#fff' },
+  'astro':       { url: bv('astropay'),    bg: '#fff' },
+  'cenco':       { url: bv('centcopay'),   bg: '#fff' },
+  'lemon':       { url: bv('lemoncash'),   bg: '#fff' },
+  "let's":       { url: bv('letsbit'),     bg: '#fff' },
+
+  // ── Brokers ──────────────────────────────────────────────────────────────
+  'veta':        { url: gfav('vetacap.com.ar'),          bg: '#fff' },
+  'eco valor':   { url: gfav('ecovalores.com.ar'),       bg: '#fff' },
+  'iol':         { url: 'https://iolwebsite.cdn.prismic.io/iolwebsite/Zy0i7K8jQArT0jBt_IOLinvertironline_logo.svg', bg: '#fff' },
+  'balanz':      { url: gfav('balanz.com'),               bg: '#fff' },
+  'bull market': { url: gfav('bullmarketbrokers.com'),    bg: '#fff' },
+  'ppi':         { url: gfav('ppi.com.ar'),               bg: '#fff' },
+  'rava':        { url: gfav('rava.com'),                 bg: '#fff' },
+};
+
+const BANK_URLS = {
+  'nacion':      'https://www.bna.com.ar',
+  'galicia':     'https://www.galicia.com.ar',
+  'bbva':        'https://www.bbva.com.ar',
+  'santander':   'https://www.santander.com.ar',
+  'macro':       'https://www.macro.com.ar',
+  'provincia':   'https://www.bancoprovincia.com.ar',
+  'hipotecario': 'https://www.hipotecario.com.ar',
+  'ciudad':      'https://www.bancociudad.com.ar',
+  'credicoop':   'https://www.credicoop.com.ar',
+  'patagonia':   'https://www.bancopatagonia.com.ar',
+  'supervielle': 'https://www.supervielle.com.ar',
+  'icbc':        'https://www.icbc.com.ar',
+  'meridian':    'https://www.bancomeridian.com',
+  'masventas':   'https://www.masventas.com.ar',
+  'mariva':      'https://www.mariva.com.ar',
+  'bica':        'https://www.bancobica.com.ar',
+  'bibank':      'https://bibank.com.ar',
+  'reba':        'https://www.reba.com.ar',
+  'sol':         'https://www.bancodelsol.com.ar',
+  'cmf':         'https://www.bancocmf.com.ar',
+  'credito':     'https://www.creditoregional.com.ar',
+};
+function getBankUrl(name) {
+  const k = name.toLowerCase();
+  for (const [kw, url] of Object.entries(BANK_URLS))
+    if (k.includes(kw)) return url;
+  return null;
+}
+
+function getBankLogo(name) {
+  const k = name.toLowerCase();
+  for (const [kw, cfg] of Object.entries(BANK_LOGOS))
+    if (k.includes(kw)) return cfg;
+  return null;
+}
+
+/* Renderiza avatar: logo real si existe, iniciales coloreadas como fallback */
+function bankAvatar(name) {
+  const cfg      = getBankLogo(name);
+  const initials = getInitials(name);
+  const color    = getBankColor(name);
+
+  if (cfg) {
+    // full:true → íconos de app (full bleed, sin padding, object-fit:cover)
+    const extraStyle = cfg.full
+      ? 'padding:0;box-shadow:none;'
+      : '';
+    const imgStyle = cfg.full
+      ? 'width:100%;height:100%;object-fit:cover;'
+      : '';
+    return `<div class="avatar has-logo" style="background:${cfg.bg};${extraStyle}" data-ini="${initials}" data-col="${color}">
+      <img src="${cfg.url}" alt="${initials}" style="${imgStyle}"
+           onerror="var p=this.parentElement;p.classList.remove('has-logo');p.style.background=p.dataset.col;p.textContent=p.dataset.ini;"/>
+    </div>`;
+  }
+  return `<div class="avatar" style="background:${color}">${initials}</div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   BILLETERAS VIRTUALES
+════════════════════════════════════════════════════════ */
+const BILLETERAS_DATA = [
+  { name: 'Fiwind',          tna: 27.00, url: 'https://www.fiwind.com.ar',          limit: '$750 k' },
+  { name: 'Carrefour Banco', tna: 22.00, url: 'https://www.carrefourbanco.com.ar' },
+  { name: 'Banco Bica',      tna: 22.00, url: 'https://www.bancobica.com.ar' },
+  { name: 'Ualá',            tna: 20.00, url: 'https://www.uala.com.ar',            limit: '$1 M' },
+  { name: 'Brubank',         tna: 19.00, url: 'https://www.brubank.com.ar' },
+  { name: 'Cocos Pay',       tna: 18.98, url: 'https://www.cocos.com.ar' },
+  { name: 'Naranja X',       tna: 18.00, url: 'https://www.naranjax.com',           limit: '$1 M' },
+  { name: 'Mercado Pago',    tna: 17.89, url: 'https://www.mercadopago.com.ar' },
+  { name: 'Personal Pay',    tna: 17.89, url: 'https://www.personalpay.com.ar' },
+  { name: 'Prex',            tna: 17.89, url: 'https://www.prexcard.com.ar' },
+  { name: 'Supervielle',     tna: 17.89, url: 'https://www.supervielle.com.ar' },
+  { name: 'Taca Taca',       tna: 17.52, url: 'https://www.tacataca.com.ar' },
+  { name: 'Claro Pay',       tna: 17.16, url: 'https://www.claropay.com.ar' },
+  { name: 'AstroPay',        tna: 17.16, url: 'https://www.astropay.com' },
+  { name: 'Lemon Cash',      tna: 17.10, url: 'https://www.lemon.me' },
+  { name: "Let'sBit",        tna: 16.79, url: 'https://www.letsbit.io' },
+  { name: 'Banco Galicia',   tna: 16.58, url: 'https://www.galicia.com.ar' },
+];
+
+function renderBilleteras() {
+  const el = document.getElementById('billeteras-list');
+  el.innerHTML = BILLETERAS_DATA.map(({ name, tna, url, limit }, i) => `
+    <div class="wallet-item" onclick="navOrClose('${url}')">
+      ${rankBadge(i)}
+      ${bankAvatar(name)}
+      <div class="wallet-info">
+        <div class="wallet-name">${name}</div>
+        ${limit ? `<span class="limit-badge">Límite: ${limit}</span>` : ''}
+      </div>
+      <div class="wallet-rate">
+        <div class="wallet-rate-num">
+          ${tna.toFixed(2).replace('.', ',')}%
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+          </svg>
+        </div>
+        <div class="wallet-rate-tag">TNA</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════════
+   PLAZOS FIJOS — datos fallback (mayo 2026, TNA, fuente BCRA vía medios)
+════════════════════════════════════════════════════════ */
+const PF_FALLBACK = [
+  ['Banco Masventas',                     24.00],
+  ['Banco Voii',                          24.00],
+  ['Crédito Regional',                     24.00],
+  ['Banco Meridian',                      24.00],
+  ['Banco CMF',                           23.00],
+  ['Banco Bica',                          23.00],
+  ['Banco del Sol',                       22.00],
+  ['Reba',                                 22.00],
+  ['Banco Mariva',                        21.00],
+  ['Bibank',                              21.00],
+  ['Bancor',                              21.00],
+  ['Banco Dino',                          20.00],
+  ['Banco Julio',                         20.00],
+  ['Banco Provincia',                      20.00],
+  ['Banco de Comercio',                   19.00],
+  ['Banco de Formosa',                    19.00],
+  ['Ualá',                                19.00],
+  ['BBVA Argentina',                      19.00],
+  ['Banco del Chubut',                    19.00],
+  ['Banco Galicia',                       18.00],
+  ['Banco Macro',                         18.00],
+  ['Banco Comafi',                        18.00],
+  ['Banco Hipotecario',                   18.00],
+  ['Banco Nación',                        18.00],
+  ['ICBC Argentina',                      18.00],
+  ['Banco Credicoop',                     18.00],
+  ['Banco Ciudad',                        17.00],
+  ['Banco Patagonia',                     16.00],
+  ['Banco Santander',                     15.00],
+];
+
+/* Whitelist: solo estos bancos se muestran también al traer datos en vivo del BCRA */
+const PF_WHITELIST = [
+  'masventas','voii','regional','meridian','cmf','bica',
+  'del sol','reba','mariva','tierra del fuego','bibank','bancor',
+  'dino','julio','provincia','comercio','formosa','uala','bbva',
+  'chubut','galicia','macro','comafi','hipotecario','naci','icbc',
+  'credicoop','ciudad','patagonia','santander'
+];
+
+const AD_URL = 'https://api.argentinadatos.com/v1/finanzas/tasas/plazoFijo';
+const PF_EXCLUDE = ['tierra del fuego', 'córdoba', 'cordoba'];
+let plazosLoaded = false;
+
+/* Fetch con timeout */
+function fetchTimeout(url, ms) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal })
+    .then(r  => { clearTimeout(tid); return r; })
+    .catch(e => { clearTimeout(tid); throw e; });
+}
+
+/* ── loadPlazos: muestra fallback INMEDIATAMENTE, luego actualiza con API ── */
+function loadPlazos() {
+  setBadge('cached', 'TNA en pesos');
+  updateSummaryCard(PF_FALLBACK);
+  renderPlazos(PF_FALLBACK);
+  plazosLoaded = true;
+  refreshFromArgentinaDatos();
+}
+
+/* ── Actualiza con ArgentinaDatos (JSON limpio, CORS nativo, sin proxies) ── */
+async function refreshFromArgentinaDatos() {
+  try {
+    const res  = await fetchTimeout(AD_URL, 8000);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+
+    const result = data
+      .filter(b => b.tnaClientes > 0)
+      .filter(b => PF_WHITELIST.some(kw => b.entidad.toLowerCase().includes(kw)))
+      .filter(b => !PF_EXCLUDE.some(ex => b.entidad.toLowerCase().includes(ex)))
+      .map(b => [b.entidad, +( b.tnaClientes * 100).toFixed(2)])
+      .sort((a, b) => b[1] - a[1]);
+
+    if (result.length > 0) {
+      setBadge('live', 'TNA en pesos');
+      updateSummaryCard(result);
+      renderPlazos(result);
+      console.info('[FinanzasNT] Plazos fijos actualizados desde ArgentinaDatos');
+    }
+  } catch (_) {
+    console.info('[FinanzasNT] ArgentinaDatos no disponible — mostrando datos locales');
+  }
+}
+
+/* ─── Actualizar tarjeta resumen en Billeteras ─── */
+function updateSummaryCard(data) {
+  const lookup = (kw) => {
+    for (const [n, v] of data) {
+      if (n.toLowerCase().includes(kw))
+        return (typeof v === 'number' ? v : v).toFixed(2).replace('.',',') + '%';
+    }
+    return '—';
+  };
+  const set = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  set('pf-nacion',  lookup('nacion'));
+  set('pf-macro',   lookup('macro'));
+  set('pf-galicia', lookup('galicia'));
+}
+
+/* ─── Render lista ─── */
+function renderPlazos(data) {
+  const el = document.getElementById('plazos-list');
+  if (!data.length) {
+    el.innerHTML = '<div class="info-state"><p>Sin datos disponibles.</p><button class="retry-btn" onclick="retryPlazos()">Reintentar</button></div>';
+    return;
+  }
+  el.innerHTML = data.map(([name, rate], i) => {
+    const url = getBankUrl(name);
+    return `
+    <div class="wallet-item" onclick="navOrClose(${url ? `'${url}'` : 'null'})">
+      ${rankBadge(i)}
+      ${bankAvatar(name)}
+      <div class="wallet-info">
+        <div class="wallet-name">${cleanName(name)}</div>
+      </div>
+      <div class="wallet-rate">
+        <div class="wallet-rate-num">
+          ${Number(rate).toFixed(2).replace('.',',')}%
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+          </svg>
+        </div>
+        <div class="wallet-rate-tag">TNA</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── UI helpers ─── */
+function showLoading() {
+  document.getElementById('plazos-list').innerHTML =
+    '<div class="loading-state"><div class="spinner"></div><p>Consultando BCRA…</p></div>';
+}
+
+function setBadge(state, text) {
+  // badge eliminado del HTML — función vacía para no romper el flujo
+}
+
+function retryPlazos() {
+  plazosLoaded = false;
+  loadPlazos();
+}
+
+/* ════════════════════════════════════════════════════════
+   DÓLAR — dolarapi.com (gratuita, CORS habilitado)
+════════════════════════════════════════════════════════ */
+
+/* Configuración visual por tipo de dólar */
+const DOLAR_CONFIG = {
+  blue:            { label: 'Dólar Blue',       desc: 'Mercado informal',           color: 'linear-gradient(135deg,#1a3d6e,#2a5ea8)', icon: 'BL' },
+  oficial:         { label: 'Dólar Oficial',    desc: 'Banco Central · regulado',   color: 'linear-gradient(135deg,#1a5a28,#277a38)', icon: 'OF' },
+  tarjeta:         { label: 'Dólar Tarjeta',    desc: 'Con impuesto PAÍS',          color: 'linear-gradient(135deg,#7a3510,#b05020)', icon: 'TC' },
+  bolsa:           { label: 'Dólar MEP',         desc: 'Mercado bursátil',           color: 'linear-gradient(135deg,#4a2d7a,#6b40b0)', icon: 'MEP' },
+  contadoconliqui: { label: 'Dólar CCL',         desc: 'Contado con liquidación',    color: 'linear-gradient(135deg,#2a1a6e,#4030a0)', icon: 'CCL' },
+  mayorista:       { label: 'Dólar Mayorista',  desc: 'Interbancario',              color: 'linear-gradient(135deg,#1a3050,#2a5080)', icon: 'MY' },
+  cripto:          { label: 'Dólar Cripto',     desc: 'USDT · Exchange',            color: 'linear-gradient(135deg,#5a4010,#8a6820)', icon: 'CR' },
+};
+const DOLAR_ORDER = ['blue','oficial','bolsa','contadoconliqui','cripto','tarjeta'];
+
+let dolarLoaded = false;
+
+/* Carga inmediata con spinner, luego fetcha en paralelo */
+function loadDolar() {
+  dolarLoaded = true;
+  fetchDolar();
+}
+
+async function fetchDolar() {
+  /* dolarapi.com — CORS habilitado, sin registro */
+  const PRIMARY  = 'https://dolarapi.com/v1/dolares';
+  /* bluelytics como segundo intento */
+  const FALLBACK = 'https://api.bluelytics.com.ar/v2/latest';
+
+  const attempts = [
+    /* Intento 1: dolarapi.com */
+    async () => {
+      const r = await fetchTimeout(PRIMARY, 6000);
+      if (!r.ok) throw Error(r.status);
+      const arr = await r.json();
+      return normalizeDolarApi(arr);
+    },
+    /* Intento 2: bluelytics */
+    async () => {
+      const r = await fetchTimeout(FALLBACK, 6000);
+      if (!r.ok) throw Error(r.status);
+      const j = await r.json();
+      return normalizeBluelytics(j);
+    },
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      const data = await attempt();
+      if (data && data.length) {
+        renderDolar(data, true);
+        return;
+      }
+    } catch (e) {
+      console.warn('[FinanzasNT] dolar API failed:', e.message);
+    }
+  }
+
+  /* Si ambas fallan: mostrar error con retry */
+  showDolarError();
+}
+
+/* Normalizar respuesta de dolarapi.com */
+function normalizeDolarApi(arr) {
+  return DOLAR_ORDER
+    .map(casa => {
+      const d = arr.find(x => x.casa === casa);
+      if (!d) return null;
+      return { casa, compra: d.compra, venta: d.venta };
+    })
+    .filter(Boolean);
+}
+
+/* Normalizar respuesta de bluelytics.com.ar */
+function normalizeBluelytics(j) {
+  const map = {
+    oficial: { compra: j.oficial?.value_buy,  venta: j.oficial?.value_sell  },
+    blue:    { compra: j.blue?.value_buy,     venta: j.blue?.value_sell     },
+  };
+  return DOLAR_ORDER
+    .map(casa => {
+      const d = map[casa];
+      if (!d || !d.venta) return null;
+      return { casa, compra: d.compra, venta: d.venta, fecha: j.last_update };
+    })
+    .filter(Boolean);
+}
+
+/* Formatear precio en pesos argentinos */
+function fmtARS(n) {
+  if (!n && n !== 0) return '—';
+  return '$' + Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+}
+
+/* Render lista de dólares */
+function renderDolar(data, isLive) {
+
+
+  /* Actualizar también la tarjeta resumen en Billeteras */
+  const findVenta = (casa) => {
+    const d = data.find(x => x.casa === casa);
+    return d ? fmtARS(d.venta) : '—';
+  };
+  const setEl = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  setEl('sum-dolar-oficial',  findVenta('oficial'));
+  setEl('sum-dolar-blue',     findVenta('blue'));
+  setEl('sum-dolar-tarjeta',  findVenta('tarjeta'));
+
+  /* Lista */
+  const el = document.getElementById('dolar-list');
+  el.innerHTML = data.map(({ casa, compra, venta }) => {
+    const cfg = DOLAR_CONFIG[casa] || { label: casa };
+    return `
+      <div class="dollar-item" id="ditem-${casa}" onclick="toggleDolarChart('${casa}')" style="flex-wrap:wrap;">
+        <div class="dollar-name-wrap">
+          <span class="dollar-name">${cfg.label}</span>
+        </div>
+        <div class="dollar-col">
+          <span class="dollar-col-label">Compra</span>
+          <span class="dollar-price-compra">${fmtARS(compra)}</span>
+        </div>
+        <div class="dollar-sep"></div>
+        <div class="dollar-col">
+          <span class="dollar-col-label">Venta</span>
+          <span class="dollar-price-venta">${fmtARS(venta)}</span>
+        </div>
+        <div class="dollar-chevron">▾</div>
+      </div>
+      <div class="dolar-chart" id="chart-${casa}"></div>`;
+  }).join('');
+}
+
+function showDolarError() {
+  document.getElementById('dolar-list').innerHTML = `
+    <div class="info-state">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>No se pudo conectar<br>con la API de cotizaciones.</p>
+      <button class="retry-btn" onclick="retryDolar()">Reintentar</button>
+    </div>`;
+}
+
+function retryDolar() {
+  document.getElementById('dolar-list').innerHTML =
+    '<div class="loading-state"><div class="spinner"></div><p>Cargando cotizaciones…</p></div>';
+  fetchDolar();
+}
+
+/* ════════════════════════════════════════════════════════
+   GRÁFICO HISTÓRICO DÓLAR
+════════════════════════════════════════════════════════ */
+const DOLAR_HISTORY_SLUGS = {
+  blue:            'blue',
+  oficial:         'oficial',
+  bolsa:           'bolsa',
+  contadoconliqui: 'contadoconliqui',
+  cripto:          'cripto',
+  tarjeta:         'tarjeta',
+};
+
+const historyCache = {};
+
+async function toggleDolarChart(casa) {
+  const chartDiv = document.getElementById(`chart-${casa}`);
+  const itemDiv  = document.getElementById(`ditem-${casa}`);
+  if (!chartDiv || !itemDiv) return;
+
+  const isOpen = chartDiv.classList.contains('open');
+
+  // Cerrar todos los otros gráficos
+  document.querySelectorAll('.dolar-chart.open').forEach(c => c.classList.remove('open'));
+  document.querySelectorAll('.dollar-item.chart-open').forEach(i => i.classList.remove('chart-open'));
+
+  if (isOpen) return; // era el mismo → solo cerrar
+
+  // Abrir este
+  itemDiv.classList.add('chart-open');
+  chartDiv.classList.add('open');
+  chartDiv.innerHTML = '<div class="chart-loading">Cargando historial…</div>';
+
+  try {
+    const data = await fetchDolarHistory(casa);
+    if (!data || data.length < 5) {
+      chartDiv.innerHTML = '<div class="chart-empty">Sin historial disponible</div>';
+      return;
+    }
+    chartDiv.innerHTML = buildSparkline(data, casa);
+  } catch (_) {
+    chartDiv.innerHTML = '<div class="chart-empty">Sin historial disponible</div>';
+  }
+}
+
+async function fetchDolarHistory(casa) {
+  if (historyCache[casa]) return historyCache[casa];
+
+  const slug = DOLAR_HISTORY_SLUGS[casa];
+  if (!slug) return null;
+
+  const r = await fetchTimeout(
+    `https://api.argentinadatos.com/v1/cotizaciones/dolares/${slug}`, 8000
+  );
+  if (!r.ok) throw new Error(r.status);
+  const raw = await r.json();
+
+  // Últimos 90 días, solo registros con venta válida
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 90);
+  const filtered = raw
+    .filter(d => d.venta > 0 && new Date(d.fecha + 'T00:00:00') >= cutoff)
+    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+  historyCache[casa] = filtered;
+  return filtered;
+}
+
+function buildSparkline(data, casa) {
+  const W = 400, H = 72;
+  const pad = { l: 4, r: 4, t: 8, b: 4 };
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+
+  const prices = data.map(d => d.venta);
+  const minP = Math.min(...prices);
+  const maxP = Math.max(...prices);
+  const range = maxP - minP || 1;
+
+  const px = i => pad.l + (i / (data.length - 1)) * cw;
+  const py = p => pad.t + ch - ((p - minP) / range) * ch;
+
+  const linePoints = data.map((d, i) => `${px(i).toFixed(1)},${py(d.venta).toFixed(1)}`).join(' ');
+  const areaPoints =
+    `${px(0).toFixed(1)},${H} ` +
+    linePoints +
+    ` ${px(data.length - 1).toFixed(1)},${H}`;
+
+  const last  = data[data.length - 1];
+  const first = data[0];
+  const pct   = ((last.venta - first.venta) / first.venta) * 100;
+  // En Argentina subida del dólar = señal de alerta (rojo), bajada = verde
+  const changeColor = pct >= 0 ? '#ff7a7a' : '#00e8a0';
+  const changeStr   = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+
+  const fmt = d => new Date(d.fecha + 'T00:00:00')
+    .toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+
+  const gradId = `cg-${casa}`;
+
+  return `
+    <div class="chart-meta">
+      <span class="chart-range">${fmt(first)} — ${fmt(last)}</span>
+      <span class="chart-change" style="color:${changeColor}">${changeStr} 90d</span>
+    </div>
+    <svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#00e8ff" stop-opacity="0.20"/>
+          <stop offset="100%" stop-color="#00e8ff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${areaPoints}" fill="url(#${gradId})"/>
+      <polyline points="${linePoints}" fill="none" stroke="#00e8ff" stroke-width="1.8"
+                stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- Punto final -->
+      <circle cx="${px(data.length-1).toFixed(1)}" cy="${py(last.venta).toFixed(1)}"
+              r="3" fill="#00e8ff"/>
+    </svg>
+    <div class="chart-labels">
+      <span>mín $${fmtInt(minP)}</span>
+      <span style="color:var(--accent-text);font-weight:700">$${fmtInt(last.venta)}</span>
+      <span>máx $${fmtInt(maxP)}</span>
+    </div>`;
+}
+
+function fmtInt(n) {
+  return Math.round(n).toLocaleString('es-AR');
+}
+
+/* ════════════════════════════════════════════════════════
+   CALCULADORA FLOTANTE
+════════════════════════════════════════════════════════ */
+function toggleCalc() {
+  const brokerOpen = document.getElementById('brokerOverlay').classList.contains('open');
+  const panel  = document.getElementById(brokerOpen ? 'calcBrokerPanel' : 'calcPanel');
+  const other  = document.getElementById(brokerOpen ? 'calcPanel' : 'calcBrokerPanel');
+  other.classList.remove('open');
+  panel.classList.toggle('open');
+  // Backdrop: visible cuando alguna calc está abierta
+  const anyOpen = panel.classList.contains('open');
+  document.getElementById('calcBackdrop').classList.toggle('open', anyOpen);
+}
+
+/* Cierra cualquier calc abierta y oculta el backdrop */
+function closeCalc() {
+  document.getElementById('calcPanel').classList.remove('open');
+  document.getElementById('calcBrokerPanel').classList.remove('open');
+  document.getElementById('calcBackdrop').classList.remove('open');
+}
+
+/* navOrClose ya no es necesario pero se conserva por si acaso */
+function navOrClose(url) {
+  if (url) window.open(url, '_blank');
+}
+
+/* ════════════════════════════════════════════════════════
+   BROKERS
+════════════════════════════════════════════════════════ */
+const BROKERS_DATA = [
+  { name: 'Veta Cap',      pct: 0.15, url: 'https://vetacap.com.ar' },
+  { name: 'Eco Valores',   pct: 0.33, url: 'https://ecovalores.com.ar' },
+  { name: 'Cocos Capital', pct: 0.45, url: 'https://cocos.com.ar' },
+  { name: 'IOL',           pct: 0.50, url: 'https://invertironline.com' },
+  { name: 'Balanz',        pct: 0.50, url: 'https://balanz.com' },
+  { name: 'Bull Market',   pct: 0.50, url: 'https://bullmarketbrokers.com' },
+  { name: 'PPI',           pct: 0.60, url: 'https://ppi.com.ar' },
+  { name: 'Rava Bursátil', pct: 0.80, url: 'https://rava.com' },
+];
+
+/* ─── Banderita de ranking compartida ─── */
+const RIBBON_COLORS = [
+  'linear-gradient(170deg, #3d2400 0%, #7a4e00 18%, #b07800 36%, #d4a020 50%, #b07800 64%, #6a3e00 82%, #3d2400 100%)',
+  'linear-gradient(170deg, #1e1e1e 0%, #5a5a5a 20%, #b0b0b0 42%, #d8d8d8 52%, #b0b0b0 62%, #5a5a5a 80%, #1e1e1e 100%)',
+  'linear-gradient(170deg, #2e1200 0%, #5c2e0a 22%, #8a4a18 42%, #9e5820 52%, #7a3e10 72%, #3a1800 100%)',
+];
+function rankBadge(i) {
+  if (i < 3) return `<div class="broker-ribbon" style="background:${RIBBON_COLORS[i]}">${i+1}</div>`;
+  return `<span class="rank">${i + 1}</span>`;
+}
+
+function brokerBarColor(pct) {
+  if (pct <= 0.20) return '#00e8a0';
+  if (pct <= 0.45) return '#00e8ff';
+  if (pct <= 0.55) return '#f0c060';
+  return '#ff7070';
+}
+
+function renderBrokers() {
+  const maxPct = Math.max(...BROKERS_DATA.map(b => b.pct));
+  const el = document.getElementById('brokers-list');
+  el.innerHTML = BROKERS_DATA.map((b, i) => {
+    const barW  = Math.round((b.pct / maxPct) * 100);
+    const color = brokerBarColor(b.pct);
+    return `
+    <div class="broker-item" onclick="navOrClose('${b.url}')">
+      ${rankBadge(i)}
+      ${bankAvatar(b.name)}
+      <div class="broker-info">
+        <div class="broker-name">${b.name}</div>
+      </div>
+      <div class="broker-pct-col">
+        <div class="broker-pct-badge" style="color:${color};border-color:${color}" title="Calcular comisión" onclick="event.stopPropagation();useBrokerInCalc(${b.pct})">${b.pct.toFixed(2).replace('.',',')}%</div>
+        <div class="broker-pct-sub">calcular</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openBrokers() {
+  closeMenu();
+  closeCalc();
+  document.getElementById('brokerOverlay').classList.add('open');
+  renderBrokers();
+}
+
+function closeBrokers() {
+  document.getElementById('brokerOverlay').classList.remove('open');
+  document.getElementById('calcBrokerPanel').classList.remove('open');
+}
+
+/* ─── Menú hamburguesa ─── */
+function toggleMenu(e) {
+  e.stopPropagation();
+  document.getElementById('menuDropdown').classList.toggle('open');
+}
+
+function closeMenu() {
+  document.getElementById('menuDropdown').classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  const btn    = document.getElementById('calcBtn');
+  const bubble = document.getElementById('calcBubble');
+  ['calcPanel', 'calcBrokerPanel'].forEach(id => {
+    const p = document.getElementById(id);
+    if (p.classList.contains('open') && !p.contains(e.target) && !btn.contains(e.target))
+      p.classList.remove('open');
+  });
+  // Cerrar bubble si se toca afuera
+  if (bubble.classList.contains('show') && !bubble.contains(e.target) && !btn.contains(e.target))
+    bubble.classList.remove('show');
+  // Cerrar menú si se toca afuera
+  const menu    = document.getElementById('menuDropdown');
+  const menuBtn = document.querySelector('.menu-btn');
+  if (menu.classList.contains('open') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+
+function fmtMontoInput(input) {
+  const raw = input.value.replace(/\D/g, '');
+  input.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+  calcular();
+}
+
+function calcular() {
+  const raw   = document.getElementById('calcMonto').value.replace(/\./g, '');
+  const monto = parseFloat(raw);
+  const tna   = parseFloat(document.getElementById('calcTasa').value);
+  const el    = document.getElementById('calcResults');
+
+  if (!monto || !tna || monto <= 0 || tna <= 0) {
+    el.innerHTML = '<p class="calc-placeholder">Completá los campos para ver tu rendimiento</p>';
+    return;
+  }
+
+  const tasaDiaria = tna / 100 / 365;
+  const diario     = monto * tasaDiaria;
+  const mensual    = monto * (Math.pow(1 + tasaDiaria, 30) - 1);
+  const anual      = monto * (Math.pow(1 + tasaDiaria, 365) - 1);
+  const capitalFin = monto + anual;
+
+  el.innerHTML = `
+    <div class="calc-divider"></div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">Rendimiento diario</span>
+      <span class="calc-result-val">${fmtARS(diario.toFixed(2))}</span>
+    </div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">Rendimiento mensual</span>
+      <span class="calc-result-val">${fmtARS(mensual.toFixed(2))}</span>
+    </div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">Ganancia en 12 meses</span>
+      <span class="calc-result-val">${fmtARS(anual.toFixed(2))}</span>
+    </div>
+    <div class="calc-divider"></div>
+    <div class="calc-result-row main">
+      <span class="calc-result-label">Tu capital en 1 mes</span>
+      <span class="calc-result-val">${fmtARS((monto + mensual).toFixed(2))}</span>
+    </div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   CALCULADORA DE COMISIONES (BROKERS)
+════════════════════════════════════════════════════════ */
+const MERCADO_FEE = 500; // Derecho de mercado BYMA (fijo)
+
+function fmtBrokerMontoInput(input) {
+  const raw = input.value.replace(/\D/g, '');
+  input.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+  calcularBroker();
+}
+
+function fmtBrokerPctInput(input) {
+  // Solo dígitos; los últimos 2 son decimales: "015" → "0,15"
+  const digits = input.value.replace(/\D/g, '');
+  if (!digits || parseInt(digits, 10) === 0) {
+    input.value = '';
+    calcularBroker();
+    return;
+  }
+  const num = Math.min(parseInt(digits, 10), 999); // tope 9,99%
+  input.value = (num / 100).toFixed(2).replace('.', ',');
+  calcularBroker();
+}
+
+function calcularBroker() {
+  const rawMonto = document.getElementById('calcBrokerMonto').value.replace(/\./g, '');
+  const monto    = parseFloat(rawMonto);
+  const pct      = parseFloat(document.getElementById('calcBrokerPct').value.replace(',', '.'));
+  const el       = document.getElementById('calcBrokerResults');
+
+  if (!monto || !pct || monto <= 0 || pct <= 0) {
+    el.innerHTML = '<p class="calc-placeholder">Completá los campos para calcular</p>';
+    return;
+  }
+
+  const comision = monto * (pct / 100);
+  const mercado  = MERCADO_FEE;
+  const iva      = (comision + mercado) * 0.21;
+  const total    = comision + mercado + iva;
+  const pctFmt   = pct.toFixed(2).replace('.', ',');
+
+  el.innerHTML = `
+    <div class="calc-divider"></div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">Comisión (${pctFmt}%)</span>
+      <span class="calc-result-val">${fmtARS(comision.toFixed(2))}</span>
+    </div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">Der. mercado (BYMA)</span>
+      <span class="calc-result-val">${fmtARS(mercado.toFixed(2))}</span>
+    </div>
+    <div class="calc-result-row">
+      <span class="calc-result-label">IVA (21%)</span>
+      <span class="calc-result-val">${fmtARS(iva.toFixed(2))}</span>
+    </div>
+    <div class="calc-divider"></div>
+    <div class="calc-result-row main">
+      <span class="calc-result-label">Total en costos</span>
+      <span class="calc-result-val">${fmtARS(total.toFixed(2))}</span>
+    </div>`;
+}
+
+function useBrokerInCalc(pct) {
+  document.getElementById('calcBrokerPanel').classList.add('open');
+  document.getElementById('calcPanel').classList.remove('open');
+  document.getElementById('calcBackdrop').classList.add('open');
+  // Formatear con coma: 0.15 → "0,15"
+  document.getElementById('calcBrokerPct').value = pct.toFixed(2).replace('.', ',');
+  calcularBroker();
+}
+
+/* ════════════════════════════════════════════════════════
+   SPEECH BUBBLE — hint de la calculadora
+════════════════════════════════════════════════════════ */
+function showCalcBubble() {
+  // No mostrar si la calc ya está abierta
+  if (document.getElementById('calcPanel').classList.contains('open'))       return;
+  if (document.getElementById('calcBrokerPanel').classList.contains('open')) return;
+
+  const isBroker = document.getElementById('brokerOverlay').classList.contains('open');
+  const b = document.getElementById('calcBubble');
+  b.textContent = isBroker ? '🧮 Calculá tu comisión' : '🧮 Calculá tu ganancia';
+  b.onclick = () => { toggleCalc(); b.classList.remove('show'); };
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 4000);
+}
+
+// Primera aparición a los 3 segundos, luego cada 50 segundos
+setTimeout(() => { showCalcBubble(); setInterval(showCalcBubble, 50000); }, 3000);
+
+/* ════════════════════════════════════════════════════════
+   FAQ ACORDEÓN
+════════════════════════════════════════════════════════ */
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  item.classList.toggle('open');
+}
+
+/* ════════════════════════════════════════════════════════
+   MODALES
+════════════════════════════════════════════════════════ */
+const MODAL_CONTENT = {
+  disclaimer: {
+    heading: 'Disclaimer financiero',
+    body: `
+      <p>La información presentada en esta app es exclusivamente orientativa y no constituye asesoramiento financiero, legal ni impositivo.</p>
+      <p>Las tasas mostradas pueden variar sin previo aviso. Siempre verificá los datos directamente con la entidad antes de tomar decisiones de inversión.</p>
+      <p>Invertir implica riesgos. Los rendimientos pasados no garantizan resultados futuros. El capital invertido puede disminuir de valor.</p>
+      <p>Tasita no es una entidad financiera regulada y no se responsabiliza por pérdidas derivadas del uso de esta información.</p>
+    `
+  },
+  privacy: {
+    heading: 'Política de privacidad',
+    body: `
+      <p>Tasita no recopila, almacena ni comparte datos personales de sus usuarios. La app funciona completamente en tu dispositivo.</p>
+      <p>Las cotizaciones y tasas se obtienen de APIs públicas de terceros (dolarapi.com, argentinadatos.com). No tenemos acceso a los datos que esas APIs registran.</p>
+      <p>No utilizamos cookies de seguimiento ni herramientas de analítica que identifiquen usuarios individuales.</p>
+      <p>Esta app puede mostrar publicidad a través de Google AdSense, que utiliza cookies propias según su política de privacidad.</p>
+      <p>Para consultas: <a href="https://www.instagram.com/rodrigogalarza__" target="_blank" style="color:var(--accent-text)">@rodrigogalarza__</a></p>
+    `
+  }
+};
+
+function openModal(type) {
+  const content = MODAL_CONTENT[type];
+  if (!content) return;
+  document.getElementById('modalHeading').textContent = content.heading;
+  document.getElementById('modalBody').innerHTML = content.body;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalBackdrop'))
+    document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function closeModalDirect() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+/* ─── Arranque ─── */
+renderBilleteras();
+/* Precargar tarjeta resumen de Billeteras con datos locales de inmediato */
+updateSummaryCard(PF_FALLBACK);
+/* Actualizar plazos fijos desde ArgentinaDatos en segundo plano */
+refreshFromArgentinaDatos();
+/* Dólar: cargar en segundo plano para que la tarjeta resumen se llene */
+fetchDolar();
+</script>
+</body>
+</html>
