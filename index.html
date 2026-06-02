@@ -1934,12 +1934,14 @@ function closeBrokers() {
 async function openPFUVA() {
   closeMenu();
   closeCalc();
+  hideCalcBtn();
   document.getElementById('pfuvaOverlay').classList.add('open');
   await renderPFUVA();
 }
 
 function closePFUVA() {
   document.getElementById('pfuvaOverlay').classList.remove('open');
+  showCalcBtn();
 }
 
 async function renderPFUVA() {
@@ -2216,17 +2218,28 @@ function closeModalDirect() {
 /* ════════════════════════════════════════════════════════
    INFLACIÓN
 ════════════════════════════════════════════════════════ */
+function hideCalcBtn() {
+  document.getElementById('calcBtn').style.display    = 'none';
+  document.getElementById('calcBubble').style.display = 'none';
+}
+function showCalcBtn() {
+  document.getElementById('calcBtn').style.display    = '';
+  document.getElementById('calcBubble').style.display = '';
+}
+
 const MESES_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 function openInflacion() {
   closeMenu();
   closeCalc();
+  hideCalcBtn();
   document.getElementById('inflacionOverlay').classList.add('open');
   renderInflacion();
 }
 
 function closeInflacion() {
   document.getElementById('inflacionOverlay').classList.remove('open');
+  showCalcBtn();
 }
 
 async function renderInflacion() {
