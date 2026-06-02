@@ -1270,6 +1270,17 @@ const BANK_LOGOS = {
   'bica':        { url: 'https://www.bancobica.com.ar/images/logo-white.png',                          bg: '#0c1f3f' }, // logo blanco
   'bibank':      { url: 'https://bibank.com.ar/wp-content/uploads/2023/10/Logo-blanco.webp',           bg: '#0c1f3f' }, // logo blanco
 
+  // ── Google Favicon 256px (dominios con buen ícono indexado) ──────────────
+  'regional':    { url: gfav('creditoregional.com.ar'),  bg: '#fff' },
+  'voii':        { url: gfav('voii.com.ar'),              bg: '#fff' },
+  'dino':        { url: gfav('bancodino.com'),            bg: '#fff' },
+  'julio':       { url: gfav('bancojulio.com.ar'),        bg: '#fff' },
+  'comercio':    { url: gfav('bancodecomercio.com.ar'),   bg: '#fff' },
+  'formosa':     { url: gfav('bancoformosa.com.ar'),      bg: '#fff' },
+  'chubut':      { url: gfav('bancochubut.com.ar'),       bg: '#fff' },
+  'comafi':      { url: gfav('comafi.com.ar'),            bg: '#fff' },
+  'bancor':      { url: gfav('bancor.com.ar'),            bg: '#fff' },
+
   // ── Google Play icons (bancos sin logo web accesible, full bleed) ─────────
   'reba':        { url: gplay('BhdcdU2uUP8UTAne1HYqDIxTasQVJkJW8k8DckwkqHecnVfnm4K_lIIlPOVQRWOsj2M'), bg: 'transparent', full: true },
   'sol':         { url: gplay('HPKsZxDXWaXkFRUjDy2V6K57VDAkhl0PEuxG0bse01Vj0_Dl-HZqjAQN7CqnSeuaQdzG'), bg: 'transparent', full: true },
@@ -1326,6 +1337,15 @@ const BANK_URLS = {
   'sol':         'https://www.bancodelsol.com.ar',
   'cmf':         'https://www.bancocmf.com.ar',
   'credito':     'https://www.creditoregional.com.ar',
+  'regional':    'https://www.creditoregional.com.ar',
+  'voii':        'https://www.voii.com.ar',
+  'dino':        'https://bancodino.com',
+  'julio':       'https://www.bancojulio.com.ar',
+  'comercio':    'https://www.bancodecomercio.com.ar',
+  'formosa':     'https://www.bancoformosa.com.ar',
+  'chubut':      'https://www.bancochubut.com.ar',
+  'comafi':      'https://www.comafi.com.ar',
+  'bancor':      'https://www.bancor.com.ar',
 };
 function getBankUrl(name) {
   const k = name.toLowerCase();
