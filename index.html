@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tasita</title>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WG3NV7JNE0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-WG3NV7JNE0');
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1142,6 +1150,11 @@
 /* ════════════════════════════════════════════════════════
    TABS
 ════════════════════════════════════════════════════════ */
+function gaEvent(seccion) {
+  if (typeof gtag === 'function')
+    gtag('event', 'ver_seccion', { seccion });
+}
+
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t =>
     t.classList.toggle('active', t.dataset.tab === name));
@@ -1149,6 +1162,7 @@ function switchTab(name) {
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
   if (name === 'dolar'  && !dolarLoaded)  loadDolar();
+  gaEvent(name);
 }
 document.querySelectorAll('.tab').forEach(t =>
   t.addEventListener('click', () => switchTab(t.dataset.tab)));
@@ -1943,6 +1957,7 @@ function openBrokers() {
   closeCalc();
   document.getElementById('brokerOverlay').classList.add('open');
   renderBrokers();
+  gaEvent('brokers');
 }
 
 function closeBrokers() {
@@ -1957,6 +1972,7 @@ async function openPFUVA() {
   hideCalcBtn();
   document.getElementById('pfuvaOverlay').classList.add('open');
   await renderPFUVA();
+  gaEvent('pf_uvas');
 }
 
 function closePFUVA() {
@@ -2255,6 +2271,7 @@ function openInflacion() {
   hideCalcBtn();
   document.getElementById('inflacionOverlay').classList.add('open');
   renderInflacion();
+  gaEvent('inflacion');
 }
 
 function closeInflacion() {
