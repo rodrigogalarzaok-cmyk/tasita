@@ -647,19 +647,20 @@
           </svg>
           Brokers
         </div>
-        <div class="menu-option" onclick="openPFUVA()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-            <polyline points="16 7 22 7 22 13"/>
-          </svg>
-          P.F UVAs
-        </div>
         <div class="menu-option" onclick="openInflacion()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
             <path d="M7 16l4-4 4 4 4-4"/>
           </svg>
           Inflación
+        </div>
+        <div class="menu-option" onclick="openDonacion()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2v4M10 2v4M14 2v4"/>
+            <path d="M4 8h12l-1.5 9A2 2 0 0 1 12.52 19H7.48a2 2 0 0 1-1.98-2L4 8z"/>
+            <path d="M16 10h2a2 2 0 0 1 0 4h-2"/>
+          </svg>
+          Tacita
         </div>
       </div>
     </div>
@@ -920,6 +921,57 @@
           @rodrigogalarzaa
         </a>
       </footer>
+    </div>
+  </div>
+
+  <!-- ══ Tacita overlay ══ -->
+  <div class="broker-overlay" id="donacionOverlay">
+    <div class="broker-inner">
+
+      <div class="header" style="padding-bottom:16px;">
+        <div class="logo">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2v4M10 2v4M14 2v4"/>
+            <path d="M4 8h12l-1.5 9A2 2 0 0 1 12.52 19H7.48a2 2 0 0 1-1.98-2L4 8z"/>
+            <path d="M16 10h2a2 2 0 0 1 0 4h-2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="app-name">Tacita</div>
+          <div class="app-sub" style="font-size:12px;opacity:.55;">Apoyá el proyecto</div>
+        </div>
+        <button class="menu-btn" style="margin-left:auto;" onclick="closeDonacion()">✕</button>
+      </div>
+
+      <div style="text-align:center; padding: 8px 4px 28px;">
+        <p style="font-size:15px; color:var(--text-main); line-height:1.7; margin-bottom:6px;">
+          Tasita es gratuita y seguirá siéndolo.
+        </p>
+        <p style="font-size:13.5px; color:var(--text-sub); line-height:1.75; margin-bottom:6px;">
+          Si alguna vez te ayudó a tomar una mejor decisión financiera,<br>
+          podés colaborar para que el proyecto siga creciendo y mejorando.
+        </p>
+        <p style="font-size:13.5px; color:var(--text-sub); line-height:1.75;">
+          Y si no, está perfecto también.<br>
+          Gracias por usar Tasita. ☕
+        </p>
+      </div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:14px; padding-bottom:28px;">
+        <img src="41.jpg" alt="Tasita" style="width:200px; object-fit:contain; border-radius:16px;"/>
+        <div style="text-align:center; line-height:1.6;">
+          <div style="font-size:11px; color:var(--text-sub); letter-spacing:.06em; text-transform:uppercase;">Alias</div>
+          <div style="display:inline-flex; align-items:center; gap:8px; margin-top:2px;">
+            <span style="font-size:17px; font-weight:600; color:#fff; letter-spacing:.03em;">TASITA.ARG</span>
+            <button id="copyAliasBtn" onclick="copyAlias()" style="background:none; border:none; cursor:pointer; padding:4px; color:var(--text-sub); display:flex; align-items:center;" title="Copiar alias">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2277,6 +2329,31 @@ function openInflacion() {
 function closeInflacion() {
   document.getElementById('inflacionOverlay').classList.remove('open');
   showCalcBtn();
+}
+
+function openDonacion() {
+  closeMenu();
+  closeCalc();
+  hideCalcBtn();
+  document.getElementById('donacionOverlay').classList.add('open');
+  gaEvent('donacion');
+}
+
+function closeDonacion() {
+  document.getElementById('donacionOverlay').classList.remove('open');
+  showCalcBtn();
+}
+
+function copyAlias() {
+  navigator.clipboard.writeText('TASITA.ARG').then(() => {
+    const btn = document.getElementById('copyAliasBtn');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    btn.style.color = '#00e8ff';
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      btn.style.color = '';
+    }, 2000);
+  });
 }
 
 async function renderInflacion() {
