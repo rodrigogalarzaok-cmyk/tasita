@@ -284,6 +284,10 @@
     .menu-option svg { color: var(--accent-text); flex-shrink: 0; }
 
     /* ─── Broker overlay (pantalla completa) ─── */
+    #inflacionOverlay {
+      background: linear-gradient(to bottom, #000810 0%, #070e1a 70%, #001a38 100%);
+    }
+
     .broker-overlay {
       position: fixed; inset: 0;
       background: linear-gradient(to bottom, #000810 0%, #070e1a 60%, #4b88ff 100%);
@@ -904,7 +908,7 @@
         <div style="color:var(--text-sub);font-size:14px;padding:20px 0;">Cargando...</div>
       </div>
 
-      <p class="broker-disclaimer" id="inflacion-disclaimer">Datos publicados por el INDEC · Se actualizan automáticamente</p>
+      <p class="broker-disclaimer" id="inflacion-disclaimer">Datos publicados por el INDEC</p>
 
       <footer class="social-footer">
         <a class="social-link ig" href="https://www.instagram.com/rodrigogalarza__" target="_blank">
@@ -2416,17 +2420,16 @@ async function renderInflacion() {
     const lblIni    = `${MESES_ES[parseInt(fechaIni[1],10)-1]} ${fechaIni[0]}`;
     const lblFin    = `${MESES_ES[parseInt(fechaFin[1],10)-1]} ${fechaFin[0]}`;
 
-    // Lista desde enero 2026 en adelante
-    const desde2026 = mensual.filter(d => d.fecha >= '2026-01-01').reverse();
-    const filas = desde2026.map(d => {
-      const [a, m] = d.fecha.split('-');
-      const nm = `${MESES_ES[parseInt(m,10)-1]} ${a}`;
-      return `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;">
-          <span style="font-size:14px;color:var(--text-main);">${nm}</span>
-          <span style="font-size:16px;font-weight:700;color:var(--accent-text);">${d.valor.toFixed(1)}%</span>
-        </div>`;
-    }).join('');
+    // Construir índice acumulado para la calculadora
+    const sorted = [...mensual].sort((a,b) => a.fecha.localeCompare(b.fecha));
+    let ipcBase = 100;
+    window._ipcIndex = {};
+    sorted.forEach(d => {
+      const key = d.fecha.slice(0,7);
+      ipcBase = ipcBase * (1 + d.valor / 100);
+      window._ipcIndex[key] = ipcBase;
+    });
+    window._ipcKeys = Object.keys(window._ipcIndex).sort();
 
     el.innerHTML = `
       <!-- Tarjetas principales -->
@@ -2446,7 +2449,7 @@ async function renderInflacion() {
       </div>
 
       <!-- Gráfico 12 meses -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 14px;margin-bottom:20px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 14px;margin-bottom:40px;">
         <div style="font-size:12px;color:var(--text-sub);margin-bottom:2px;">Inflación mensual — últimos 12 meses</div>
         ${sparkline}
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-sub);">
@@ -2454,13 +2457,163 @@ async function renderInflacion() {
         </div>
       </div>
 
-      <!-- Últimos 6 meses -->
-      <div style="font-size:13px;font-weight:700;color:var(--text-sub);letter-spacing:.4px;margin-bottom:10px;">INFLACIÓN 2026</div>
-      ${filas}`;
+      <!-- Calculadora IPC -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;text-align:center;">Calculadora de inflación</div>
 
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+          <span style="font-size:16px;color:var(--text-sub);font-weight:700;width:12px;">$</span>
+          <input id="ipc-monto" type="text" inputmode="numeric" placeholder="100.000"
+            style="width:108px;background:rgba(255,255,255,0.06);border:1px solid rgba(0,232,255,0.2);border-radius:8px;color:var(--text-main);font-size:14px;font-weight:600;padding:9px 10px;outline:none;"
+            oninput="fmtIpcMonto(this)">
+          <span style="font-size:12px;color:var(--text-sub);">en</span>
+          <select id="ipc-mes-desde" onchange="calcInflacion()"
+            style="background:#060e1c;border:1px solid rgba(0,232,255,0.2);border-radius:8px;color:var(--text-main);font-size:12px;padding:9px 5px;outline:none;"></select>
+          <span style="font-size:12px;color:var(--text-sub);">de</span>
+          <select id="ipc-anio-desde" onchange="calcInflacion()"
+            style="background:#060e1c;border:1px solid rgba(0,232,255,0.2);border-radius:8px;color:var(--text-main);font-size:12px;padding:9px 5px;outline:none;"></select>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px;margin-bottom:12px;">
+          <span style="font-size:12px;color:var(--text-sub);font-style:italic;">equivale aproximadamente a</span>
+          <button onclick="swapIpcDates()"
+            style="background:rgba(0,232,255,0.1);border:1px solid rgba(0,232,255,0.25);border-radius:8px;color:var(--accent-text);padding:5px 11px;cursor:pointer;font-size:16px;line-height:1;">⇅</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+          <span style="font-size:16px;color:var(--text-sub);font-weight:700;width:12px;">$</span>
+          <div id="ipc-resultado"
+            style="width:108px;background:rgba(0,232,255,0.05);border:1px solid rgba(0,232,255,0.15);border-radius:8px;color:var(--accent-text);font-size:14px;font-weight:700;padding:9px 10px;min-height:38px;">—</div>
+          <span style="font-size:12px;color:var(--text-sub);">en</span>
+          <select id="ipc-mes-hasta" onchange="calcInflacion()"
+            style="background:#060e1c;border:1px solid rgba(0,232,255,0.2);border-radius:8px;color:var(--text-main);font-size:12px;padding:9px 5px;outline:none;"></select>
+          <span style="font-size:12px;color:var(--text-sub);">de</span>
+          <select id="ipc-anio-hasta" onchange="calcInflacion()"
+            style="background:#060e1c;border:1px solid rgba(0,232,255,0.2);border-radius:8px;color:var(--text-main);font-size:12px;padding:9px 5px;outline:none;"></select>
+        </div>
+
+        <div id="ipc-stats" style="display:none;padding-top:12px;border-top:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:12px;color:var(--text-sub);">Inflación total</span>
+            <span id="ipc-stat-total" style="font-size:13px;font-weight:700;color:#ff7a7a;"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:var(--text-sub);">Promedio anual</span>
+            <span id="ipc-stat-anual" style="font-size:13px;font-weight:700;color:var(--text-main);"></span>
+          </div>
+        </div>
+      </div>`;
+
+    initIpcCalc();
   } catch(e) {
     el.innerHTML = '<div style="color:var(--text-sub);font-size:14px;padding:20px 0;">Error al cargar datos.</div>';
   }
+}
+
+/* ════════════════════════════════════════════════════════
+   CALCULADORA IPC
+════════════════════════════════════════════════════════ */
+const IPC_MESES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function initIpcCalc() {
+  const keys = (window._ipcKeys || []).filter(k => k >= '1992-01');
+  if (!keys.length) return;
+
+  const years = [...new Set(keys.map(k => k.slice(0,4)))].sort();
+
+  ['desde','hasta'].forEach(cual => {
+    const selMes  = document.getElementById(`ipc-mes-${cual}`);
+    const selAnio = document.getElementById(`ipc-anio-${cual}`);
+    if (!selMes || !selAnio) return;
+
+    selMes.innerHTML = IPC_MESES_NOMBRES.map((m, i) =>
+      `<option value="${i+1}">${m}</option>`).join('');
+    selAnio.innerHTML = [...years].reverse().map(a =>
+      `<option value="${a}">${a}</option>`).join('');
+  });
+
+  // Defaults: hace 12 meses → último mes disponible
+  const lastKey  = keys[keys.length - 1];
+  const [lY, lM] = lastKey.split('-');
+  const prevKey  = keys[Math.max(0, keys.length - 13)];
+  const [pY, pM] = prevKey.split('-');
+
+  setIpcSelect('mes-desde',  parseInt(pM, 10));
+  setIpcSelect('anio-desde', pY);
+  setIpcSelect('mes-hasta',  parseInt(lM, 10));
+  setIpcSelect('anio-hasta', lY);
+
+  calcInflacion();
+}
+
+function setIpcSelect(id, val) {
+  const el = document.getElementById(`ipc-${id}`);
+  if (el) el.value = val;
+}
+
+function fmtIpcMonto(input) {
+  const raw = input.value.replace(/\D/g,'');
+  input.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g,'.') : '';
+  calcInflacion();
+}
+
+function calcInflacion() {
+  const idx = window._ipcIndex;
+  if (!idx) return;
+
+  const mesD  = document.getElementById('ipc-mes-desde')?.value;
+  const anioD = document.getElementById('ipc-anio-desde')?.value;
+  const mesH  = document.getElementById('ipc-mes-hasta')?.value;
+  const anioH = document.getElementById('ipc-anio-hasta')?.value;
+  if (!mesD || !anioD || !mesH || !anioH) return;
+
+  const keyD = `${anioD}-${String(mesD).padStart(2,'0')}`;
+  const keyH = `${anioH}-${String(mesH).padStart(2,'0')}`;
+  const ipcD = idx[keyD];
+  const ipcH = idx[keyH];
+
+  const resEl   = document.getElementById('ipc-resultado');
+  const statsEl = document.getElementById('ipc-stats');
+  if (!resEl) return;
+
+  if (!ipcD || !ipcH || keyD === keyH) {
+    resEl.textContent = '—';
+    if (statsEl) statsEl.style.display = 'none';
+    return;
+  }
+
+  const raw   = (document.getElementById('ipc-monto')?.value || '').replace(/\./g,'');
+  const monto = parseFloat(raw) || 100;
+  const ratio  = ipcH / ipcD;
+
+  resEl.textContent = (monto * ratio).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+
+  const [aD, mD] = keyD.split('-');
+  const [aH, mH] = keyH.split('-');
+  const meses = (parseInt(aH) - parseInt(aD)) * 12 + (parseInt(mH) - parseInt(mD));
+
+  if (statsEl && Math.abs(meses) > 0) {
+    const inflTotal = (ratio - 1) * 100;
+    const inflAnual = (Math.pow(ratio, 12 / meses) - 1) * 100;
+    const sign = inflTotal >= 0 ? '+' : '';
+    document.getElementById('ipc-stat-total').textContent = `${sign}${inflTotal.toFixed(1)}%`;
+    document.getElementById('ipc-stat-anual').textContent = `${inflAnual.toFixed(1)}% anual`;
+    statsEl.style.display = 'block';
+  } else if (statsEl) {
+    statsEl.style.display = 'none';
+  }
+}
+
+function swapIpcDates() {
+  const mD = document.getElementById('ipc-mes-desde')?.value;
+  const aD = document.getElementById('ipc-anio-desde')?.value;
+  const mH = document.getElementById('ipc-mes-hasta')?.value;
+  const aH = document.getElementById('ipc-anio-hasta')?.value;
+  setIpcSelect('mes-desde',  mH);
+  setIpcSelect('anio-desde', aH);
+  setIpcSelect('mes-hasta',  mD);
+  setIpcSelect('anio-hasta', aD);
+  calcInflacion();
 }
 
 /* ─── Arranque ─── */
