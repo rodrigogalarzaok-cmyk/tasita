@@ -380,6 +380,11 @@
     }
     .calc-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(0,232,255,0.5); }
 
+    @media (min-width: 768px) {
+      .calc-fab    { left: calc(50% - 360px); }
+      .calc-bubble { left: calc(50% - 370px); }
+    }
+
     /* Backdrop transparente — cubre todo cuando la calc está abierta */
     .calc-backdrop {
       display: none; position: fixed; inset: 0;
