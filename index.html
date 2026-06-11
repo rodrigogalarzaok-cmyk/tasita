@@ -2535,10 +2535,12 @@ async function calcularDolar() {
   const { day: pd, month: pm, year: py } = pickerConfirmed;
   const fecha = `${py}-${String(pm+1).padStart(2,'0')}-${String(pd).padStart(2,'0')}`;
   const resultDiv = document.getElementById('dcalc-result');
-  const today    = new Date().toISOString().slice(0, 10);
+  const maxDate  = getMaxPickerDate();
+  const maxStr   = maxDate.toISOString().slice(0, 10);
+  const maxLabel = `${String(maxDate.getDate()).padStart(2,'0')}/${String(maxDate.getMonth()+1).padStart(2,'0')}/${maxDate.getFullYear()}`;
 
   if (!monto || monto <= 0) { showDcalcError('Ingresá un monto válido.'); return; }
-  if (fecha >= today)       { showDcalcError('La fecha debe ser anterior a hoy.'); return; }
+  if (fecha > maxStr)       { showDcalcError(`Esos datos todavía no están disponibles. Podés calcular hasta el ${maxLabel}.`); return; }
 
   resultDiv.style.display = 'block';
   resultDiv.innerHTML = '<div class="dcalc-loading">Cargando historial…</div>';
@@ -2621,10 +2623,16 @@ const PICKER_MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oc
 let pickerConfirmed = null;
 let pickerScrollTimers = {};
 
+/* Último día del mes anterior — máximo confiable de la API */
+function getMaxPickerDate() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 0); // día 0 = último día del mes anterior
+}
+
 function buildPickerYears() {
-  const cur = new Date().getFullYear();
+  const maxY = getMaxPickerDate().getFullYear();
   const arr = [];
-  for (let y = 2015; y <= cur; y++) arr.push(String(y));
+  for (let y = 2015; y <= maxY; y++) arr.push(String(y));
   return arr;
 }
 
@@ -2730,9 +2738,9 @@ function confirmDatePicker() {
   closeDatePicker();
 }
 
-/* Inicializar con fecha hace 1 año */
+/* Inicializar con el último día del mes anterior */
 (function initDolarCalc() {
-  const d = new Date(); d.setFullYear(d.getFullYear() - 1);
+  const d = getMaxPickerDate();
   pickerConfirmed = { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
   const dd = String(pickerConfirmed.day).padStart(2,'0');
   const mm = String(pickerConfirmed.month+1).padStart(2,'0');
