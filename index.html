@@ -1069,7 +1069,7 @@
   </section>
 
   <!-- FAQ -->
-  <section class="faq-section">
+  <section class="faq-section" id="main-faq">
     <p class="faq-section-title">Preguntas frecuentes</p>
 
     <div class="faq-item">
@@ -1223,7 +1223,7 @@ function switchTab(name) {
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
   if (name === 'dolar'  && !dolarLoaded)  loadDolar();
-  document.querySelector('.faq-section').style.display = name === 'dolar' ? 'none' : '';
+  document.getElementById('main-faq').style.display = name === 'dolar' ? 'none' : '';
   gaEvent(name);
 }
 document.querySelectorAll('.tab').forEach(t =>
