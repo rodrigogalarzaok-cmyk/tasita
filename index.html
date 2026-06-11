@@ -1445,7 +1445,8 @@ function switchTab(name) {
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
   if (name === 'dolar'  && !dolarLoaded)  loadDolar();
-  document.getElementById('main-faq').style.display = name === 'dolar' ? 'none' : '';
+  document.getElementById('main-faq').style.display  = name === 'dolar' ? 'none' : '';
+  document.getElementById('calcBtn').style.display   = name === 'dolar' ? 'none' : '';
   gaEvent(name);
 }
 document.querySelectorAll('.tab').forEach(t =>
