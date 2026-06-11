@@ -2474,6 +2474,8 @@ function useBrokerInCalc(pct) {
    SPEECH BUBBLE — hint de la calculadora
 ════════════════════════════════════════════════════════ */
 function showCalcBubble() {
+  // No mostrar en pestaña dólar
+  if (document.getElementById('tab-dolar').classList.contains('active'))     return;
   // No mostrar si la calc ya está abierta
   if (document.getElementById('calcPanel').classList.contains('open'))       return;
   if (document.getElementById('calcBrokerPanel').classList.contains('open')) return;
