@@ -2624,7 +2624,7 @@ let pickerScrollTimers = {};
 function buildPickerYears() {
   const cur = new Date().getFullYear();
   const arr = [];
-  for (let y = 2015; y <= cur - 1; y++) arr.push(String(y));
+  for (let y = 2015; y <= cur; y++) arr.push(String(y));
   return arr;
 }
 
