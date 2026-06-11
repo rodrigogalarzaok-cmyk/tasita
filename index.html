@@ -637,12 +637,85 @@
       display: flex; align-items: center; gap: 10px;
       background: rgba(255,255,255,0.05); border: 1px solid var(--border);
       border-radius: 12px; padding: 13px 14px; margin-bottom: 18px;
+      cursor: pointer;
     }
     .dcalc-cal-icon { font-size: 16px; flex-shrink: 0; }
-    .dcalc-date {
-      flex: 1; background: transparent; border: none; outline: none;
-      font-size: 16px; font-weight: 600; color: var(--text-main);
-      color-scheme: dark; min-width: 0;
+    .dcalc-date-display {
+      flex: 1; font-size: 16px; font-weight: 600; color: var(--text-main);
+    }
+    .dcalc-date-arrow {
+      font-size: 18px; color: var(--text-sub);
+    }
+    /* ── Picker overlay ── */
+    .dcalc-picker-overlay {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .dcalc-picker-sheet {
+      width: 100%; max-width: 540px;
+      background: #0c1a30; border-radius: 22px 22px 0 0;
+      padding-bottom: env(safe-area-inset-bottom,0px);
+    }
+    .dcalc-picker-handle {
+      width: 38px; height: 4px; background: rgba(255,255,255,0.18);
+      border-radius: 2px; margin: 12px auto 0;
+    }
+    .dcalc-picker-title {
+      text-align: center; padding: 14px 0 6px;
+      font-size: 15px; font-weight: 700; color: var(--text-main);
+    }
+    .dcalc-picker-body { position: relative; }
+    .dcalc-picker-cols { display: flex; }
+    .dcalc-picker-col  { flex: 1; }
+    .dcalc-picker-col-label {
+      text-align: center; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.8px; color: var(--text-sub);
+      padding: 8px 0 4px;
+    }
+    .dcalc-picker-scroll {
+      height: 220px;
+      overflow-y: scroll; scroll-snap-type: y mandatory;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .dcalc-picker-scroll::-webkit-scrollbar { display: none; }
+    .dcalc-picker-spacer { height: 88px; flex-shrink: 0; }
+    .dcalc-picker-item {
+      height: 44px; display: flex; align-items: center; justify-content: center;
+      scroll-snap-align: center;
+      font-size: 17px; font-weight: 500; color: rgba(255,255,255,0.28);
+      transition: color .12s, font-weight .12s;
+      user-select: none;
+    }
+    .dcalc-picker-item.sel {
+      color: var(--text-main); font-weight: 700;
+    }
+    .dcalc-picker-highlight {
+      position: absolute; left: 12px; right: 12px; height: 44px;
+      border-top: 1px solid rgba(0,232,255,0.22);
+      border-bottom: 1px solid rgba(0,232,255,0.22);
+      background: rgba(0,232,255,0.06); border-radius: 10px;
+      pointer-events: none;
+    }
+    .dcalc-picker-fade-top, .dcalc-picker-fade-bot {
+      position: absolute; left: 0; right: 0; height: 88px;
+      pointer-events: none; z-index: 1;
+    }
+    .dcalc-picker-fade-top { top: 28px;  background: linear-gradient(to bottom, #0c1a30 30%, transparent); }
+    .dcalc-picker-fade-bot { bottom: 0;  background: linear-gradient(to top,    #0c1a30 30%, transparent); }
+    .dcalc-picker-actions {
+      display: flex; gap: 10px; padding: 14px 16px 22px;
+    }
+    .dcalc-picker-cancel {
+      flex: 1; padding: 13px; border: 1px solid var(--border); border-radius: 12px;
+      background: transparent; color: var(--text-sub);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .dcalc-picker-confirm {
+      flex: 2; padding: 13px;
+      border: 1px solid rgba(0,232,255,0.3); border-radius: 12px;
+      background: rgba(0,232,255,0.1); color: var(--accent-text);
+      font-size: 14px; font-weight: 700; cursor: pointer;
     }
     .dcalc-btn {
       width: 100%; padding: 14px; border-radius: 12px;
@@ -1158,7 +1231,7 @@
 
     <!-- Calculadora histórica dólar -->
     <div class="dcalc-section">
-      <p class="dcalc-title">💰 ¿Cuánto ganaste comprando dólares?</p>
+      <p class="dcalc-title">Calculadora de dólares</p>
 
       <div class="dcalc-label">TIPO DE DÓLAR</div>
       <div class="dcalc-chips">
@@ -1175,9 +1248,39 @@
       </div>
 
       <div class="dcalc-label">FECHA DE COMPRA</div>
-      <div class="dcalc-date-wrap">
+      <div class="dcalc-date-wrap" onclick="openDatePicker()">
         <span class="dcalc-cal-icon">📅</span>
-        <input type="date" id="dcalc-fecha" class="dcalc-date" min="2002-01-01">
+        <span id="dcalc-fecha-display" class="dcalc-date-display">—</span>
+        <span class="dcalc-date-arrow">›</span>
+      </div>
+
+      <!-- Picker overlay -->
+      <div id="dcalc-picker-overlay" class="dcalc-picker-overlay" style="display:none" onclick="pickerOverlayClick(event)">
+        <div class="dcalc-picker-sheet">
+          <div class="dcalc-picker-handle"></div>
+          <div class="dcalc-picker-title">Fecha de compra</div>
+          <div class="dcalc-picker-body" id="dcalc-picker-body">
+            <div class="dcalc-picker-cols">
+              <div class="dcalc-picker-col">
+                <div class="dcalc-picker-col-label">DÍA</div>
+                <div class="dcalc-picker-scroll" id="picker-days"   onscroll="onPickerScroll('days',this)"></div>
+              </div>
+              <div class="dcalc-picker-col">
+                <div class="dcalc-picker-col-label">MES</div>
+                <div class="dcalc-picker-scroll" id="picker-months" onscroll="onPickerScroll('months',this)"></div>
+              </div>
+              <div class="dcalc-picker-col">
+                <div class="dcalc-picker-col-label">AÑO</div>
+                <div class="dcalc-picker-scroll" id="picker-years"  onscroll="onPickerScroll('years',this)"></div>
+              </div>
+            </div>
+            <div class="dcalc-picker-highlight" id="dcalc-picker-hl"></div>
+          </div>
+          <div class="dcalc-picker-actions">
+            <button class="dcalc-picker-cancel"  onclick="closeDatePicker()">Cancelar</button>
+            <button class="dcalc-picker-confirm" onclick="confirmDatePicker()">Confirmar fecha</button>
+          </div>
+        </div>
       </div>
 
       <button class="dcalc-btn" onclick="calcularDolar()">📊 Calcular</button>
@@ -2425,12 +2528,13 @@ async function fetchDolarHistoryFull(casa) {
 async function calcularDolar() {
   const montoRaw = document.getElementById('dcalc-monto').value.replace(/\./g, '').replace(/,/g, '');
   const monto    = parseFloat(montoRaw);
-  const fecha    = document.getElementById('dcalc-fecha').value;
+  if (!pickerConfirmed) { showDcalcError('Seleccioná una fecha.'); return; }
+  const { day: pd, month: pm, year: py } = pickerConfirmed;
+  const fecha = `${py}-${String(pm+1).padStart(2,'0')}-${String(pd).padStart(2,'0')}`;
   const resultDiv = document.getElementById('dcalc-result');
   const today    = new Date().toISOString().slice(0, 10);
 
   if (!monto || monto <= 0) { showDcalcError('Ingresá un monto válido.'); return; }
-  if (!fecha)               { showDcalcError('Seleccioná una fecha.'); return; }
   if (fecha >= today)       { showDcalcError('La fecha debe ser anterior a hoy.'); return; }
 
   resultDiv.style.display = 'block';
@@ -2508,16 +2612,129 @@ function showDcalcError(msg) {
 }
 
 /* Setear fecha máxima = ayer al cargar */
+/* ── Picker de fecha ── */
+const PICKER_H  = 44;
+const PICKER_MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+let pickerConfirmed = null;
+let pickerScrollTimers = {};
+
+function buildPickerYears() {
+  const cur = new Date().getFullYear();
+  const arr = [];
+  for (let y = 2002; y <= cur - 1; y++) arr.push(String(y));
+  return arr;
+}
+
+function fillPickerCol(id, items) {
+  const el = document.getElementById('picker-' + id);
+  if (!el) return;
+  el.innerHTML =
+    '<div class="dcalc-picker-spacer"></div>' +
+    items.map(v => `<div class="dcalc-picker-item">${v}</div>`).join('') +
+    '<div class="dcalc-picker-spacer"></div>';
+}
+
+function scrollPickerToIdx(id, idx) {
+  const el = document.getElementById('picker-' + id);
+  if (el) el.scrollTop = idx * PICKER_H;
+}
+
+function highlightPickerCol(id, idx) {
+  const el = document.getElementById('picker-' + id);
+  if (!el) return;
+  el.querySelectorAll('.dcalc-picker-item').forEach((item, i) =>
+    item.classList.toggle('sel', i === idx));
+}
+
+function positionPickerHighlight() {
+  const body = document.getElementById('dcalc-picker-body');
+  const firstScroll = document.getElementById('picker-days');
+  const hl = document.getElementById('dcalc-picker-hl');
+  if (!body || !firstScroll || !hl) return;
+  const bRect = body.getBoundingClientRect();
+  const sRect = firstScroll.getBoundingClientRect();
+  const centerY = sRect.top - bRect.top + (sRect.height / 2) - (PICKER_H / 2);
+  hl.style.top = centerY + 'px';
+}
+
+function onPickerScroll(id, el) {
+  clearTimeout(pickerScrollTimers[id]);
+  pickerScrollTimers[id] = setTimeout(() => {
+    const idx = Math.round(el.scrollTop / PICKER_H);
+    el.scrollTo({ top: idx * PICKER_H, behavior: 'smooth' });
+    highlightPickerCol(id, idx);
+  }, 100);
+}
+
+function openDatePicker() {
+  const years = buildPickerYears();
+  fillPickerCol('days',   Array.from({length:31}, (_,i) => String(i+1).padStart(2,'0')));
+  fillPickerCol('months', PICKER_MONTHS);
+  fillPickerCol('years',  years);
+
+  const ref = pickerConfirmed || (() => {
+    const d = new Date(); d.setFullYear(d.getFullYear() - 1);
+    return { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
+  })();
+
+  document.getElementById('dcalc-picker-overlay').style.display = 'flex';
+
+  /* Agregar fades */
+  const body = document.getElementById('dcalc-picker-body');
+  if (!body.querySelector('.dcalc-picker-fade-top')) {
+    body.insertAdjacentHTML('beforeend',
+      '<div class="dcalc-picker-fade-top"></div><div class="dcalc-picker-fade-bot"></div>');
+  }
+
+  requestAnimationFrame(() => {
+    positionPickerHighlight();
+    const yearIdx = ref.year - 2002;
+    scrollPickerToIdx('days',   ref.day - 1);
+    scrollPickerToIdx('months', ref.month);
+    scrollPickerToIdx('years',  yearIdx);
+    setTimeout(() => {
+      highlightPickerCol('days',   ref.day - 1);
+      highlightPickerCol('months', ref.month);
+      highlightPickerCol('years',  yearIdx);
+    }, 60);
+  });
+}
+
+function closeDatePicker() {
+  document.getElementById('dcalc-picker-overlay').style.display = 'none';
+}
+
+function pickerOverlayClick(e) {
+  if (e.target === document.getElementById('dcalc-picker-overlay')) closeDatePicker();
+}
+
+function confirmDatePicker() {
+  const years   = buildPickerYears();
+  const dayIdx  = Math.round(document.getElementById('picker-days').scrollTop   / PICKER_H);
+  const monIdx  = Math.round(document.getElementById('picker-months').scrollTop / PICKER_H);
+  const yearIdx = Math.round(document.getElementById('picker-years').scrollTop  / PICKER_H);
+
+  const day   = dayIdx  + 1;
+  const month = Math.min(monIdx,  11);
+  const year  = parseInt(years[Math.min(yearIdx, years.length - 1)]);
+
+  pickerConfirmed = { day, month, year };
+
+  const dd = String(day).padStart(2,'0');
+  const mm = String(month+1).padStart(2,'0');
+  document.getElementById('dcalc-fecha-display').textContent = `${dd} / ${mm} / ${year}`;
+  document.getElementById('dcalc-result').style.display = 'none';
+  closeDatePicker();
+}
+
+/* Inicializar con fecha hace 1 año */
 (function initDolarCalc() {
-  const inp = document.getElementById('dcalc-fecha');
-  if (!inp) return;
-  const y = new Date(); y.setDate(y.getDate() - 1);
-  const maxStr = y.toISOString().slice(0, 10);
-  inp.max = maxStr;
-  inp.value = maxStr;
-  /* Sugerir hace 1 año */
   const d = new Date(); d.setFullYear(d.getFullYear() - 1);
-  inp.value = d.toISOString().slice(0, 10);
+  pickerConfirmed = { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
+  const dd = String(pickerConfirmed.day).padStart(2,'0');
+  const mm = String(pickerConfirmed.month+1).padStart(2,'0');
+  const display = document.getElementById('dcalc-fecha-display');
+  if (display) display.textContent = `${dd} / ${mm} / ${pickerConfirmed.year}`;
 })();
 
 /* ════════════════════════════════════════════════════════
