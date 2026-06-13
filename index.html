@@ -450,7 +450,7 @@
 
     /* ─── Speech bubble de la calculadora ─── */
     .calc-bubble {
-      position: fixed; bottom: 90px; left: 14px;
+      position: fixed; bottom: 86px; left: 16px;
       background: #060e1c;
       border: 1.5px solid rgba(176,238,255,0.4);
       border-radius: 14px; padding: 10px 16px;
@@ -820,20 +820,19 @@
           </svg>
           Brokers
         </div>
+        <div class="menu-option" onclick="openDolarOverlay()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Dólares
+        </div>
         <div class="menu-option" onclick="openInflacion()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
             <path d="M7 16l4-4 4 4 4-4"/>
           </svg>
           Inflación
-        </div>
-        <div class="menu-option" onclick="openDonacion()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2v4M10 2v4M14 2v4"/>
-            <path d="M4 8h12l-1.5 9A2 2 0 0 1 12.52 19H7.48a2 2 0 0 1-1.98-2L4 8z"/>
-            <path d="M16 10h2a2 2 0 0 1 0 4h-2"/>
-          </svg>
-          Tacita
         </div>
       </div>
     </div>
@@ -1097,56 +1096,135 @@
     </div>
   </div>
 
-  <!-- ══ Tacita overlay ══ -->
-  <div class="broker-overlay" id="donacionOverlay">
+  <!-- ══ Dólar overlay ══ -->
+  <div class="broker-overlay" id="dolarOverlay">
     <div class="broker-inner">
 
-      <div class="header" style="padding-bottom:16px;">
+      <div class="header" style="padding-bottom:16px; cursor:pointer;" onclick="closeDolarOverlay()">
         <div class="logo">
-          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2v4M10 2v4M14 2v4"/>
-            <path d="M4 8h12l-1.5 9A2 2 0 0 1 12.52 19H7.48a2 2 0 0 1-1.98-2L4 8z"/>
-            <path d="M16 10h2a2 2 0 0 1 0 4h-2"/>
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"
+               stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <clipPath id="cc-dolar">
+                <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
+              </clipPath>
+            </defs>
+            <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+            <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
+            <g clip-path="url(#cc-dolar)">
+              <rect x="4"   y="16.5" width="3" height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="8.5" y="14"   width="3" height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="13"  y="11.5" width="3" height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
+            </g>
           </svg>
+          <span class="logo-name">Tasita</span>
         </div>
-        <div>
-          <div class="app-name">Tacita</div>
-          <div class="app-sub" style="font-size:12px;opacity:.55;">Apoyá el proyecto</div>
-        </div>
-        <button class="menu-btn" style="margin-left:auto;" onclick="closeDonacion()">✕</button>
       </div>
 
-      <div style="text-align:center; padding: 8px 4px 28px;">
-        <p style="font-size:15px; color:var(--text-main); line-height:1.7; margin-bottom:6px;">
-          Tasita es gratuita y seguirá siéndolo.
-        </p>
-        <p style="font-size:13.5px; color:var(--text-sub); line-height:1.75; margin-bottom:6px;">
-          Si alguna vez te ayudó a tomar una mejor decisión financiera,<br>
-          podés colaborar para que el proyecto siga creciendo y mejorando.
-        </p>
-        <p style="font-size:13.5px; color:var(--text-sub); line-height:1.75;">
-          Y si no, está perfecto también.<br>
-          Gracias por usar Tasita. ☕
-        </p>
+      <button class="broker-back" onclick="closeDolarOverlay()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Volver
+      </button>
+
+      <div class="sec-header">
+        <h2 class="sec-title">
+          <span class="sec-emoji">💵</span>
+          Cotización del dólar
+        </h2>
       </div>
 
-      <div style="display:flex; flex-direction:column; align-items:center; gap:14px; padding-bottom:28px;">
-        <img src="41.jpg" alt="Tasita" style="width:200px; object-fit:contain; border-radius:16px;"/>
-        <div style="text-align:center; line-height:1.6;">
-          <div style="font-size:11px; color:var(--text-sub); letter-spacing:.06em; text-transform:uppercase;">Alias</div>
-          <div style="display:inline-flex; align-items:center; gap:8px; margin-top:2px;">
-            <span style="font-size:17px; font-weight:600; color:#fff; letter-spacing:.03em;">TASITA.ARG</span>
-            <button id="copyAliasBtn" onclick="copyAlias()" style="background:none; border:none; cursor:pointer; padding:4px; color:var(--text-sub); display:flex; align-items:center;" title="Copiar alias">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            </button>
+      <div id="dolar-list" class="wallet-list">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando cotizaciones…</p>
+        </div>
+      </div>
+
+      <!-- Calculadora histórica dólar -->
+      <div class="dcalc-section">
+        <p class="dcalc-title">Calculadora de dólares</p>
+
+        <div class="dcalc-label">TIPO DE DÓLAR</div>
+        <div class="dcalc-chips">
+          <button class="dcalc-chip active" data-type="blue"            onclick="setDolarCalcType('blue')">Blue</button>
+          <button class="dcalc-chip"        data-type="bolsa"           onclick="setDolarCalcType('bolsa')">MEP</button>
+          <button class="dcalc-chip"        data-type="contadoconliqui" onclick="setDolarCalcType('contadoconliqui')">CCL</button>
+          <button class="dcalc-chip"        data-type="oficial"         onclick="setDolarCalcType('oficial')">Oficial</button>
+        </div>
+
+        <div class="dcalc-label">MONTO</div>
+        <div class="dcalc-input-wrap">
+          <span class="dcalc-currency">$</span>
+          <input type="text" id="dcalc-monto" class="dcalc-input" placeholder="100.000" inputmode="numeric" oninput="fmtDcalcMonto(this)">
+        </div>
+
+        <div class="dcalc-label">FECHA DE COMPRA</div>
+        <div class="dcalc-date-wrap" onclick="openDatePicker()">
+          <span id="dcalc-fecha-display" class="dcalc-date-display">—</span>
+          <span class="dcalc-date-arrow">›</span>
+        </div>
+
+        <!-- Picker overlay -->
+        <div id="dcalc-picker-overlay" class="dcalc-picker-overlay" style="display:none" onclick="pickerOverlayClick(event)">
+          <div class="dcalc-picker-sheet">
+            <div class="dcalc-picker-handle"></div>
+            <div class="dcalc-picker-title">Fecha de compra</div>
+            <div class="dcalc-picker-body" id="dcalc-picker-body">
+              <div class="dcalc-picker-cols">
+                <div class="dcalc-picker-col">
+                  <div class="dcalc-picker-col-label">DÍA</div>
+                  <div class="dcalc-picker-scroll" id="picker-days"   onscroll="onPickerScroll('days',this)"></div>
+                </div>
+                <div class="dcalc-picker-col">
+                  <div class="dcalc-picker-col-label">MES</div>
+                  <div class="dcalc-picker-scroll" id="picker-months" onscroll="onPickerScroll('months',this)"></div>
+                </div>
+                <div class="dcalc-picker-col">
+                  <div class="dcalc-picker-col-label">AÑO</div>
+                  <div class="dcalc-picker-scroll" id="picker-years"  onscroll="onPickerScroll('years',this)"></div>
+                </div>
+              </div>
+              <div class="dcalc-picker-highlight" id="dcalc-picker-hl"></div>
+            </div>
+            <div class="dcalc-picker-actions">
+              <button class="dcalc-picker-cancel"  onclick="closeDatePicker()">Cancelar</button>
+              <button class="dcalc-picker-confirm" onclick="confirmDatePicker()">Confirmar fecha</button>
+            </div>
           </div>
         </div>
+
+        <button class="dcalc-btn" onclick="calcularDolar()">Calcular</button>
+
+        <div id="dcalc-result" style="display:none"></div>
       </div>
 
+      <footer class="social-footer">
+        <a class="social-link ig" href="https://www.instagram.com/rodrigogalarza__" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5.5" fill="url(#ig-bg)"/>
+            <rect x="4.5" y="4.5" width="15" height="15" rx="4" stroke="white" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="3.8" stroke="white" stroke-width="1.8"/>
+            <circle cx="17.2" cy="6.8" r="1.3" fill="white"/>
+          </svg>
+          @rodrigogalarza__
+        </a>
+        <a class="social-link tt" href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5" fill="#010101"/>
+            <path transform="translate(1.5,0)" fill="#ee1d52" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path transform="translate(-1.5,0)" fill="#69c9d0" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path fill="white" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+          </svg>
+          @rodrigogalarzaa
+        </a>
+      </footer>
     </div>
   </div>
+
 
   <!-- Tab bar -->
   <nav class="tab-bar" role="tablist">
@@ -1210,82 +1288,30 @@
 
   </section>
 
+
   <!-- ══════════════════════════════
        DÓLAR
   ══════════════════════════════ -->
   <section class="tab-content" id="tab-dolar" role="tabpanel">
 
-    <div class="sec-header">
-      <h2 class="sec-title">
-        <span class="sec-emoji">💵</span>
-        Cotización del dólar
-      </h2>
+    <!-- Botones comprar / vender -->
+    <div style="display:flex; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:20px; gap:4px;">
+      <button id="cdBtn" onclick="setCDMode('comprar')" style="flex:1; padding:10px 4px; border:none; background:var(--accent-btn); color:#010609; font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        Quiero comprar
+      </button>
+      <button id="cvBtn" onclick="setCDMode('vender')" style="flex:1; padding:10px 4px; border:none; background:transparent; color:rgba(255,255,255,0.82); font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+        Quiero vender
+      </button>
     </div>
 
-    <!-- Lista dinámica -->
-    <div id="dolar-list" class="wallet-list">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Cargando cotizaciones…</p>
-      </div>
+    <div style="display:flex; justify-content:flex-end; margin-bottom:10px; padding:0 4px;">
+      <span id="cd-col-label" style="font-size:11px; color:var(--text-sub); font-weight:600; letter-spacing:0.4px;">COMPRÁS A</span>
     </div>
 
-    <!-- Calculadora histórica dólar -->
-    <div class="dcalc-section">
-      <p class="dcalc-title">Calculadora de dólares</p>
-
-      <div class="dcalc-label">TIPO DE DÓLAR</div>
-      <div class="dcalc-chips">
-        <button class="dcalc-chip active" data-type="blue"            onclick="setDolarCalcType('blue')">Blue</button>
-        <button class="dcalc-chip"        data-type="bolsa"           onclick="setDolarCalcType('bolsa')">MEP</button>
-        <button class="dcalc-chip"        data-type="contadoconliqui" onclick="setDolarCalcType('contadoconliqui')">CCL</button>
-        <button class="dcalc-chip"        data-type="oficial"         onclick="setDolarCalcType('oficial')">Oficial</button>
-      </div>
-
-      <div class="dcalc-label">MONTO</div>
-      <div class="dcalc-input-wrap">
-        <span class="dcalc-currency">$</span>
-        <input type="text" id="dcalc-monto" class="dcalc-input" placeholder="100.000" inputmode="numeric" oninput="fmtDcalcMonto(this)">
-      </div>
-
-      <div class="dcalc-label">FECHA DE COMPRA</div>
-      <div class="dcalc-date-wrap" onclick="openDatePicker()">
-        <span id="dcalc-fecha-display" class="dcalc-date-display">—</span>
-        <span class="dcalc-date-arrow">›</span>
-      </div>
-
-      <!-- Picker overlay -->
-      <div id="dcalc-picker-overlay" class="dcalc-picker-overlay" style="display:none" onclick="pickerOverlayClick(event)">
-        <div class="dcalc-picker-sheet">
-          <div class="dcalc-picker-handle"></div>
-          <div class="dcalc-picker-title">Fecha de compra</div>
-          <div class="dcalc-picker-body" id="dcalc-picker-body">
-            <div class="dcalc-picker-cols">
-              <div class="dcalc-picker-col">
-                <div class="dcalc-picker-col-label">DÍA</div>
-                <div class="dcalc-picker-scroll" id="picker-days"   onscroll="onPickerScroll('days',this)"></div>
-              </div>
-              <div class="dcalc-picker-col">
-                <div class="dcalc-picker-col-label">MES</div>
-                <div class="dcalc-picker-scroll" id="picker-months" onscroll="onPickerScroll('months',this)"></div>
-              </div>
-              <div class="dcalc-picker-col">
-                <div class="dcalc-picker-col-label">AÑO</div>
-                <div class="dcalc-picker-scroll" id="picker-years"  onscroll="onPickerScroll('years',this)"></div>
-              </div>
-            </div>
-            <div class="dcalc-picker-highlight" id="dcalc-picker-hl"></div>
-          </div>
-          <div class="dcalc-picker-actions">
-            <button class="dcalc-picker-cancel"  onclick="closeDatePicker()">Cancelar</button>
-            <button class="dcalc-picker-confirm" onclick="confirmDatePicker()">Confirmar fecha</button>
-          </div>
-        </div>
-      </div>
-
-      <button class="dcalc-btn" onclick="calcularDolar()">Calcular</button>
-
-      <div id="dcalc-result" style="display:none"></div>
+    <div id="cd-list" class="wallet-list">
+      <div class="loading-state"><div class="spinner"></div><p>Cargando…</p></div>
     </div>
 
   </section>
@@ -1444,7 +1470,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(c =>
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
-  if (name === 'dolar'  && !dolarLoaded)  loadDolar();
+  if (name === 'dolar') loadCD();
   document.getElementById('main-faq').style.display  = name === 'dolar' ? 'none' : '';
   document.getElementById('calcBtn').style.display   = name === 'dolar' ? 'none' : '';
   gaEvent(name);
@@ -1689,7 +1715,7 @@ const BILLETERAS_DATA = [
   { name: 'Fiwind',          tna: 25.00, url: 'https://www.fiwind.com.ar',          limit: '$750 k' },
   { name: 'Carrefour Banco', tna: 21.00, url: 'https://www.carrefourbanco.com.ar' },
   { name: 'Ualá',            tna: 19.00, url: 'https://www.uala.com.ar',            limit: '$1 M' },
-  { name: 'Brubank',         tna: 19.00, url: 'https://www.brubank.com.ar' },
+  { name: 'Brubank',         tna: 17.00, url: 'https://www.brubank.com.ar' },
   { name: 'Cocos Pay',       tna: 18.98, url: 'https://www.cocos.com.ar' },
   { name: 'Naranja X',       tna: 18.00, url: 'https://www.naranjax.com',           limit: '$1 M' },
   { name: 'Mercado Pago',    tna: 17.89, url: 'https://mpago.li/2yKh6np' },
@@ -1706,7 +1732,7 @@ const BILLETERAS_DATA = [
 
 function renderBilleteras() {
   const el = document.getElementById('billeteras-list');
-  el.innerHTML = BILLETERAS_DATA.map(({ name, tna, url, limit }, i) => `
+  el.innerHTML = [...BILLETERAS_DATA].sort((a, b) => b.tna - a.tna).map(({ name, tna, url, limit }, i) => `
     <div class="wallet-item" onclick="navOrClose('${url}')">
       ${rankBadge(i)}
       ${bankAvatar(name)}
@@ -2812,6 +2838,104 @@ function showCalcBtn() {
 
 const MESES_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
+/* ─── Comparador dólar (pestaña DÓLAR) ─── */
+let cdMode = 'comprar';
+let cdData = null;
+const CD_DIRECT = 'https://api.comparadolar.ar/usd';
+const CD_PROXIES = [
+  'https://corsproxy.io/?url=' + encodeURIComponent('https://api.comparadolar.ar/usd'),
+  'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.comparadolar.ar/usd'),
+];
+
+async function loadCD() {
+  if (cdData) { renderCD(); return; }
+  document.getElementById('cd-list').innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Cargando…</p></div>';
+  const urls = [CD_DIRECT, ...CD_PROXIES];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) continue;
+      cdData = await r.json();
+      renderCD();
+      return;
+    } catch { /* probar siguiente */ }
+  }
+  document.getElementById('cd-list').innerHTML = '<div class="info-state"><p>No se pudieron cargar los datos.<br><button class="retry-btn" onclick="cdData=null;loadCD()">Reintentar</button></p></div>';
+}
+
+function setCDMode(m) {
+  cdMode = m;
+  const cb = document.getElementById('cdBtn');
+  const vb = document.getElementById('cvBtn');
+  if (m === 'comprar') {
+    cb.style.background = 'var(--accent-btn)'; cb.style.color = '#010609';
+    vb.style.background = 'transparent';        vb.style.color = 'rgba(255,255,255,0.82)';
+    document.getElementById('cd-col-label').textContent = 'COMPRÁS A';
+  } else {
+    vb.style.background = 'var(--accent-btn)'; vb.style.color = '#010609';
+    cb.style.background = 'transparent';        cb.style.color = 'rgba(255,255,255,0.82)';
+    document.getElementById('cd-col-label').textContent = 'VENDÉS A';
+  }
+  renderCD();
+}
+
+function renderCD() {
+  if (!cdData) return;
+  const list = document.getElementById('cd-list');
+  const fmt = n => n != null ? '$' + Math.round(n).toLocaleString('es-AR') : '—';
+
+  let items = cdData.filter(p => cdMode === 'comprar' ? p.ask != null : p.bid != null);
+  // filtro de precios inválidos: descarta outliers que sean >5x el mínimo del resto
+  const prices = items.map(p => cdMode === 'comprar' ? p.ask : p.bid).sort((a,b) => a-b);
+  const minPrice = prices[0] || 1;
+  items = items.filter(p => {
+    const price = cdMode === 'comprar' ? p.ask : p.bid;
+    return price <= minPrice * 5;
+  });
+  if (cdMode === 'comprar') {
+    items.sort((a, b) => a.ask - b.ask);
+  } else {
+    items.sort((a, b) => b.bid - a.bid);
+  }
+
+  if (!items.length) { list.innerHTML = '<div class="info-state"><p>Sin datos disponibles.</p></div>'; return; }
+
+  list.innerHTML = items.map((p, i) => {
+    const name = p.prettyName || p.name || '—';
+    const price = cdMode === 'comprar' ? p.ask : p.bid;
+    const logo = p.logoUrl || p.logo || '';
+    const initials = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const avatarHtml = logo
+      ? `<div class="avatar has-logo" style="margin:0 12px 0 0;"><img src="${logo}" alt="${name}" onerror="this.parentElement.innerHTML='<span style=\'font-size:12px;font-weight:800;color:var(--accent-text);\'>${initials}</span>';this.parentElement.style.background='rgba(0,232,255,0.1)'"></div>`
+      : `<div class="avatar" style="margin:0 12px 0 0;background:rgba(0,232,255,0.1);color:var(--accent-text);">${initials}</div>`;
+
+    return `<div class="wallet-item" style="cursor:default;">
+      <span class="rank" style="min-width:20px;">${i + 1}</span>
+      ${avatarHtml}
+      <div class="wallet-info">
+        <div class="wallet-name">${name}</div>
+      </div>
+      <div class="wallet-rate">
+        <div class="wallet-rate-num" style="font-size:16px;">${fmt(price)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openDolarOverlay() {
+  closeMenu();
+  closeCalc();
+  hideCalcBtn();
+  document.getElementById('dolarOverlay').classList.add('open');
+  loadDolar();
+  gaEvent('dolar_overlay');
+}
+
+function closeDolarOverlay() {
+  document.getElementById('dolarOverlay').classList.remove('open');
+  showCalcBtn();
+}
+
 function openInflacion() {
   closeMenu();
   closeCalc();
@@ -2826,30 +2950,6 @@ function closeInflacion() {
   showCalcBtn();
 }
 
-function openDonacion() {
-  closeMenu();
-  closeCalc();
-  hideCalcBtn();
-  document.getElementById('donacionOverlay').classList.add('open');
-  gaEvent('donacion');
-}
-
-function closeDonacion() {
-  document.getElementById('donacionOverlay').classList.remove('open');
-  showCalcBtn();
-}
-
-function copyAlias() {
-  navigator.clipboard.writeText('TASITA.ARG').then(() => {
-    const btn = document.getElementById('copyAliasBtn');
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-    btn.style.color = '#00e8ff';
-    setTimeout(() => {
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-      btn.style.color = '';
-    }, 2000);
-  });
-}
 
 async function renderInflacion() {
   const el = document.getElementById('inflacion-content');
