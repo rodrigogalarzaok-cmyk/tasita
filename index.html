@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tasita</title>
+  <title>Tasita — Compará billeteras, plazos fijos y dólar</title>
+  <meta name="description" content="Tasita: compará las mejores tasas de billeteras virtuales, plazos fijos bancarios y cotizaciones del dólar en Argentina. Gratis, sin registro." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
+  <meta property="og:description" content="Compará las mejores tasas de billeteras virtuales, plazos fijos bancarios y cotizaciones del dólar en Argentina." />
+  <meta property="og:type" content="website" />
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-WG3NV7JNE0"></script>
   <script>
@@ -544,6 +549,26 @@
       padding: 0 2px;
     }
     .faq-item.open .faq-a { max-height: 300px; padding: 0 2px 14px; }
+
+    /* ─── Cookie banner ─── */
+    .cookie-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 800;
+      background: rgba(6,14,28,0.97); border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cookie-bar.hidden { display: none; }
+    .cookie-bar p {
+      font-size: 11px; color: rgba(255,255,255,0.38); margin: 0; line-height: 1.5;
+    }
+    .cookie-bar a { color: rgba(255,255,255,0.45); text-decoration: underline; }
+    .cookie-ok {
+      background: rgba(176,238,255,0.12); border: 1px solid rgba(176,238,255,0.2);
+      color: var(--accent-btn); font-size: 11px; font-weight: 700;
+      padding: 5px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap;
+      font-family: inherit;
+    }
 
     /* ─── Footer legal ─── */
     .legal-footer {
@@ -1355,11 +1380,11 @@
 
   <!-- Footer legal -->
   <div class="legal-footer">
-    <span>© 2025 Tasita</span>
+    <span>© 2026 Tasita</span>
     <span>·</span>
     <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer financiero</button>
     <span>·</span>
-    <button class="legal-link" onclick="openModal('privacy')">Privacidad</button>
+    <button class="legal-link" id="privacy" onclick="openModal('privacy')">Privacidad</button>
   </div>
 
   <!-- Footer redes -->
@@ -1384,6 +1409,12 @@
     </a>
   </footer>
 
+</div>
+
+<!-- Cookie banner -->
+<div class="cookie-bar" id="cookieBar">
+  <p>Usamos cookies para analítica (Google Analytics) y publicidad (Google AdSense). <a href="#privacy" onclick="openModal('privacy');return false;">Más info</a></p>
+  <button class="cookie-ok" onclick="acceptCookies()">Entendido</button>
 </div>
 
 <!-- Modales: Disclaimer y Privacidad -->
@@ -2798,10 +2829,9 @@ const MODAL_CONTENT = {
   privacy: {
     heading: 'Política de privacidad',
     body: `
-      <p>Tasita no recopila, almacena ni comparte datos personales de sus usuarios. La app funciona completamente en tu dispositivo.</p>
-      <p>Las cotizaciones y tasas se obtienen de APIs públicas de terceros (dolarapi.com, argentinadatos.com). No tenemos acceso a los datos que esas APIs registran.</p>
-      <p>No utilizamos cookies de seguimiento ni herramientas de analítica que identifiquen usuarios individuales.</p>
-      <p>Esta app puede mostrar publicidad a través de Google AdSense, que utiliza cookies propias según su política de privacidad.</p>
+      <p>Tasita no recopila ni almacena datos personales. Las cotizaciones y tasas se obtienen de APIs públicas de terceros; no tenemos acceso a los datos que esas APIs registran.</p>
+      <p><strong style="color:var(--text-main)">Cookies y analítica.</strong> Usamos Google Analytics para medir el tráfico del sitio (páginas visitadas, sesiones). Google Analytics utiliza cookies propias para este fin. Esta app también puede mostrar publicidad a través de Google AdSense, que emplea cookies para personalizar anuncios según tus intereses. Podés gestionar o rechazar estas cookies desde la configuración de tu navegador.</p>
+      <p>Para más información sobre cómo Google usa los datos, visitá <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--accent-text)">policies.google.com/privacy</a>.</p>
       <p>Para consultas: <a href="https://www.instagram.com/rodrigogalarza__" target="_blank" style="color:var(--accent-text)">@rodrigogalarza__</a></p>
     `
   }
@@ -2822,6 +2852,15 @@ function closeModal(e) {
 
 function closeModalDirect() {
   document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+/* ── Cookie banner ── */
+function acceptCookies() {
+  localStorage.setItem('cookie_ok', '1');
+  document.getElementById('cookieBar').classList.add('hidden');
+}
+if (localStorage.getItem('cookie_ok')) {
+  document.getElementById('cookieBar').classList.add('hidden');
 }
 
 /* ════════════════════════════════════════════════════════
