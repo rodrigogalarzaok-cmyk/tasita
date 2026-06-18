@@ -1415,41 +1415,31 @@
     </div>
   </section>
 
-  <!-- Sobre Tasita -->
-  <section id="sobre-tasita" style="margin-top:36px; padding-top:28px; border-top:1px solid var(--border);">
-    <p class="faq-section-title">Sobre Tasita</p>
-    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38); margin-bottom:10px;">
-      Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida.
-    </p>
-    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38); margin-bottom:10px;">
-      No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.
-    </p>
-    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38);">
-      Ante cualquier consulta podés contactarnos por Instagram: <a href="https://www.instagram.com/rodrigogalarza__" target="_blank" style="color:var(--accent-text);text-decoration:none;">@rodrigogalarza__</a>
-    </p>
-  </section>
-
-  <!-- Política de privacidad (anchor accesible para AdSense) -->
-  <section id="privacy" style="margin-top:28px; padding-top:24px; border-top:1px solid var(--border);">
-    <p class="faq-section-title">Política de privacidad</p>
-    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32); margin-bottom:8px;">
-      Tasita utiliza <strong style="color:rgba(255,255,255,0.45);">Google Analytics</strong> para medir el tráfico del sitio de forma anónima y agregada. También utilizamos <strong style="color:rgba(255,255,255,0.45);">Google AdSense</strong> para mostrar publicidad relevante. Ambos servicios pueden usar cookies para personalizar anuncios según tus intereses y el historial de navegación.
-    </p>
-    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32); margin-bottom:8px;">
-      No recopilamos datos personales propios. No requerimos registro ni acceso a tus cuentas financieras. Las cookies de terceros (Google) pueden desactivarse desde la configuración de tu navegador o desde <a href="https://adssettings.google.com" target="_blank" style="color:var(--accent-text);text-decoration:none;">adssettings.google.com</a>.
-    </p>
-    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32);">
-      Al continuar usando Tasita aceptás el uso de cookies de analítica y publicidad según lo descripto. Para más información sobre la política de privacidad de Google visitá <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--accent-text);text-decoration:none;">policies.google.com/privacy</a>.
-    </p>
-  </section>
+  <!-- Contenido oculto: indexable por bots, invisible para usuarios -->
+  <div style="display:none" aria-hidden="true">
+    <section id="sobre-tasita">
+      <h2>Sobre Tasita</h2>
+      <p>Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida.</p>
+      <p>No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.</p>
+      <p>Ante cualquier consulta podés contactarnos por Instagram: @rodrigogalarza__</p>
+    </section>
+    <section id="privacy">
+      <h2>Política de privacidad</h2>
+      <p>Tasita utiliza Google Analytics para medir el tráfico del sitio de forma anónima y agregada. También utilizamos Google AdSense para mostrar publicidad relevante. Ambos servicios pueden usar cookies para personalizar anuncios según tus intereses y el historial de navegación.</p>
+      <p>No recopilamos datos personales propios. No requerimos registro ni acceso a tus cuentas financieras. Las cookies de terceros (Google) pueden desactivarse desde la configuración de tu navegador o desde adssettings.google.com.</p>
+      <p>Al continuar usando Tasita aceptás el uso de cookies de analítica y publicidad según lo descripto. Para más información sobre la política de privacidad de Google visitá policies.google.com/privacy.</p>
+    </section>
+  </div>
 
   <!-- Footer legal -->
   <div class="legal-footer" style="margin-top:28px;">
     <span>© 2026 Tasita</span>
     <span>·</span>
-    <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer financiero</button>
+    <button class="legal-link" onclick="openModal('sobre')">Sobre Tasita</button>
     <span>·</span>
-    <a class="legal-link" href="#privacy">Privacidad</a>
+    <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer</button>
+    <span>·</span>
+    <button class="legal-link" id="privacy-link" onclick="openModal('privacy')">Privacidad</button>
   </div>
 
   <!-- Footer redes -->
@@ -2882,6 +2872,14 @@ function toggleFaq(btn) {
    MODALES
 ════════════════════════════════════════════════════════ */
 const MODAL_CONTENT = {
+  sobre: {
+    heading: 'Sobre Tasita',
+    body: `
+      <p>Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida.</p>
+      <p>No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.</p>
+      <p>Para consultas o sugerencias: <a href="https://www.instagram.com/rodrigogalarza__" target="_blank" style="color:var(--accent-text)">@rodrigogalarza__</a></p>
+    `
+  },
   disclaimer: {
     heading: 'Disclaimer financiero',
     body: `
