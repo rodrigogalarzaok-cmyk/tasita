@@ -9,6 +9,11 @@
   <meta property="og:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
   <meta property="og:description" content="Compará las mejores tasas de billeteras virtuales, plazos fijos bancarios y cotizaciones del dólar en Argentina." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tasita.com.ar/" />
+  <meta property="og:image" content="https://tasita.com.ar/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
+  <meta name="twitter:description" content="Compará tasas de billeteras virtuales, plazos fijos y dólar en Argentina. Gratis, sin registro." />
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-WG3NV7JNE0"></script>
   <script>
@@ -1376,17 +1381,75 @@
       </div>
       <div class="faq-a">Usá la calculadora integrada: tocá el botón 🧮 en la esquina inferior izquierda, ingresá el monto que querés invertir y la TNA de la billetera o plazo fijo que elegiste. La app te muestra al instante cuánto ganás por día, por mes y en un año.</div>
     </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Las tasas se actualizan en tiempo real?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Depende de la sección. Las cotizaciones del dólar y las tasas de plazos fijos bancarios se actualizan automáticamente cada vez que abrís la app. Las tasas de billeteras virtuales se actualizan manualmente de forma semanal, ya que las billeteras no exponen sus tasas en APIs públicas.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Es seguro usar Tasita?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Tasita es una herramienta de consulta: no te pide datos personales, no requiere registro y no tiene acceso a tus cuentas bancarias ni billeteras. Solo compara información pública de tasas y cotizaciones. Podés usarla con total tranquilidad.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Qué es el dólar Blue, MEP y CCL?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">El dólar Blue es el tipo de cambio del mercado informal. El MEP (Mercado Electrónico de Pagos) es un dólar legal que se opera a través de la bolsa comprando y vendiendo bonos. El CCL (Contado con Liquidación) es similar al MEP pero permite sacar divisas al exterior. El dólar Oficial es el tipo de cambio regulado por el BCRA.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Conviene más un plazo fijo o una billetera virtual?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Depende de tu horizonte y necesidad de liquidez. Las billeteras virtuales ofrecen rendimiento diario y podés retirar cuando quieras, ideal para el dinero del día a día. Los plazos fijos suelen tener tasas algo mayores pero el dinero queda inmovilizado hasta el vencimiento (generalmente 30 días). Si no necesitás el dinero en el corto plazo, un plazo fijo puede ser más conveniente.</div>
+    </div>
+  </section>
+
+  <!-- Sobre Tasita -->
+  <section id="sobre-tasita" style="margin-top:36px; padding-top:28px; border-top:1px solid var(--border);">
+    <p class="faq-section-title">Sobre Tasita</p>
+    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38); margin-bottom:10px;">
+      Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida.
+    </p>
+    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38); margin-bottom:10px;">
+      No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.
+    </p>
+    <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,0.38);">
+      Ante cualquier consulta podés contactarnos por Instagram: <a href="https://www.instagram.com/rodrigogalarza__" target="_blank" style="color:var(--accent-text);text-decoration:none;">@rodrigogalarza__</a>
+    </p>
+  </section>
+
+  <!-- Política de privacidad (anchor accesible para AdSense) -->
+  <section id="privacy" style="margin-top:28px; padding-top:24px; border-top:1px solid var(--border);">
+    <p class="faq-section-title">Política de privacidad</p>
+    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32); margin-bottom:8px;">
+      Tasita utiliza <strong style="color:rgba(255,255,255,0.45);">Google Analytics</strong> para medir el tráfico del sitio de forma anónima y agregada. También utilizamos <strong style="color:rgba(255,255,255,0.45);">Google AdSense</strong> para mostrar publicidad relevante. Ambos servicios pueden usar cookies para personalizar anuncios según tus intereses y el historial de navegación.
+    </p>
+    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32); margin-bottom:8px;">
+      No recopilamos datos personales propios. No requerimos registro ni acceso a tus cuentas financieras. Las cookies de terceros (Google) pueden desactivarse desde la configuración de tu navegador o desde <a href="https://adssettings.google.com" target="_blank" style="color:var(--accent-text);text-decoration:none;">adssettings.google.com</a>.
+    </p>
+    <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,0.32);">
+      Al continuar usando Tasita aceptás el uso de cookies de analítica y publicidad según lo descripto. Para más información sobre la política de privacidad de Google visitá <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--accent-text);text-decoration:none;">policies.google.com/privacy</a>.
+    </p>
   </section>
 
   <!-- Footer legal -->
-  <div class="legal-footer">
-    <span>Tasita es una herramienta independiente para comparar opciones de ahorro en Argentina.</span>
-    <span style="display:block;width:100%;margin:0"></span>
+  <div class="legal-footer" style="margin-top:28px;">
     <span>© 2026 Tasita</span>
     <span>·</span>
     <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer financiero</button>
     <span>·</span>
-    <button class="legal-link" id="privacy" onclick="openModal('privacy')">Privacidad</button>
+    <a class="legal-link" href="#privacy">Privacidad</a>
   </div>
 
   <!-- Footer redes -->
