@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#000810"/>
+      <stop offset="55%"  stop-color="#070e1a"/>
+      <stop offset="100%" stop-color="#001a50"/>
+    </linearGradient>
+
+    <!-- Glow para las barras -->
+    <filter id="barGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Glow suave para la taza -->
+    <filter id="cupGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Clip de la taza en coordenadas finales -->
+    <clipPath id="insideCup">
+      <path d="M 290 498 H 686 V 648 a 198 198 0 0 1-198 198 H 488 a 198 198 0 0 1-198-198 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+
+  <!-- Halo de ambiente cyan muy sutil -->
+  <radialGradient id="halo" cx="50%" cy="50%" r="40%">
+    <stop offset="0%"   stop-color="#00e8ff" stop-opacity="0.06"/>
+    <stop offset="100%" stop-color="#00e8ff" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1080" height="1080" fill="url(#halo)"/>
+
+  <!-- ══ VAPOR (dos S-curves finas y elegantes) ══ -->
+  <g fill="none" stroke="#dce4f0" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <!-- Vapor izquierdo -->
+    <path d="M 432 168 a 52 52 0 0 0-22 44 a 52 52 0 0 0 22 44"/>
+    <!-- Vapor derecho -->
+    <path d="M 556 168 a 52 52 0 0 0-22 44 a 52 52 0 0 0 22 44"/>
+  </g>
+
+  <!-- ══ CUERPO DE LA TAZA ══ -->
+  <g filter="url(#cupGlow)" fill="none" stroke="#dce4f0" stroke-width="28"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- Cuerpo principal -->
+    <path d="M 290 498 H 686 V 648 a 198 198 0 0 1-198 198 H 488 a 198 198 0 0 1-198-198 Z"/>
+    <!-- Asa -->
+    <path d="M 672 726 a 99 99 0 1 0 8.4-182.7"/>
+  </g>
+
+  <!-- ══ BARRAS ASCENDENTES (cyan, clipeadas dentro de la taza) ══ -->
+  <g clip-path="url(#insideCup)" filter="url(#barGlow)">
+    <!-- Barra izquierda (más baja) -->
+    <rect x="318" y="742" width="98"  height="164" rx="16" fill="#00e8ff"/>
+    <!-- Barra central -->
+    <rect x="469" y="664" width="98"  height="242" rx="16" fill="#00e8ff"/>
+    <!-- Barra derecha (más alta) -->
+    <rect x="620" y="574" width="98"  height="332" rx="16" fill="#00e8ff"/>
+  </g>
+
+</svg>
