@@ -160,6 +160,13 @@
     .wallet-rate-tag {
       font-size: 10.5px; color: var(--text-sub); font-weight: 500; letter-spacing: 0.4px;
     }
+    .sinlimit-badge {
+      display: inline-block; margin-top: 5px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.2px;
+      color: #3ddc84; background: rgba(61,220,132,0.10);
+      border: 1px solid rgba(61,220,132,0.30);
+      border-radius: 6px; padding: 2px 7px;
+    }
     .limit-badge {
       display: inline-block; margin-top: 5px;
       font-size: 10.5px; font-weight: 600; letter-spacing: 0.2px;
@@ -1172,69 +1179,24 @@
         </h2>
       </div>
 
-      <div id="dolar-list" class="wallet-list">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Cargando cotizaciones…</p>
-        </div>
+      <!-- Botones comprar / vender -->
+      <div style="display:flex; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:20px; gap:4px;">
+        <button id="cdBtn" onclick="setCDMode('comprar')" style="flex:1; padding:10px 4px; border:none; background:var(--accent-btn); color:#010609; font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          Quiero comprar
+        </button>
+        <button id="cvBtn" onclick="setCDMode('vender')" style="flex:1; padding:10px 4px; border:none; background:transparent; color:rgba(255,255,255,0.82); font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          Quiero vender
+        </button>
       </div>
 
-      <!-- Calculadora histórica dólar -->
-      <div class="dcalc-section">
-        <p class="dcalc-title">Calculadora de dólares</p>
+      <div style="display:flex; justify-content:flex-end; margin-bottom:10px; padding:0 4px;">
+        <span id="cd-col-label" style="font-size:11px; color:var(--text-sub); font-weight:600; letter-spacing:0.4px;">COMPRÁS A</span>
+      </div>
 
-        <div class="dcalc-label">TIPO DE DÓLAR</div>
-        <div class="dcalc-chips">
-          <button class="dcalc-chip active" data-type="blue"            onclick="setDolarCalcType('blue')">Blue</button>
-          <button class="dcalc-chip"        data-type="bolsa"           onclick="setDolarCalcType('bolsa')">MEP</button>
-          <button class="dcalc-chip"        data-type="contadoconliqui" onclick="setDolarCalcType('contadoconliqui')">CCL</button>
-          <button class="dcalc-chip"        data-type="oficial"         onclick="setDolarCalcType('oficial')">Oficial</button>
-        </div>
-
-        <div class="dcalc-label">MONTO</div>
-        <div class="dcalc-input-wrap">
-          <span class="dcalc-currency">$</span>
-          <input type="text" id="dcalc-monto" class="dcalc-input" placeholder="100.000" inputmode="numeric" oninput="fmtDcalcMonto(this)">
-        </div>
-
-        <div class="dcalc-label">FECHA DE COMPRA</div>
-        <div class="dcalc-date-wrap" onclick="openDatePicker()">
-          <span id="dcalc-fecha-display" class="dcalc-date-display">—</span>
-          <span class="dcalc-date-arrow">›</span>
-        </div>
-
-        <!-- Picker overlay -->
-        <div id="dcalc-picker-overlay" class="dcalc-picker-overlay" style="display:none" onclick="pickerOverlayClick(event)">
-          <div class="dcalc-picker-sheet">
-            <div class="dcalc-picker-handle"></div>
-            <div class="dcalc-picker-title">Fecha de compra</div>
-            <div class="dcalc-picker-body" id="dcalc-picker-body">
-              <div class="dcalc-picker-cols">
-                <div class="dcalc-picker-col">
-                  <div class="dcalc-picker-col-label">DÍA</div>
-                  <div class="dcalc-picker-scroll" id="picker-days"   onscroll="onPickerScroll('days',this)"></div>
-                </div>
-                <div class="dcalc-picker-col">
-                  <div class="dcalc-picker-col-label">MES</div>
-                  <div class="dcalc-picker-scroll" id="picker-months" onscroll="onPickerScroll('months',this)"></div>
-                </div>
-                <div class="dcalc-picker-col">
-                  <div class="dcalc-picker-col-label">AÑO</div>
-                  <div class="dcalc-picker-scroll" id="picker-years"  onscroll="onPickerScroll('years',this)"></div>
-                </div>
-              </div>
-              <div class="dcalc-picker-highlight" id="dcalc-picker-hl"></div>
-            </div>
-            <div class="dcalc-picker-actions">
-              <button class="dcalc-picker-cancel"  onclick="closeDatePicker()">Cancelar</button>
-              <button class="dcalc-picker-confirm" onclick="confirmDatePicker()">Confirmar fecha</button>
-            </div>
-          </div>
-        </div>
-
-        <button class="dcalc-btn" onclick="calcularDolar()">Calcular</button>
-
-        <div id="dcalc-result" style="display:none"></div>
+      <div id="cd-list" class="wallet-list">
+        <div class="loading-state"><div class="spinner"></div><p>Cargando…</p></div>
       </div>
 
       <footer class="social-footer">
@@ -1329,25 +1291,14 @@
   ══════════════════════════════ -->
   <section class="tab-content" id="tab-dolar" role="tabpanel">
 
-    <!-- Botones comprar / vender -->
-    <div style="display:flex; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:20px; gap:4px;">
-      <button id="cdBtn" onclick="setCDMode('comprar')" style="flex:1; padding:10px 4px; border:none; background:var(--accent-btn); color:#010609; font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-        Quiero comprar
-      </button>
-      <button id="cvBtn" onclick="setCDMode('vender')" style="flex:1; padding:10px 4px; border:none; background:transparent; color:rgba(255,255,255,0.82); font-size:11.5px; font-weight:700; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; letter-spacing:0.3px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-        Quiero vender
-      </button>
+    <div class="sec-header">
+      <h2 class="sec-title">
+        <span class="sec-emoji">💵</span>
+        Billeteras en dólares
+      </h2>
     </div>
 
-    <div style="display:flex; justify-content:flex-end; margin-bottom:10px; padding:0 4px;">
-      <span id="cd-col-label" style="font-size:11px; color:var(--text-sub); font-weight:600; letter-spacing:0.4px;">COMPRÁS A</span>
-    </div>
-
-    <div id="cd-list" class="wallet-list">
-      <div class="loading-state"><div class="spinner"></div><p>Cargando…</p></div>
-    </div>
+    <div id="billeteras-usd-list" class="wallet-list"></div>
 
   </section>
 
@@ -1563,7 +1514,6 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(c =>
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
-  if (name === 'dolar') loadCD();
   document.getElementById('main-faq').style.display  = name === 'dolar' ? 'none' : '';
   document.getElementById('calcBtn').style.display   = name === 'dolar' ? 'none' : '';
   gaEvent(name);
@@ -1680,6 +1630,7 @@ const BANK_LOGOS = {
   'supervielle': { url: wiki('0/0f/Logo_Banco_Supervielle.svg'),                bg: '#fff' },
   'icbc':        { url: wiki('6/69/ICBC_Argentina.png'),                        bg: '#fff' },
   'nacion':      { url: wiki('2/20/Logo_Banco_de_la_Nacion_Argentina.svg'),     bg: '#fff' },
+  'naci':        { url: wiki('2/20/Logo_Banco_de_la_Nacion_Argentina.svg'),     bg: '#fff' },
 
   // ── Sitios oficiales ───────────────────────────────────────────────────────
   'meridian':    { url: 'https://www.bancomeridian.com/img/logo.png',                                  bg: '#fff' },
@@ -1703,6 +1654,9 @@ const BANK_LOGOS = {
   'reba':        { url: gplay('BhdcdU2uUP8UTAne1HYqDIxTasQVJkJW8k8DckwkqHecnVfnm4K_lIIlPOVQRWOsj2M'), bg: 'transparent', full: true },
   'sol':         { url: gplay('HPKsZxDXWaXkFRUjDy2V6K57VDAkhl0PEuxG0bse01Vj0_Dl-HZqjAQN7CqnSeuaQdzG'), bg: 'transparent', full: true },
   'cmf':         { url: gplay('N35vbjiC8tWpOqW6bi50invKb_B1k2qI5CkguRcgqiL6g2Ejb82zIqtU4e6Zcb1pH2E'),  bg: 'transparent', full: true },
+
+  // ── DolarApp ──────────────────────────────────────────────────────────────
+  'dolarapp':    { url: gfav('dolarapp.com'), bg: 'transparent', full: true },
 
   // ── Billeteras virtuales (billeterasvirtuales.com.ar) ──────────────────────
   'fiwind':      { url: bv('fiwind'),      bg: '#fff' },
@@ -3045,7 +2999,7 @@ function openDolarOverlay() {
   closeCalc();
   hideCalcBtn();
   document.getElementById('dolarOverlay').classList.add('open');
-  loadDolar();
+  loadCD();
   gaEvent('dolar_overlay');
 }
 
@@ -3320,8 +3274,42 @@ function swapIpcDates() {
   calcInflacion();
 }
 
+/* ════════════════════════════════════════════════════════
+   BILLETERAS EN DÓLARES
+════════════════════════════════════════════════════════ */
+const BILLETERAS_USD_DATA = [
+  { name: 'Brubank',        tna: 6.54 },
+  { name: 'Ualá',          tna: 6.00 },
+  { name: 'AstroPay',      tna: 3.10 },
+  { name: 'Cocos Pay',     tna: 3.00 },
+  { name: 'Prex',          tna: 2.00 },
+  { name: 'ARQ (DolarApp)', tna: 2.00 },
+  { name: 'Mercado Pago',  tna: 1.80 },
+  { name: 'Banco Nación',  tna: 0.60, limit: '$10.000' },
+];
+
+function renderBilleterasUSD() {
+  const el = document.getElementById('billeteras-usd-list');
+  el.innerHTML = [...BILLETERAS_USD_DATA].sort((a, b) => b.tna - a.tna).map(({ name, tna, limit }, i) => `
+    <div class="wallet-item">
+      ${rankBadge(i)}
+      ${bankAvatar(name)}
+      <div class="wallet-info">
+        <div class="wallet-name">${name}</div>
+        ${limit
+          ? `<span class="limit-badge">Límite: ${limit}</span>`
+          : `<span class="sinlimit-badge">∞ Sin Límites</span>`}
+      </div>
+      <div class="wallet-rate">
+        <div class="wallet-rate-num">${tna.toFixed(2).replace('.', ',')}%</div>
+        <div class="wallet-rate-tag">TNA</div>
+      </div>
+    </div>`).join('');
+}
+
 /* ─── Arranque ─── */
 renderBilleteras();
+renderBilleterasUSD();
 /* Precargar tarjeta resumen de Billeteras con datos locales de inmediato */
 updateSummaryCard(PF_FALLBACK);
 /* Actualizar plazos fijos desde ArgentinaDatos en segundo plano */
