@@ -3264,20 +3264,20 @@ function swapIpcDates() {
    BILLETERAS EN DÓLARES
 ════════════════════════════════════════════════════════ */
 const BILLETERAS_USD_DATA = [
-  { name: 'Brubank',        tna: 6.54 },
-  { name: 'Ualá',          tna: 6.00 },
+  { name: 'Brubank',        tna: 6.54, url: 'https://www.brubank.com.ar' },
+  { name: 'Ualá',          tna: 6.00, url: 'https://www.uala.com.ar' },
   { name: 'BingX',         tna: 4.50, ref: 'https://bingxdao.com/partner/rodrigogalarzaa' },
-  { name: 'AstroPay',      tna: 3.10 },
-  { name: 'Cocos Pay',     tna: 3.00 },
-  { name: 'Prex',          tna: 2.00 },
-  { name: 'ARQ (DolarApp)', tna: 2.00 },
-  { name: 'Mercado Pago',  tna: 1.80 },
-  { name: 'Banco Nación',  tna: 0.60, limit: '$10.000' },
+  { name: 'AstroPay',      tna: 3.10, url: 'https://www.astropay.com' },
+  { name: 'Cocos Pay',     tna: 3.00, url: 'https://www.cocos.com.ar' },
+  { name: 'Prex',          tna: 2.00, url: 'https://www.prex.com.uy' },
+  { name: 'ARQ (DolarApp)', tna: 2.00, url: 'https://www.dolarapp.com' },
+  { name: 'Mercado Pago',  tna: 1.80, url: 'https://www.mercadopago.com.ar' },
+  { name: 'Banco Nación',  tna: 0.60, url: 'https://www.bna.com.ar', limit: '$10.000' },
 ];
 
 function renderBilleterasUSD() {
   const el = document.getElementById('billeteras-usd-list');
-  el.innerHTML = [...BILLETERAS_USD_DATA].sort((a, b) => b.tna - a.tna).map(({ name, tna, limit, ref }, i) => {
+  el.innerHTML = [...BILLETERAS_USD_DATA].sort((a, b) => b.tna - a.tna).map(({ name, tna, limit, ref, url }, i) => {
     const inner = `
       ${rankBadge(i)}
       ${bankAvatar(name)}
@@ -3293,8 +3293,9 @@ function renderBilleterasUSD() {
         <div class="wallet-rate-num">${tna.toFixed(2).replace('.', ',')}%</div>
         <div class="wallet-rate-tag">TNA</div>
       </div>`;
-    return ref
-      ? `<a class="wallet-item" href="${ref}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;cursor:pointer;">${inner}</a>`
+    const href = ref || url;
+    return href
+      ? `<a class="wallet-item" href="${href}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;cursor:pointer;">${inner}</a>`
       : `<div class="wallet-item">${inner}</div>`;
   }).join('');
 }
