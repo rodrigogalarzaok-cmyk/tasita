@@ -1798,13 +1798,28 @@ const intentPresupuesto = () =>
   'intent://presupuesto.tasita.com.ar/#Intent;scheme=https;package=com.android.chrome;' +
   'S.browser_fallback_url=' + encodeURIComponent(PRESU_URL) + ';end';
 
-function abrirPresupuesto(e) {
-  const android = /Android/i.test(navigator.userAgent || '');
-  if (!navegadorInApp() || !android) return true;   // navegador normal o iPhone: link común
+/* En iPhone no hay nada como intent://: una página no puede abrir otro
+   navegador. Esta dirección especial es lo único que a veces logra salir a
+   Safari desde el navegador de Instagram, y depende de la versión de esa app.
+   Si no prende no pasa nada: se sigue con el link normal, igual que antes. */
+const safariPresupuesto = () => 'x-safari-' + PRESU_URL;
 
-  e.preventDefault();
-  window.location.href = intentPresupuesto();
-  return false;
+function abrirPresupuesto(e) {
+  if (!navegadorInApp()) return true;              // navegador normal: link común
+
+  const ua = navigator.userAgent || '';
+  if (/Android/i.test(ua))            { e.preventDefault(); window.location.href = intentPresupuesto(); return false; }
+  if (/iPhone|iPad|iPod/i.test(ua)) {
+    e.preventDefault();
+    window.location.href = safariPresupuesto();
+    /* Si Safari no abrió seguimos acá y el botón habría quedado muerto, así que
+       al segundo se abre el link normal, igual que antes de este cambio. */
+    setTimeout(() => {
+      if (document.visibilityState === 'visible') window.location.href = PRESU_URL;
+    }, 1000);
+    return false;
+  }
+  return true;
 }
 
 function switchTab(name) {
