@@ -1399,7 +1399,8 @@
             </div>
           </div>
 
-          <a class="presu-download" href="https://presupuesto.tasita.com.ar" target="_blank" rel="noopener">
+          <a class="presu-download" href="https://presupuesto.tasita.com.ar" target="_blank" rel="noopener"
+             onclick="return abrirPresupuesto(event)">
             <span class="presu-download-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="6 10 12 16 18 10"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
             </span>
@@ -1776,6 +1777,34 @@
 function gaEvent(seccion) {
   if (typeof gtag === 'function')
     gtag('event', 'ver_seccion', { seccion });
+}
+
+/* ════════════════════════════════════════════════════════
+   DESCARGAR TACITA (Presupuesto)
+   Instagram, Facebook y TikTok abren los links adentro de un navegador propio.
+   En Android ese navegador es un WebView y nunca ofrece instalar la app, así
+   que desde ahí el botón "Descargar" no descargaba nada. Con una URL intent://
+   se salta a Chrome de verdad, que sí la puede instalar; si Chrome no está,
+   browser_fallback_url abre el link normal y queda todo como antes.
+   En iPhone no hay equivalente: se abre igual que siempre y la propia app
+   explica el paso de Compartir → Agregar a inicio.
+════════════════════════════════════════════════════════ */
+const PRESU_URL = 'https://presupuesto.tasita.com.ar/';
+
+const navegadorInApp = () =>
+  /Instagram|FBAN|FBAV|FB_IAB|BytedanceWebview|musical_ly|TikTok|LinkedInApp/i.test(navigator.userAgent || '');
+
+const intentPresupuesto = () =>
+  'intent://presupuesto.tasita.com.ar/#Intent;scheme=https;package=com.android.chrome;' +
+  'S.browser_fallback_url=' + encodeURIComponent(PRESU_URL) + ';end';
+
+function abrirPresupuesto(e) {
+  const android = /Android/i.test(navigator.userAgent || '');
+  if (!navegadorInApp() || !android) return true;   // navegador normal o iPhone: link común
+
+  e.preventDefault();
+  window.location.href = intentPresupuesto();
+  return false;
 }
 
 function switchTab(name) {
