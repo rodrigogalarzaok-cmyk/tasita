@@ -2365,8 +2365,14 @@ function renderDolar(data, isLive) {
 
   currentDolarData = data;
 
-  /* Lista */
+  /* Lista. Desde el rediseño de la solapa DÓLAR (billeteras en dólares) esta
+     lista ya no está en la página, pero la cotización se sigue pidiendo porque
+     la usa la calculadora de comprar/vender. Sin este corte, escribir en un
+     contenedor que no existe tira un error, fetchDolar lo toma como "falló la
+     API" y repite el pedido con el respaldo al pedo. */
   const el = document.getElementById('dolar-list');
+  if (!el) return;
+
   el.innerHTML = data.map(({ casa, compra, venta }) => {
     const cfg = DOLAR_CONFIG[casa] || { label: casa };
     return `
@@ -2390,7 +2396,9 @@ function renderDolar(data, isLive) {
 }
 
 function showDolarError() {
-  document.getElementById('dolar-list').innerHTML = `
+  const el = document.getElementById('dolar-list');
+  if (!el) return;
+  el.innerHTML = `
     <div class="info-state">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="12" cy="12" r="10"/>
@@ -2402,7 +2410,8 @@ function showDolarError() {
 }
 
 function retryDolar() {
-  document.getElementById('dolar-list').innerHTML =
+  const el = document.getElementById('dolar-list');
+  if (el) el.innerHTML =
     '<div class="loading-state"><div class="spinner"></div><p>Cargando cotizaciones…</p></div>';
   fetchDolar();
 }
