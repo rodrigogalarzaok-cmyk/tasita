@@ -93,12 +93,12 @@ const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
 { name: 'Naranja X',       tna: 19.00 }
 { name: 'Lemon Cash',      tna: 19.00 }
 { name: 'Prex',            tna: 18.85 }
+{ name: 'Claro Pay',       tna: 18.31 }
 { name: 'Mercado Pago',    tna: 18.17 }
 { name: 'Ualá',            tna: 18.00 }
 { name: 'Personal Pay',    tna: 17.89 }
 { name: 'Taca Taca',       tna: 17.52 }
 { name: 'Cocos Pay',       tna: 17.27 }
-{ name: 'Claro Pay',       tna: 17.16 }
 { name: 'Brubank',         tna: 17.00 }
 { name: 'YPF',             tna: 16.89 }
 { name: "Let'sBit",        tna: 16.79 }
