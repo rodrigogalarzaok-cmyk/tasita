@@ -762,6 +762,26 @@
     }
     .faq-item.open .faq-a { max-height: 300px; padding: 0 2px 14px; }
 
+    /* ─── Cookie banner ─── */
+    .cookie-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 800;
+      background: rgba(6,14,28,0.97); border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cookie-bar.hidden { display: none; }
+    .cookie-bar p {
+      font-size: 11px; color: rgba(255,255,255,0.38); margin: 0; line-height: 1.5;
+    }
+    .cookie-bar a { color: rgba(255,255,255,0.45); text-decoration: underline; }
+    .cookie-ok {
+      background: rgba(176,238,255,0.12); border: 1px solid rgba(176,238,255,0.2);
+      color: var(--accent-btn); font-size: 11px; font-weight: 700;
+      padding: 5px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap;
+      font-family: inherit;
+    }
+
     /* ─── Footer legal ─── */
     .legal-footer {
       display: flex; justify-content: center; align-items: center;
@@ -1044,15 +1064,6 @@
           </svg>
           Dólares
         </div>
-        <div class="menu-option" onclick="openLecaps()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 3h11l5 5v13H4z"/>
-            <polyline points="15 3 15 8 20 8"/>
-            <line x1="8" y1="13" x2="16" y2="13"/>
-            <line x1="8" y1="17" x2="13" y2="17"/>
-          </svg>
-          Letras
-        </div>
         <div class="menu-option" onclick="openPresupuesto()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
@@ -1247,114 +1258,6 @@
     </div>
   </div>
 
-  <!-- ══ Letras (LECAPs) overlay ══ -->
-  <div class="broker-overlay" id="lecapsOverlay">
-    <div class="broker-inner">
-
-      <!-- Logo Tasita (toca → vuelve al inicio) -->
-      <div class="header" style="padding-bottom:16px; cursor:pointer;" onclick="closeLecaps()">
-        <div class="logo">
-          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"
-               stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <defs>
-              <clipPath id="cc-lecaps">
-                <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
-              </clipPath>
-            </defs>
-            <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
-            <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
-            <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
-            <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
-            <g clip-path="url(#cc-lecaps)">
-              <rect x="4"   y="16.5" width="3" height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
-              <rect x="8.5" y="14"   width="3" height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
-              <rect x="13"  y="11.5" width="3" height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
-            </g>
-          </svg>
-          <span class="logo-name">Tasita</span>
-        </div>
-      </div>
-
-      <!-- Botón volver -->
-      <button class="broker-back" onclick="closeLecaps()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        Volver
-      </button>
-
-      <div class="sec-header">
-        <h2 class="sec-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 3h11l5 5v13H4z"/>
-            <polyline points="15 3 15 8 20 8"/>
-            <line x1="8" y1="13" x2="16" y2="13"/>
-            <line x1="8" y1="17" x2="13" y2="17"/>
-          </svg>
-          Letras del Tesoro
-        </h2>
-        <p style="margin:4px 0 0; font-size:13px; color:var(--text-sub);">Tasa fija en pesos</p>
-      </div>
-
-      <div id="lecaps-list" class="wallet-list"></div>
-
-      <p class="broker-disclaimer" id="lecaps-disclaimer">La tasa surge del precio de mercado y cambia todos los días · Es el rendimiento si la mantenés hasta el vencimiento</p>
-
-      <section class="faq-section">
-        <p class="faq-section-title">Preguntas frecuentes</p>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            ¿Qué es una letra del Tesoro?
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">Es un préstamo a corto plazo que le hacés al Estado argentino. La comprás hoy a un precio y en la fecha de vencimiento cobrás un monto fijo, ya conocido de antemano. La diferencia entre lo que pagás y lo que cobrás es tu ganancia. Se compran y se venden desde cualquier broker.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            ¿Qué es la TEM?
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">La TEM es la Tasa Efectiva Mensual: cuánto rinde la letra por cada mes que falta hasta su vencimiento. Sirve para comparar letras de distinto plazo entre sí, y también contra una billetera virtual o un plazo fijo, llevando todo a la misma medida mensual.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            ¿La tasa está garantizada?
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">Sí, siempre que la mantengas hasta el vencimiento: en esa fecha cobrás el monto pactado. Si en cambio la vendés antes, recibís el precio de mercado de ese día, que puede ser mayor o menor al esperado.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            ¿Por qué cambia la tasa durante el día?
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">Porque el precio de la letra se mueve con la oferta y la demanda del mercado. Si el precio sube, la tasa que queda por delante baja; si el precio baja, la tasa sube. Por eso los valores se recalculan cada vez que abrís la app.</div>
-        </div>
-      </section>
-
-      <footer class="social-footer">
-        <a class="social-link ig" href="https://www.instagram.com/rodrigogalarzaa" target="_blank">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.5" y="0.5" width="23" height="23" rx="5.5" fill="url(#ig-bg)"/>
-            <rect x="4.5" y="4.5" width="15" height="15" rx="4" stroke="white" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="3.8" stroke="white" stroke-width="1.8"/>
-            <circle cx="17.2" cy="6.8" r="1.3" fill="white"/>
-          </svg>
-          @rodrigogalarzaa
-        </a>
-        <a class="social-link tt" href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank">
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.5" y="0.5" width="23" height="23" rx="5" fill="#010101"/>
-            <path transform="translate(1.5,0)" fill="#ee1d52" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
-            <path transform="translate(-1.5,0)" fill="#69c9d0" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
-            <path fill="white" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
-          </svg>
-          @rodrigogalarzaa
-        </a>
-      </footer>
-    </div>
-  </div>
-
   <!-- ══ Presupuesto overlay ══ -->
   <div class="broker-overlay" id="presupuestoOverlay">
     <div class="broker-inner">
@@ -1516,8 +1419,7 @@
             </div>
           </div>
 
-          <a class="presu-download" href="https://presupuesto.tasita.com.ar" target="_blank" rel="noopener"
-             onclick="return abrirPresupuesto(event)">
+          <a class="presu-download" href="https://presupuesto.tasita.com.ar" target="_blank" rel="noopener">
             <span class="presu-download-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="6 10 12 16 18 10"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
             </span>
@@ -1818,6 +1720,12 @@
 
 </div>
 
+<!-- Cookie banner -->
+<div class="cookie-bar" id="cookieBar">
+  <p>Usamos cookies para analítica (Google Analytics) y publicidad (Google AdSense). <a href="#privacy" onclick="openModal('privacy');return false;">Más info</a></p>
+  <button class="cookie-ok" onclick="acceptCookies()">Entendido</button>
+</div>
+
 <!-- Modales: Disclaimer y Privacidad -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
   <div class="modal-sheet" id="modalSheet">
@@ -1894,49 +1802,6 @@
 function gaEvent(seccion) {
   if (typeof gtag === 'function')
     gtag('event', 'ver_seccion', { seccion });
-}
-
-/* ════════════════════════════════════════════════════════
-   DESCARGAR TACITA (Presupuesto)
-   Instagram, Facebook y TikTok abren los links adentro de un navegador propio.
-   En Android ese navegador es un WebView y nunca ofrece instalar la app, así
-   que desde ahí el botón "Descargar" no descargaba nada. Con una URL intent://
-   se salta a Chrome de verdad, que sí la puede instalar; si Chrome no está,
-   browser_fallback_url abre el link normal y queda todo como antes.
-   En iPhone no hay equivalente: se abre igual que siempre y la propia app
-   explica el paso de Compartir → Agregar a inicio.
-════════════════════════════════════════════════════════ */
-const PRESU_URL = 'https://presupuesto.tasita.com.ar/';
-
-const navegadorInApp = () =>
-  /Instagram|FBAN|FBAV|FB_IAB|BytedanceWebview|musical_ly|TikTok|LinkedInApp/i.test(navigator.userAgent || '');
-
-const intentPresupuesto = () =>
-  'intent://presupuesto.tasita.com.ar/#Intent;scheme=https;package=com.android.chrome;' +
-  'S.browser_fallback_url=' + encodeURIComponent(PRESU_URL) + ';end';
-
-/* En iPhone no hay nada como intent://: una página no puede abrir otro
-   navegador. Esta dirección especial es lo único que a veces logra salir a
-   Safari desde el navegador de Instagram, y depende de la versión de esa app.
-   Si no prende no pasa nada: se sigue con el link normal, igual que antes. */
-const safariPresupuesto = () => 'x-safari-' + PRESU_URL;
-
-function abrirPresupuesto(e) {
-  if (!navegadorInApp()) return true;              // navegador normal: link común
-
-  const ua = navigator.userAgent || '';
-  if (/Android/i.test(ua))            { e.preventDefault(); window.location.href = intentPresupuesto(); return false; }
-  if (/iPhone|iPad|iPod/i.test(ua)) {
-    e.preventDefault();
-    window.location.href = safariPresupuesto();
-    /* Si Safari no abrió seguimos acá y el botón habría quedado muerto, así que
-       al segundo se abre el link normal, igual que antes de este cambio. */
-    setTimeout(() => {
-      if (document.visibilityState === 'visible') window.location.href = PRESU_URL;
-    }, 1000);
-    return false;
-  }
-  return true;
 }
 
 function switchTab(name) {
@@ -2110,7 +1975,6 @@ const BANK_LOGOS = {
   'cenco':       { url: bv('centcopay'),   bg: '#fff' },
   'lemon':       { url: bv('lemoncash'),   bg: '#fff' },
   "let's":       { url: bv('letsbit'),     bg: '#fff' },
-  'ypf':         { url: bv('ypf'),         bg: 'transparent', full: true }, // ícono de app, degradado propio
 
   // ── Brokers ──────────────────────────────────────────────────────────────
   'veta':        { url: gfav('vetacap.com.ar'),          bg: '#fff' },
@@ -2194,23 +2058,22 @@ function bankAvatar(name) {
    BILLETERAS VIRTUALES
 ════════════════════════════════════════════════════════ */
 const BILLETERAS_DATA = [
+  { name: 'Fiwind',          tna: 23.00, url: 'https://www.fiwind.com.ar',          limit: '$750 k' },
   { name: 'Carrefour Banco', tna: 21.00, url: 'https://www.carrefourbanco.com.ar' },
-  { name: 'Fiwind',          tna: 20.00, url: 'https://www.fiwind.com.ar',          limit: '$750 k' },
-  { name: 'Naranja X',       tna: 19.00, url: 'https://www.naranjax.com',           limit: '$1 M' },
-  { name: 'Lemon Cash',      tna: 19.00, url: 'https://www.lemon.me' },
-  { name: 'Prex',            tna: 18.85, url: 'https://www.prexcard.com.ar' },
-  { name: 'Claro Pay',       tna: 18.31, url: 'https://www.claropay.com.ar' },
-  { name: 'Mercado Pago',    tna: 18.17, url: 'https://mpago.li/2yKh6np' },
-  { name: 'Ualá',            tna: 18.00, url: 'https://www.uala.com.ar',            limit: '$1 M' },
-  { name: 'Personal Pay',    tna: 17.89, url: 'https://www.personalpay.com.ar' },
-  { name: 'Taca Taca',       tna: 17.52, url: 'https://www.tacataca.com.ar' },
-  { name: 'Cocos Pay',       tna: 17.27, url: 'https://www.cocos.com.ar' },
+  { name: 'Ualá',            tna: 19.00, url: 'https://www.uala.com.ar',            limit: '$1 M' },
   { name: 'Brubank',         tna: 17.00, url: 'https://www.brubank.com.ar' },
-  { name: 'YPF',             tna: 16.89, url: 'https://app.ypf.com' },
+  { name: 'Cocos Pay',       tna: 18.98, url: 'https://www.cocos.com.ar' },
+  { name: 'Naranja X',       tna: 18.00, url: 'https://www.naranjax.com',           limit: '$1 M' },
+  { name: 'Mercado Pago',    tna: 17.89, url: 'https://mpago.li/2yKh6np' },
+  { name: 'Personal Pay',    tna: 17.89, url: 'https://www.personalpay.com.ar' },
+  { name: 'Prex',            tna: 17.89, url: 'https://www.prexcard.com.ar' },
+  { name: 'Supervielle',     tna: 17.89, url: 'https://www.supervielle.com.ar' },
+  { name: 'Taca Taca',       tna: 17.52, url: 'https://www.tacataca.com.ar' },
+  { name: 'Claro Pay',       tna: 17.16, url: 'https://www.claropay.com.ar' },
+  { name: 'AstroPay',        tna: 17.16, url: 'https://www.astropay.com' },
+  { name: 'Lemon Cash',      tna: 17.10, url: 'https://www.lemon.me' },
   { name: "Let'sBit",        tna: 16.79, url: 'https://www.letsbit.io' },
-  { name: 'AstroPay',        tna: 16.15, url: 'https://www.astropay.com' },
-  { name: 'Banco Galicia',   tna: 15.80, url: 'https://www.galicia.com.ar' },
-  { name: 'Supervielle',     tna: 15.00, url: 'https://www.supervielle.com.ar' },
+  { name: 'Banco Galicia',   tna: 16.58, url: 'https://www.galicia.com.ar' },
 ];
 
 function renderBilleteras() {
@@ -2499,14 +2362,8 @@ function renderDolar(data, isLive) {
 
   currentDolarData = data;
 
-  /* Lista. Desde el rediseño de la solapa DÓLAR (billeteras en dólares) esta
-     lista ya no está en la página, pero la cotización se sigue pidiendo porque
-     la usa la calculadora de comprar/vender. Sin este corte, escribir en un
-     contenedor que no existe tira un error, fetchDolar lo toma como "falló la
-     API" y repite el pedido con el respaldo al pedo. */
+  /* Lista */
   const el = document.getElementById('dolar-list');
-  if (!el) return;
-
   el.innerHTML = data.map(({ casa, compra, venta }) => {
     const cfg = DOLAR_CONFIG[casa] || { label: casa };
     return `
@@ -2530,9 +2387,7 @@ function renderDolar(data, isLive) {
 }
 
 function showDolarError() {
-  const el = document.getElementById('dolar-list');
-  if (!el) return;
-  el.innerHTML = `
+  document.getElementById('dolar-list').innerHTML = `
     <div class="info-state">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="12" cy="12" r="10"/>
@@ -2544,8 +2399,7 @@ function showDolarError() {
 }
 
 function retryDolar() {
-  const el = document.getElementById('dolar-list');
-  if (el) el.innerHTML =
+  document.getElementById('dolar-list').innerHTML =
     '<div class="loading-state"><div class="spinner"></div><p>Cargando cotizaciones…</p></div>';
   fetchDolar();
 }
@@ -2842,158 +2696,6 @@ async function renderPFUVA() {
   } catch(e) {
     el.innerHTML = '<div style="color:var(--text-sub);font-size:14px;padding:20px 0;">Error al cargar datos.</div>';
   }
-}
-
-/* ════════════════════════════════════════════════════════
-   LETRAS DEL TESORO (LECAPs y BONCAPs)
-
-   Cada letra paga un monto fijo y ya conocido en su fecha de
-   vencimiento (pagoFinal, por cada 100 nominales). Ese número
-   no se mueve nunca: queda definido cuando el Tesoro la emite.
-   Lo único que cambia día a día es el precio al que cotiza, y
-   de ahí sale la tasa. Por eso el precio se baja en vivo y la
-   TEM se recalcula sola cada vez que alguien abre la app.
-
-   precioRef es el último precio conocido: se usa para mostrar
-   la lista al instante y como respaldo si el precio en vivo no
-   llega. Cuando el Tesoro licita una letra nueva hay que
-   sumarla acá con su vencimiento y su pago final.
-════════════════════════════════════════════════════════ */
-const LECAPS_URL = 'https://data912.com/live/arg_notes';
-
-const LECAPS_DATA = [
-  { simbolo: 'S15S6', vence: '2026-09-15', pagoFinal: 107.210, precioRef: 106.810 },
-  { simbolo: 'S30S6', vence: '2026-09-30', pagoFinal: 117.536, precioRef: 115.978 },
-  { simbolo: 'S16O6', vence: '2026-10-16', pagoFinal: 105.204, precioRef: 102.835 },
-  { simbolo: 'S30O6', vence: '2026-10-30', pagoFinal: 135.278, precioRef: 130.993 },
-  { simbolo: 'S13N6', vence: '2026-11-13', pagoFinal: 109.651, precioRef: 104.981 },
-  { simbolo: 'S30N6', vence: '2026-11-30', pagoFinal: 129.888, precioRef: 122.890 },
-  { simbolo: 'T15E7', vence: '2027-01-15', pagoFinal: 161.104, precioRef: 147.500 },
-  { simbolo: 'T30A7', vence: '2027-04-30', pagoFinal: 157.341, precioRef: 133.750 },
-  { simbolo: 'T31Y7', vence: '2027-05-31', pagoFinal: 151.563, precioRef: 125.750 },
-  { simbolo: 'T30J7', vence: '2027-06-30', pagoFinal: 156.037, precioRef: 127.050 },
-];
-
-const MESES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-
-/* Días que faltan hasta el vencimiento, contados sobre el día
-   calendario para que no dependa de la hora en que se abra. */
-function diasHasta(fechaISO) {
-  const [a, m, d] = fechaISO.split('-').map(Number);
-  const hoy = new Date();
-  const cero = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-  return Math.round((new Date(a, m - 1, d) - cero) / 86400000);
-}
-
-function fechaCorta(fechaISO) {
-  const [a, m, d] = fechaISO.split('-').map(Number);
-  return `${d} ${MESES_CORTOS[m - 1]} ${a}`;
-}
-
-function plazoTexto(dias) {
-  if (dias === 0) return 'vence hoy';
-  if (dias === 1) return 'vence mañana';
-  return `en ${dias} días`;
-}
-
-/* Arma la lista final: descarta las ya vencidas, calcula la tasa
-   con el precio que tenga cada una y ordena de mayor a menor TEM. */
-function calcLecaps(precios) {
-  return LECAPS_DATA
-    .map(l => {
-      const dias = diasHasta(l.vence);
-      if (dias <= 0) return null;
-
-      let precio = precios[l.simbolo];
-      const tem = p => Math.pow(l.pagoFinal / p, 30 / dias) - 1;
-
-      /* Un precio raro (letra sin operar en el día, punta cruzada)
-         daría una tasa disparatada: en ese caso vale más el último
-         precio conocido que un número que no tiene sentido. */
-      if (!precio || tem(precio) <= 0 || tem(precio) > 0.30) precio = l.precioRef;
-
-      return {
-        simbolo: l.simbolo,
-        vence:   l.vence,
-        dias,
-        precio,
-        tem: tem(precio),
-        tea: Math.pow(l.pagoFinal / precio, 365 / dias) - 1,
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.tem - a.tem);
-}
-
-/* Precios en vivo. Si no llegan, la lista igual se muestra con
-   los de referencia — nunca queda una pantalla vacía. */
-async function preciosLecaps() {
-  try {
-    const res = await fetchTimeout(LECAPS_URL, 8000);
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-
-    const precios = {};
-    data.forEach(t => {
-      const mid = (t.px_bid > 0 && t.px_ask > 0) ? (t.px_bid + t.px_ask) / 2 : 0;
-      const px  = t.c > 0 ? t.c : (mid || t.px_bid);
-      if (px > 0) precios[t.symbol] = px;
-    });
-    console.info('[FinanzasNT] Letras actualizadas con precios de mercado');
-    return precios;
-  } catch (_) {
-    console.info('[FinanzasNT] Precios de letras no disponibles — mostrando últimos conocidos');
-    return {};
-  }
-}
-
-function renderLecaps(lista) {
-  const el = document.getElementById('lecaps-list');
-
-  if (!lista.length) {
-    el.innerHTML = '<div style="color:var(--text-sub);font-size:14px;padding:20px 0;">No hay letras disponibles en este momento.</div>';
-    return;
-  }
-
-  el.innerHTML = lista.map((l, i) => {
-    const mes = MESES_CORTOS[Number(l.vence.split('-')[1]) - 1].toUpperCase();
-    const pct = n => (n * 100).toFixed(2).replace('.', ',') + '%';
-    return `
-    <div class="wallet-item" style="cursor:default;">
-      ${rankBadge(i)}
-      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#0d2b52,#1a4a7a);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;margin-right:13px;line-height:1;">
-        <span style="font-size:12px;font-weight:800;color:#00e8ff;letter-spacing:.5px;">${mes}</span>
-        <span style="font-size:9.5px;color:rgba(255,255,255,.55);margin-top:2px;">${l.vence.slice(2, 4)}</span>
-      </div>
-      <div class="wallet-info">
-        <div class="wallet-name">${l.simbolo}</div>
-        <div class="wallet-sub" style="margin-top:3px;">Vence ${fechaCorta(l.vence)} · ${plazoTexto(l.dias)}</div>
-        <div class="wallet-sub" style="margin-top:2px;">TEA ${pct(l.tea)}</div>
-      </div>
-      <div class="wallet-rate">
-        <div class="wallet-rate-num">${pct(l.tem)}</div>
-        <div class="wallet-rate-tag">TEM</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function openLecaps() {
-  closeMenu();
-  closeCalc();
-  hideCalcBtn();
-  document.getElementById('lecapsOverlay').classList.add('open');
-  gaEvent('lecaps');
-
-  /* Primero la lista con los últimos precios conocidos, para que
-     algo se vea al toque, y después el refresco con los de hoy. */
-  renderLecaps(calcLecaps({}));
-  renderLecaps(calcLecaps(await preciosLecaps()));
-}
-
-function closeLecaps() {
-  document.getElementById('lecapsOverlay').classList.remove('open');
-  showCalcBtn();
 }
 
 /* ─── Menú hamburguesa ─── */
@@ -3482,6 +3184,15 @@ function closeModal(e) {
 
 function closeModalDirect() {
   document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+/* ── Cookie banner ── */
+function acceptCookies() {
+  localStorage.setItem('cookie_ok', '1');
+  document.getElementById('cookieBar').classList.add('hidden');
+}
+if (localStorage.getItem('cookie_ok')) {
+  document.getElementById('cookieBar').classList.add('hidden');
 }
 
 /* ════════════════════════════════════════════════════════

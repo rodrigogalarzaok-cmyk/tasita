@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1080px; height: 1080px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #000810 0%, #070e1a 55%, #001a50 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- Exactamente el mismo SVG que está en la app, escalado a 700px -->
+<svg width="700" height="700" viewBox="0 0 24 24" fill="none"
+     stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+     xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="cc">
+      <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Vapor -->
+  <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+  <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+
+  <!-- Cuerpo de la taza -->
+  <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+
+  <!-- Asa -->
+  <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
+
+  <!-- Barras cyan clipeadas dentro de la taza -->
+  <g clip-path="url(#cc)">
+    <rect x="4"   y="16.5" width="3"   height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
+    <rect x="8.5" y="14"   width="3"   height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
+    <rect x="13"  y="11.5" width="3"   height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
+  </g>
+</svg>
+
+</body>
+</html>

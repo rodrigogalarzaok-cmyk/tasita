@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Calculadora de Inflación</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-1: #010609;
+    --bg-2: #060e1c;
+    --bg-3: #0a2040;
+    --accent-text: #00e8ff;
+    --accent-btn: #b0eeff;
+    --text-main: #dce4f0;
+    --text-muted: #7a9bbf;
+    --green: #00e5a0;
+    --card-border: rgba(0,232,255,0.12);
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(to bottom, #000810, #000e28, #001255, #002878) fixed;
+    min-height: 100vh;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent-text);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .card {
+    background: linear-gradient(135deg, rgba(10,32,64,0.9), rgba(6,14,28,0.95));
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 480px;
+    backdrop-filter: blur(8px);
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    background: rgba(1,6,9,0.7);
+    border: 1px solid rgba(0,232,255,0.2);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300e8ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  select:focus, input[type="number"]:focus {
+    border-color: var(--accent-text);
+  }
+
+  select option { background: #060e1c; }
+
+  .amount-wrap {
+    position: relative;
+  }
+
+  .amount-wrap span {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+
+  .amount-wrap input {
+    padding-left: 26px;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #003a6b, #00527a);
+    border: 1px solid rgba(0,232,255,0.3);
+    border-radius: 10px;
+    color: var(--accent-btn);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { background: linear-gradient(135deg, #004a8a, #006090); border-color: rgba(0,232,255,0.5); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .results {
+    margin-top: 24px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .results.visible { display: flex; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 4px 0;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .result-row .label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .result-row .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .result-row.highlight .value {
+    font-size: 1.25rem;
+    color: var(--green);
+  }
+
+  .result-row.inflation .value {
+    color: #ff7a50;
+  }
+
+  .status {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
+  .status.error { color: #ff6b6b; }
+  .status.loading { color: var(--accent-text); }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    background: rgba(0,232,255,0.08);
+    border: 1px solid rgba(0,232,255,0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    text-align: center;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<h1>Calculadora de Inflación</h1>
+<p class="subtitle">Demo — Tasita</p>
+
+<div class="card">
+  <div class="field-group">
+
+    <div class="field">
+      <label>Desde</label>
+      <div class="date-row">
+        <select id="mesDesde"></select>
+        <select id="anioDesde"></select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Hasta</label>
+      <div class="date-row">
+        <select id="mesHasta"></select>
+        <select id="anioHasta"></select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Monto (opcional)</label>
+      <div class="amount-wrap">
+        <span>$</span>
+        <input type="number" id="monto" placeholder="100.000" min="0" step="any">
+      </div>
+    </div>
+
+  </div>
+
+  <button class="btn" id="calcBtn" onclick="calcular()">Calcular</button>
+
+  <div class="results" id="results">
+    <hr class="divider">
+    <div class="result-row inflation">
+      <span class="label">Inflación total</span>
+      <span class="value" id="rInflacion">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Promedio anual</span>
+      <span class="value" id="rAnual">—</span>
+    </div>
+    <div class="result-row" id="rowMonto" style="display:none">
+      <span class="label">Monto ajustado</span>
+      <span class="value highlight" id="rMonto">—</span>
+    </div>
+    <div class="result-row" id="rowPoder" style="display:none">
+      <span class="label">Poder adquisitivo hoy de $1 de entonces</span>
+      <span class="value" id="rPoder">—</span>
+    </div>
+  </div>
+
+  <p class="status" id="status">Cargando datos de IPC...</p>
+  <span class="tag">Fuente: INDEC · IPC Nacional</span>
+</div>
+
+<script>
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const API_URL = 'https://api.argentinadatos.com/v1/finanzas/indices/inflacion';
+
+let ipcIndex = null; // { 'YYYY-MM': acumulado }
+
+function poblarSelects() {
+  const hoy = new Date();
+  const anioActual = hoy.getFullYear();
+  const mesActual = hoy.getMonth(); // 0-based
+
+  ['Desde','Hasta'].forEach(cual => {
+    const selMes = document.getElementById('mes' + cual);
+    const selAnio = document.getElementById('anio' + cual);
+
+    MESES.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i + 1;
+      opt.textContent = m;
+      selMes.appendChild(opt);
+    });
+
+    for (let a = anioActual; a >= 1943; a--) {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selAnio.appendChild(opt);
+    }
+  });
+
+  // Defaults: desde = hace 12 meses, hasta = mes actual
+  const hace12 = new Date(hoy.getFullYear(), hoy.getMonth() - 12, 1);
+  document.getElementById('mesDesde').value = hace12.getMonth() + 1;
+  document.getElementById('anioDesde').value = hace12.getFullYear();
+  document.getElementById('mesHasta').value = mesActual + 1;
+  document.getElementById('anioHasta').value = anioActual;
+}
+
+async function cargarIPC() {
+  setStatus('Cargando datos de IPC...', 'loading');
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json(); // [{fecha: 'YYYY-MM-DD', valor: X}, ...]
+
+    // Construir índice acumulado (base = primer registro = 100)
+    const sorted = data.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    let base = 100;
+    ipcIndex = {};
+    sorted.forEach(d => {
+      const key = d.fecha.slice(0, 7); // 'YYYY-MM'
+      base = base * (1 + d.valor / 100);
+      ipcIndex[key] = base;
+    });
+
+    setStatus('');
+    document.getElementById('calcBtn').disabled = false;
+  } catch (e) {
+    setStatus('Error al cargar datos. Intentá de nuevo.', 'error');
+    console.error(e);
+  }
+}
+
+function setStatus(msg, type = '') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+
+function fmt(n) {
+  return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calcular() {
+  if (!ipcIndex) return;
+
+  const mesD = +document.getElementById('mesDesde').value;
+  const anioD = +document.getElementById('anioDesde').value;
+  const mesH = +document.getElementById('mesHasta').value;
+  const anioH = +document.getElementById('anioHasta').value;
+  const monto = parseFloat(document.getElementById('monto').value);
+
+  const keyD = `${anioD}-${String(mesD).padStart(2,'0')}`;
+  const keyH = `${anioH}-${String(mesH).padStart(2,'0')}`;
+
+  if (keyD >= keyH) {
+    setStatus('La fecha de inicio debe ser anterior a la fecha de fin.', 'error');
+    return;
+  }
+
+  const ipcD = ipcIndex[keyD];
+  const ipcH = ipcIndex[keyH];
+
+  if (!ipcD || !ipcH) {
+    setStatus(`Sin datos para ese período (${keyD} → ${keyH}).`, 'error');
+    return;
+  }
+
+  const inflTotal = (ipcH / ipcD - 1) * 100;
+
+  // Años transcurridos
+  const mesesTotal = (anioH - anioD) * 12 + (mesH - mesD);
+  const anios = mesesTotal / 12;
+  const inflAnual = (Math.pow(ipcH / ipcD, 1 / anios) - 1) * 100;
+
+  document.getElementById('rInflacion').textContent = fmt(inflTotal) + '%';
+  document.getElementById('rAnual').textContent = fmt(inflAnual) + '% anual';
+
+  const rowMonto = document.getElementById('rowMonto');
+  const rowPoder = document.getElementById('rowPoder');
+
+  if (!isNaN(monto) && monto > 0) {
+    const ajustado = monto * (ipcH / ipcD);
+    document.getElementById('rMonto').textContent = '$ ' + fmt(ajustado);
+    rowMonto.style.display = 'flex';
+    rowPoder.style.display = 'none';
+  } else {
+    const poder = 100 / (ipcH / ipcD);
+    document.getElementById('rPoder').textContent = '$ ' + fmt(poder);
+    rowPoder.style.display = 'flex';
+    rowMonto.style.display = 'none';
+  }
+
+  setStatus('');
+  document.getElementById('results').classList.add('visible');
+}
+
+// Init
+document.getElementById('calcBtn').disabled = true;
+poblarSelects();
+cargarIPC();
+</script>
+</body>
+</html>
