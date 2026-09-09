@@ -16,6 +16,22 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
   <meta name="twitter:description" content="Compará tasas de billeteras virtuales, plazos fijos y dólar en Argentina. Gratis, sin registro." />
+  <!-- Cuando Tasita Presupuesto abre esta página, iOS la muestra dentro de su
+       propio visor y pinta las barras de arriba y abajo con el color de fondo
+       del documento, que acá es el celeste del final del degradado (#4b88ff).
+       Solo en ese caso (la app agrega ?desde=app al link) se pasan a azul
+       oscuro. Entrando directo a tasita.com.ar este bloque no hace nada y la
+       página queda exactamente igual que siempre, overscroll celeste incluido. -->
+  <script>
+    if (location.search.indexOf('desde=app') !== -1) {
+      document.documentElement.style.backgroundColor = '#000810';
+      var mTheme = document.createElement('meta');
+      mTheme.name = 'theme-color';
+      mTheme.content = '#000810';
+      document.head.appendChild(mTheme);
+    }
+  </script>
+
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7059163758387758"
      crossorigin="anonymous"></script>
