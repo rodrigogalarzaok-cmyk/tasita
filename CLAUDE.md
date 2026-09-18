@@ -104,19 +104,19 @@ const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
 { name: 'Carrefour Banco', tna: 20.00 }
 { name: 'Fiwind',          tna: 20.00 }
 { name: 'Lemon Cash',      tna: 20.00 }
+{ name: 'Prex',            tna: 19.50 }
+{ name: 'Personal Pay',    tna: 19.50 }
+{ name: 'Claro Pay',       tna: 19.40 }
 { name: 'Mercado Pago',    tna: 19.16 }
 { name: 'Naranja X',       tna: 19.00 }
 { name: 'Ualá',            tna: 19.00 }
-{ name: 'Prex',            tna: 18.85 }
-{ name: 'Claro Pay',       tna: 18.31 }
-{ name: 'Personal Pay',    tna: 17.89 }
+{ name: 'YPF',             tna: 17.66 }
 { name: 'Taca Taca',       tna: 17.52 }
+{ name: 'Banco Galicia',   tna: 17.50 }
 { name: 'Cocos Pay',       tna: 17.27 }
 { name: 'Brubank',         tna: 17.00 }
-{ name: 'YPF',             tna: 16.89 }
 { name: "Let'sBit",        tna: 16.79 }
 { name: 'AstroPay',        tna: 16.15 }
-{ name: 'Banco Galicia',   tna: 15.80 }
 { name: 'Supervielle',     tna: 15.00 }
 ```
 
