@@ -98,16 +98,16 @@ const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
 
 ---
 
-## BILLETERAS_DATA (27 ago 2026) — actualizar desde billeterasvirtuales.com.ar
+## BILLETERAS_DATA (18 sep 2026) — actualizar desde billeterasvirtuales.com.ar
 
 ```javascript
-{ name: 'Carrefour Banco', tna: 21.00 }
+{ name: 'Carrefour Banco', tna: 20.00 }
 { name: 'Fiwind',          tna: 20.00 }
+{ name: 'Lemon Cash',      tna: 20.00 }
+{ name: 'Mercado Pago',    tna: 19.16 }
 { name: 'Naranja X',       tna: 19.00 }
-{ name: 'Lemon Cash',      tna: 19.00 }
 { name: 'Prex',            tna: 18.85 }
 { name: 'Claro Pay',       tna: 18.31 }
-{ name: 'Mercado Pago',    tna: 18.17 }
 { name: 'Ualá',            tna: 18.00 }
 { name: 'Personal Pay',    tna: 17.89 }
 { name: 'Taca Taca',       tna: 17.52 }
