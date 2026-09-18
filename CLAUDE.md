@@ -36,20 +36,7 @@ Cotizaciones en tiempo real. **Completamente automático.**
 - Tipos: Blue, Oficial, Bolsa (MEP), Contado con Liqui, Cripto, Tarjeta
 - Orden: Blue → Oficial → Bolsa → CCL → Cripto → Tarjeta
 
-### 4. LETRAS DEL TESORO (menú hamburguesa → "Letras")
-LECAPs y BONCAPs ordenadas por TEM descendente. **La tasa se recalcula sola todos los días.**
-- **Precios en vivo:** `https://data912.com/live/arg_notes` (CORS `*`, gratis, sin registro)
-  - Se usa `c` (último operado); si es 0, el punto medio entre `px_bid` y `px_ask`
-- **Metadata hardcodeada:** `LECAPS_DATA` — símbolo, `vence` (ISO) y `pagoFinal` (por cada 100 nominales)
-  - `pagoFinal` sale de las condiciones de emisión: **es fijo, no cambia nunca**
-  - `precioRef` = último precio conocido, para pintar la lista al instante y como respaldo si el fetch falla
-- **Fórmulas:** `TEM = (pagoFinal / precio)^(30/días) − 1` · `TEA = (pagoFinal / precio)^(365/días) − 1`
-  - Validado contra breakeven.ar el 8 sep 2026: coincide al segundo decimal
-- Las letras ya vencidas se descartan solas (`días <= 0`)
-- Precio absurdo (letra sin operar, punta cruzada) → cae al `precioRef`
-- **Frecuencia de actualización: tras cada licitación del Tesoro (~quincenal)** — agregar la letra nueva a `LECAPS_DATA`
-
-### 5. BROKERS (menú hamburguesa → "Brokers")
+### 4. BROKERS (menú hamburguesa → "Brokers")
 Brokers argentinos ordenados por comisión de menor a mayor. **Datos hardcodeados.**
 - Fuente: https://rfinanciera.github.io/Comisiones.brokers/
 - 8 brokers para acciones y CEDEARs (comisiones sin IVA ni derechos de mercado)
@@ -251,8 +238,7 @@ closeBrokers()           — cierra overlay de brokers
 
 - [ ] **Semanal:** Actualizar tasas de BILLETERAS_DATA desde billeterasvirtuales.com.ar
 - [ ] **Mensual o ante cambios:** Actualizar BROKERS_DATA desde rfinanciera.github.io/Comisiones.brokers
-- [ ] **Quincenal (tras cada licitación):** sumar las letras nuevas a `LECAPS_DATA` con su vencimiento y su pago final
-- [ ] **Automático:** Plazos Fijos, Dólar y la tasa de las Letras se actualizan solos (ArgentinaDatos + dolarapi.com + data912)
+- [ ] **Automático:** Plazos Fijos y Dólar se actualizan solos (ArgentinaDatos + dolarapi.com)
 - [ ] Actualizar PF_FALLBACK cuando las tasas de referencia cambien significativamente
 - [ ] **Hosting:** pendiente publicar en link público (ver opciones abajo)
 
