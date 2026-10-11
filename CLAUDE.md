@@ -100,7 +100,7 @@ const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
 { name: 'YPF',             tna: 17.66 }
 { name: 'Taca Taca',       tna: 17.52 }
 { name: 'Banco Galicia',   tna: 17.50 }
-{ name: 'Cocos Pay',       tna: 17.27 }
+{ name: 'Cocos Pay',       tna: 22.00 }
 { name: 'Brubank',         tna: 17.00 }
 { name: "Let'sBit",        tna: 16.79 }
 { name: 'AstroPay',        tna: 16.15 }
