@@ -1064,7 +1064,7 @@
       letter-spacing: -0.8px; line-height: 1.1;
       white-space: nowrap;
     }
-    .lec-gain-sub { font-size: 14.5px; font-weight: 600; color: var(--text-main); margin-top: 4px; }
+    .lec-gain-sub { font-size: 14.5px; font-weight: 600; color: var(--accent-text); margin-top: 4px; }
 
     .lec-stats {
       display: flex; align-items: center;
@@ -1120,9 +1120,13 @@
     .lec-mini-val { font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
 
     .lec-right { flex-shrink: 0; text-align: right; display: flex; align-items: center; gap: 7px; }
-    /* En la lista va solo el porcentaje: los pesos se muestran arriba,
-       en la caja verde, para la letra que esté elegida */
-    .lec-item-pct { font-size: 15.5px; font-weight: 800; color: #3ddc84; letter-spacing: -0.3px; white-space: nowrap; }
+    /* En la lista va solo el porcentaje, en el celeste de la casa: el mismo
+       que lleva la TNA en Billeteras y en Plazos Fijos. El verde queda
+       reservado para un solo número, el de la caja de arriba. */
+    .lec-item-pct {
+      font-size: 15.5px; font-weight: 800; letter-spacing: -0.3px;
+      white-space: nowrap; color: var(--accent-text);
+    }
     .lec-chev { color: var(--text-sub); flex-shrink: 0; }
 
     .lec-estado { text-align: center; padding: 26px 10px; font-size: 13px; color: var(--text-sub); }
