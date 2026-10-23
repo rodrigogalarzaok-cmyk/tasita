@@ -1072,6 +1072,7 @@
       border-radius: 16px; padding: 13px 15px;
     }
     .lec-stat { flex: 1; min-width: 0; }
+    .lec-stat.lec-stat-medio { text-align: center; }
     /* El total va centrado en su columna: con el texto pegado al borde
        izquierdo quedaba todo el aire junto del lado de afuera */
     .lec-stat.lec-stat-wide {
@@ -1862,9 +1863,9 @@
         <div class="lec-stat-label">TNA</div>
         <div class="lec-stat-val" id="lec-tna">—</div>
       </div>
-      <div class="lec-stat">
-        <div class="lec-stat-label">TEM</div>
-        <div class="lec-stat-val" id="lec-tem">—</div>
+      <div class="lec-stat lec-stat-medio">
+        <div class="lec-stat-label">Días</div>
+        <div class="lec-stat-val" id="lec-dias">—</div>
       </div>
       <div class="lec-stat lec-stat-wide">
         <div class="lec-stat-label">Total a recibir</div>
@@ -1876,7 +1877,6 @@
 
     <div class="lec-list-title">
       Opciones disponibles
-      <span id="lec-vence-info"></span>
     </div>
 
     <div id="lec-list" class="lec-list">
@@ -3877,10 +3877,8 @@ function renderLetras() {
   elGanancia.parentElement.style.fontSize =
     largo >= 12 ? '16px' : largo >= 11 ? '19px' : '23px';
   document.getElementById('lec-tna').textContent      = lecPct(c.tna * 100);
-  document.getElementById('lec-tem').textContent      = lecPct(c.tem * 100);
+  document.getElementById('lec-dias').textContent     = sel.dias;
   document.getElementById('lec-total').textContent    = lecPesos(c.aCobrar);
-  document.getElementById('lec-vence-info').textContent =
-    sel.ticker + ' · vence en ' + sel.dias + (sel.dias === 1 ? ' día' : ' días');
 
   document.getElementById('lec-list').innerHTML = LETRAS.map(l => {
     const k = lecCuentas(l, monto);
