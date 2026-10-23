@@ -1006,7 +1006,7 @@
        y no se nota ningún corte de color. */
     /* Todo este bloque va lo más compacto posible: cada píxel que ocupa
        es una letra menos que se ve en la lista de abajo */
-    #tab-letras .sec-header { margin-bottom: 10px; }
+    #tab-letras .sec-header { margin-bottom: 18px; }
     /* En Letras el fondo es de un solo color, sin degradado. Así el bloque
        anclado arriba lleva exactamente ese mismo color y no se nota ningún
        corte, en ninguna pantalla. Las otras solapas no se tocan. */
@@ -1015,7 +1015,7 @@
 
     .lec-fijo {
       position: sticky; top: 0; z-index: 20;
-      padding: 5px 0 9px;
+      padding: 10px 0 12px;
       background: var(--letras-bg);
     }
     /* El monto va algo más ancho que la ganancia: ahí se escribe.
@@ -1023,15 +1023,15 @@
        y empuje la caja de la ganancia fuera de la pantalla */
     .lec-top {
       display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr);
-      gap: 7px; margin-bottom: 6px;
+      gap: 10px; margin-bottom: 10px;
     }
     .lec-box {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 10px 12px;
+      border-radius: 16px; padding: 14px;
     }
     .lec-box-label {
-      font-size: 11px; color: var(--text-sub); font-weight: 600;
-      margin-bottom: 5px; text-align: center;
+      font-size: 12px; color: var(--text-sub); font-weight: 600;
+      margin-bottom: 9px; text-align: center;
     }
 
     /* El signo $ y el número se centran como un solo conjunto: el ancho del
@@ -1040,15 +1040,15 @@
       display: flex; align-items: center; justify-content: center; gap: 5px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(0,232,255,0.30);
-      border-radius: 10px; padding: 6px 10px;
+      border-radius: 11px; padding: 9px 11px;
     }
     .lec-input-wrap:focus-within { border-color: var(--accent-text); }
-    .lec-peso { font-size: 15px; font-weight: 700; color: var(--accent-text); flex-shrink: 0; }
+    .lec-peso { font-size: 16px; font-weight: 700; color: var(--accent-text); flex-shrink: 0; }
     .lec-input {
       flex: 0 1 auto; width: auto; min-width: 0; max-width: 100%;
       background: none; border: none; outline: none;
       color: var(--text-main); font-family: inherit; text-align: center;
-      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+      font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
     }
 
     /* Caja de ganancia: es el número que importa */
@@ -1060,16 +1060,16 @@
     }
     /* Lo primero que se ve es cuánta plata gana; el % va debajo */
     .lec-gain-main {
-      font-size: 21px; font-weight: 800; color: #3ddc84;
+      font-size: 23px; font-weight: 800; color: #3ddc84;
       letter-spacing: -0.8px; line-height: 1.1;
       white-space: nowrap;
     }
-    .lec-gain-sub { font-size: 13px; font-weight: 600; color: var(--text-main); margin-top: 3px; }
+    .lec-gain-sub { font-size: 14.5px; font-weight: 600; color: var(--text-main); margin-top: 4px; }
 
     .lec-stats {
       display: flex; align-items: center;
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 9px 14px;
+      border-radius: 16px; padding: 13px 15px;
     }
     .lec-stat { flex: 1; min-width: 0; }
     /* El total va centrado en su columna: con el texto pegado al borde
@@ -1078,8 +1078,8 @@
       flex: 1.4; border-left: 1px solid var(--border);
       padding: 0 14px; text-align: center;
     }
-    .lec-stat-label { font-size: 10.5px; color: var(--text-sub); font-weight: 600; margin-bottom: 2px; }
-    .lec-stat-val { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .lec-stat-label { font-size: 11.5px; color: var(--text-sub); font-weight: 600; margin-bottom: 3px; }
+    .lec-stat-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
 
     .lec-list-title {
       font-size: 12.5px; font-weight: 700; color: var(--text-main);
@@ -3894,7 +3894,7 @@ function renderLetras() {
   /* Con montos muy grandes el número no entra en la caja: se achica solo */
   const largo = elGanancia.textContent.length;
   elGanancia.parentElement.style.fontSize =
-    largo >= 12 ? '15px' : largo >= 11 ? '18px' : '21px';
+    largo >= 12 ? '16px' : largo >= 11 ? '19px' : '23px';
   document.getElementById('lec-tna').textContent      = lecPct(c.tna * 100);
   document.getElementById('lec-tem').textContent      = lecPct(c.tem * 100);
   document.getElementById('lec-total').textContent    = lecPesos(c.aCobrar);
