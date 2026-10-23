@@ -9,6 +9,9 @@
    Cómo se corre:   node control-letras.mjs
    ═══════════════════════════════════════════════════════════════════ */
 
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+
+const HISTORIAL = new URL('./historial-letras.json', import.meta.url);
 const AD    = 'https://api.argentinadatos.com/v1/finanzas/letras';
 const VIVO  = ['https://data912.com/live/arg_notes', 'https://data912.com/live/arg_bonds'];
 const OTRO  = 'https://www.acuantoesta.com.ar/api/lecaps-prices';
@@ -38,10 +41,18 @@ try {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Accept': 'application/json' } })).json();
 } catch { console.log('(no se pudo consultar la otra fuente de precios)\n'); }
 
-console.log('Datos del', datos.fechaActualizacion, '\n');
-console.log('ticker  vence       dias   pago     ¿coincide    precio   vs otra    rinde');
-console.log('                           final    por TNA?     vivo     fuente     por mes');
-console.log('─'.repeat(78));
+/* Foto de la corrida anterior, para ver si los números se movieron */
+let previo = null;
+if (existsSync(HISTORIAL)) {
+  try { const h = JSON.parse(readFileSync(HISTORIAL, 'utf8')); previo = h[h.length - 1] || null; } catch {}
+}
+
+console.log('Datos del', datos.fechaActualizacion);
+console.log('Corrido el', new Date().toLocaleString('es-AR'));
+if (previo) console.log('Comparando contra la corrida del', new Date(previo.cuando).toLocaleString('es-AR'));
+console.log('');
+console.log('ticker  vence       dias   precio   de donde   gana hoy   antes     cambio   vs otra fuente');
+console.log('─'.repeat(92));
 
 const tems = [];
 const filas = [];
@@ -73,16 +84,41 @@ for (const l of datos.letras) {
   if (difTasas > 0.01) avisar(`${l.ticker}: la tasa efectiva y la nominal no coinciden (${pct(difTasas)} de diferencia). La calculadora la descarta sola.`);
   if (difPrecio !== null && difPrecio > 0.02) avisar(`${l.ticker}: el precio difiere ${pct(difPrecio)} de la otra fuente (${precio} vs ${pOtro}).`);
 
-  filas.push([l.ticker, l.fechaVencimiento, dias, porTEA, difTasas, precio, difPrecio, tem]);
+  filas.push({ t: l.ticker, vence: l.fechaVencimiento, dias, pago: porTEA, difTasas,
+               precio, enVivo: !!vivos[l.ticker], difPrecio,
+               gana: porTEA / precio - 1, tem });
 }
 
-for (const [t, v, d, pago, dt, px, dp, tem] of filas) {
+/* La ganancia que daría usando el precio de la otra fuente: si los dos
+   precios son el mismo, las dos ganancias tienen que ser la misma. */
+for (const f of filas) {
+  const pOtro = otros[f.t]?.price;
+  const ganaOtro = pOtro ? f.pago / pOtro - 1 : null;
+  const antes = previo?.letras?.[f.t]?.gana;
+  const cambio = antes != null ? (f.gana - antes) * 100 : null;
   console.log(
-    t.padEnd(7), v, String(d).padStart(5), pago.toFixed(4).padStart(9),
-    (dt < 0.001 ? '   sí  ' : '  NO   ').padStart(10),
-    px.toFixed(2).padStart(9),
-    (dp === null ? '   -' : (dp < 0.001 ? '   igual' : '  ' + pct(dp))).padStart(9),
-    pct(tem).padStart(9));
+    f.t.padEnd(7), f.vence, String(f.dias).padStart(5),
+    f.precio.toFixed(2).padStart(8),
+    (f.enVivo ? '  mercado' : '   cierre').padStart(10),
+    ('+' + pct(f.gana)).padStart(10),
+    (antes != null ? '+' + pct(antes) : '    -').padStart(9),
+    (cambio != null ? (cambio >= 0 ? '+' : '') + cambio.toFixed(2) + ' pts' : '    -').padStart(10),
+    (ganaOtro === null ? '      -' : (Math.abs(ganaOtro - f.gana) < 0.0001 ? '   igual' : '  da ' + pct(ganaOtro))).padStart(12));
+}
+
+/* Avisos propios de esta comparación */
+const sinVivo = filas.filter(f => !f.enVivo).map(f => f.t);
+if (sinVivo.length)
+  avisar(`sin precio de mercado (se usó el cierre anterior): ${sinVivo.join(', ')}. Con el mercado abierto esto debería estar vacío.`);
+
+if (previo) {
+  const quietas = filas.filter(f => {
+    const antes = previo.letras?.[f.t]?.gana;
+    return antes != null && Math.abs(f.gana - antes) < 0.00005;
+  });
+  const mismoDia = previo.actualizado === datos.fechaActualizacion;
+  if (quietas.length === filas.length && !mismoDia)
+    avisar('NINGUNA ganancia se movió desde la corrida anterior, y los datos son de otro día. Revisar: el precio no se está actualizando.');
 }
 
 /* El control que atrapa la tasa inventada: ninguna debería rendir por mes
@@ -90,10 +126,18 @@ for (const [t, v, d, pago, dt, px, dp, tem] of filas) {
 tems.sort((a, b) => a - b);
 const mediana = tems[Math.floor(tems.length / 2)];
 console.log('\nrinde por mes: entre', pct(tems[0]), 'y', pct(tems[tems.length - 1]), '· mediana', pct(mediana));
-filas.forEach(([t, , , , , , , tem]) => {
-  if (tem > mediana * 1.4 || tem < mediana * 0.5)
-    avisar(`${t}: rinde ${pct(tem)} por mes contra una mediana de ${pct(mediana)}. Se sale de la banda: la calculadora NO la muestra.`);
+filas.forEach(f => {
+  if (f.tem > mediana * 1.4 || f.tem < mediana * 0.5)
+    avisar(`${f.t}: rinde ${pct(f.tem)} por mes contra una mediana de ${pct(mediana)}. Se sale de la banda: la calculadora NO la muestra.`);
 });
+
+/* Se guarda la foto para poder comparar en la próxima corrida */
+try {
+  const h = existsSync(HISTORIAL) ? JSON.parse(readFileSync(HISTORIAL, 'utf8')) : [];
+  h.push({ cuando: new Date().toISOString(), actualizado: datos.fechaActualizacion,
+           letras: Object.fromEntries(filas.map(f => [f.t, { precio: f.precio, gana: f.gana, enVivo: f.enVivo }])) });
+  writeFileSync(HISTORIAL, JSON.stringify(h.slice(-60), null, 1));
+} catch (e) { console.log('(no se pudo guardar el historial:', e.message + ')'); }
 
 console.log('\n' + '═'.repeat(78));
 if (!avisos.length) {
