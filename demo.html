@@ -3720,45 +3720,84 @@ async function lecPreciosVivos() {
   }
 }
 
+/* Cuántos días faltan hasta el vencimiento, contados contra el día de hoy.
+   Se calcula acá y no se toma el de la API: la API publica una vez por día,
+   así que un fin de semana, un feriado o una demora dejarían el número
+   viejo y la ganancia saldría mal. Contándolo solo, cada día que pasa la
+   cuenta se corrige sola aunque del otro lado no se haya movido nada. */
+function lecDiasHasta(fechaISO) {
+  const [a, m, d] = fechaISO.split('-').map(Number);
+  const hoy  = new Date();
+  const cero = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  return Math.round((new Date(a, m - 1, d) - cero) / 86400000);
+}
+
+/* Respaldo: lo que paga cada letra al vencimiento. Estos números son fijos
+   desde que el Tesoro las emite y no cambian nunca, así que una vez
+   verificados valen para siempre. Están acá para que la calculadora siga
+   andando con el precio en vivo aunque la fuente de las tasas no conteste.
+   Verificados el 23/10/2026 contra el flujo de fondos de Rava. */
+const LETRAS_RESPALDO = {
+  S30O6: { vence: '2026-10-30', pago: 135.2783 },
+  S13N6: { vence: '2026-11-13', pago: 109.6512 },
+  S30N6: { vence: '2026-11-30', pago: 129.8875 },
+  T15E7: { vence: '2027-01-15', pago: 161.1026 },
+  S29E7: { vence: '2027-01-29', pago: 111.6857 },
+  T30A7: { vence: '2027-04-30', pago: 157.3422 },
+  T31Y7: { vence: '2027-05-31', pago: 152.1864 },
+  T30J7: { vence: '2027-06-30', pago: 156.0342 },
+};
+
+function lecArmar(ticker, vence, pago, precio, enVivo) {
+  return {
+    ticker, vence, pago, precio, enVivo,
+    tipo: esLecap(ticker) ? 'LECAP' : 'BONCAP',
+    dias: lecDiasHasta(vence),
+  };
+}
+
 async function cargarLetras() {
   letrasLoaded = true;
   const cont = document.getElementById('lec-list');
+
+  /* El precio en vivo se pide siempre: es lo que hace que una caída del
+     mercado se vea en la ganancia el mismo día. */
+  const vivos = await lecPreciosVivos();
+  let lista = [];
+
   try {
     const res = await fetchTimeout(LEC_BASE_URL, 9000);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    const vivos = await lecPreciosVivos();
 
-    LETRAS = (data.letras || [])
-      .filter(l => (esLecap(l.ticker) || esBoncap(l.ticker)) && l.diasAlVencimiento > 0)
+    lista = (data.letras || [])
+      .filter(l => esLecap(l.ticker) || esBoncap(l.ticker))
       .map(l => {
-        const dias  = l.diasAlVencimiento;
-        /* Pago final: se calcula con el precio de cierre y su TEA, que es
-           el par de datos que vienen juntos y son consistentes entre sí. */
-        const pago  = l.precioArs * Math.pow(1 + l.teaPorcentaje/100, dias/365);
-        const precio = vivos[l.ticker] || l.precioArs;
-        return {
-          ticker: l.ticker,
-          tipo:   esLecap(l.ticker) ? 'LECAP' : 'BONCAP',
-          vence:  l.fechaVencimiento,
-          dias,
-          precio,          // por cada 100 nominales
-          pago,            // por cada 100 nominales
-          enVivo: !!vivos[l.ticker],
-        };
-      })
-      .sort((a, b) => a.dias - b.dias);
-
-    if (!LETRAS.length) {
-      cont.innerHTML = '<div class="lec-estado">No hay letras disponibles en este momento.</div>';
-      return;
-    }
-    letraSel = letraSel && LETRAS.some(l => l.ticker === letraSel) ? letraSel : LETRAS[0].ticker;
-    renderLetras();
+        /* El pago se deduce con el precio de cierre y SU tasa, y con los días
+           que usó la propia fuente: son tres datos que vienen juntos y son
+           consistentes entre sí. Mezclarlos con los días de hoy daría un
+           pago distinto cada día, y el pago no cambia nunca. */
+        const pago = l.precioArs * Math.pow(1 + l.teaPorcentaje/100, l.diasAlVencimiento/365);
+        return lecArmar(l.ticker, l.fechaVencimiento, pago,
+                        vivos[l.ticker] || l.precioArs, !!vivos[l.ticker]);
+      });
   } catch (e) {
+    /* Sin las tasas, se arma con los pagos ya verificados y el precio en vivo */
+    lista = Object.entries(LETRAS_RESPALDO)
+      .filter(([t]) => vivos[t])
+      .map(([t, v]) => lecArmar(t, v.vence, v.pago, vivos[t], true));
+  }
+
+  /* Las vencidas se caen solas, cualquiera haya sido la fuente */
+  LETRAS = lista.filter(l => l.dias > 0).sort((a, b) => a.dias - b.dias);
+
+  if (!LETRAS.length) {
     letrasLoaded = false;   // permite reintentar al volver a entrar
     cont.innerHTML = '<div class="lec-estado">No se pudieron cargar las letras.<br>Probá de nuevo en un rato.</div>';
+    return;
   }
+  letraSel = letraSel && LETRAS.some(l => l.ticker === letraSel) ? letraSel : LETRAS[0].ticker;
+  renderLetras();
 }
 
 /* Cuentas de una letra para el monto que se puso.
