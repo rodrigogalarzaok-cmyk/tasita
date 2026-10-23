@@ -3748,12 +3748,61 @@ const LETRAS_RESPALDO = {
   T30J7: { vence: '2027-06-30', pago: 156.0342 },
 };
 
-function lecArmar(ticker, vence, pago, precio, enVivo) {
+function lecArmar(ticker, vence, pago, precioVivo, precioCierre) {
   return {
-    ticker, vence, pago, precio, enVivo,
+    ticker, vence, pago,
+    precio: precioVivo || precioCierre,
+    precioCierre,
+    enVivo: !!precioVivo,
     tipo: esLecap(ticker) ? 'LECAP' : 'BONCAP',
     dias: lecDiasHasta(vence),
   };
+}
+
+/* ── Control de calidad ──────────────────────────────────────────────
+   Antes de mostrar nada se revisa que los números cierren. Vale mil veces
+   más que falte una letra a que aparezca un rendimiento inventado: la
+   gente decide con esto dónde pone su plata.
+
+   Se descarta la letra que:
+     · no tenga precio, pago o vencimiento usables;
+     · pague menos de lo que cuesta (sería pérdida segura: dato roto);
+     · rinda por mes bastante más que el resto. Ese es el caso de "todas al
+       22% y de la nada una al 35%". Se compara contra la mediana del día,
+       así el filtro se adapta solo cuando las tasas del mercado suben o
+       bajan. El margen es apretado para arriba (1,4 veces la mediana) y
+       ancho para abajo (la mitad): una tasa inflada es la que arrastra a
+       alguien a poner la plata, una tasa baja de más no engaña a nadie.
+
+   Se compara la tasa MENSUAL y no la anual porque es la única que se
+   puede comparar entre una letra a 7 días y una a 250. */
+function lecDepurar(lista) {
+  const temDe = (pago, precio, dias) => Math.pow(pago / precio, 30 / dias) - 1;
+
+  const sanas = lista.filter(l =>
+    isFinite(l.pago) && isFinite(l.precioCierre) &&
+    l.pago > 0 && l.precioCierre > 0 && l.dias > 0 &&
+    l.pago > l.precioCierre);
+  if (!sanas.length) return [];
+
+  const tems = sanas.map(l => temDe(l.pago, l.precioCierre, l.dias)).sort((a, b) => a - b);
+  const mediana = tems[Math.floor(tems.length / 2)];
+  const aceptable = t => t > 0 && t > mediana * 0.5 && t < mediana * 1.4;
+
+  const buenas = [];
+  sanas.forEach(l => {
+    /* Si el precio del momento da un disparate (una punta cruzada, una
+       letra sin operar), se prueba con el cierre antes de descartarla. */
+    let precio = l.precio;
+    if (!aceptable(temDe(l.pago, precio, l.dias))) precio = l.precioCierre;
+
+    if (aceptable(temDe(l.pago, precio, l.dias))) {
+      buenas.push({ ...l, precio, enVivo: precio !== l.precioCierre });
+    } else {
+      console.info('[Tasita] letra no mostrada, su rendimiento no cierra con el resto:', l.ticker);
+    }
+  });
+  return buenas;
 }
 
 async function cargarLetras() {
@@ -3776,20 +3825,33 @@ async function cargarLetras() {
         /* El pago se deduce con el precio de cierre y SU tasa, y con los días
            que usó la propia fuente: son tres datos que vienen juntos y son
            consistentes entre sí. Mezclarlos con los días de hoy daría un
-           pago distinto cada día, y el pago no cambia nunca. */
-        const pago = l.precioArs * Math.pow(1 + l.teaPorcentaje/100, l.diasAlVencimiento/365);
-        return lecArmar(l.ticker, l.fechaVencimiento, pago,
-                        vivos[l.ticker] || l.precioArs, !!vivos[l.ticker]);
-      });
+           pago distinto cada día, y el pago no cambia nunca.
+
+           El mismo pago está escondido dos veces: una en la tasa efectiva y
+           otra en la nominal. Se calcula por los dos caminos y tienen que
+           dar lo mismo. Si no coinciden, algún dato de esa letra está mal y
+           no se muestra: antes que publicar un rendimiento dudoso, preferimos
+           que falte. */
+        const dias   = l.diasAlVencimiento;
+        const porTEA = l.precioArs * Math.pow(1 + l.teaPorcentaje/100, dias/365);
+        const porTNA = l.precioArs * (1 + (l.tnaPorcentaje/100) * dias/365);
+        if (!(porTEA > 0) || Math.abs(porTEA - porTNA) / porTEA > 0.01) {
+          console.info('[Tasita] letra no mostrada, sus dos tasas no coinciden:', l.ticker);
+          return null;
+        }
+        return lecArmar(l.ticker, l.fechaVencimiento, porTEA, vivos[l.ticker], l.precioArs);
+      })
+      .filter(Boolean);
   } catch (e) {
     /* Sin las tasas, se arma con los pagos ya verificados y el precio en vivo */
     lista = Object.entries(LETRAS_RESPALDO)
       .filter(([t]) => vivos[t])
-      .map(([t, v]) => lecArmar(t, v.vence, v.pago, vivos[t], true));
+      .map(([t, v]) => lecArmar(t, v.vence, v.pago, vivos[t], vivos[t]));
   }
 
-  /* Las vencidas se caen solas, cualquiera haya sido la fuente */
-  LETRAS = lista.filter(l => l.dias > 0).sort((a, b) => a.dias - b.dias);
+  /* Las vencidas se caen solas y se revisa que los números cierren,
+     cualquiera haya sido la fuente */
+  LETRAS = lecDepurar(lista.filter(l => l.dias > 0)).sort((a, b) => a.dias - b.dias);
 
   if (!LETRAS.length) {
     letrasLoaded = false;   // permite reintentar al volver a entrar
