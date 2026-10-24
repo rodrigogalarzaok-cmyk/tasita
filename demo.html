@@ -3719,6 +3719,24 @@ function lecDiasHasta(fechaISO) {
   return Math.round((new Date(a, m - 1, d) - cero) / 86400000);
 }
 
+/* Días que la plata está invertida de verdad, que son los que valen para
+   sacar las tasas. La compra no se cierra el mismo día: se cierra el día
+   hábil siguiente. Por eso un viernes el plazo arranca el lunes, y los
+   días para la cuenta son tres menos que los del almanaque.
+
+   Comprobado el 23/10/2026: así contados, los días dan exactamente los
+   mismos que informa la fuente, en las ocho letras.
+
+   (No contempla feriados: un feriado puede correr el arranque un día más.
+   Sobre una tasa anual el efecto es de centésimas.) */
+function lecDiasMercado(fechaISO) {
+  const hoy = new Date();
+  const liq = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
+  while (liq.getDay() === 0 || liq.getDay() === 6) liq.setDate(liq.getDate() + 1);
+  const [a, m, d] = fechaISO.split('-').map(Number);
+  return Math.round((new Date(a, m - 1, d) - liq) / 86400000);
+}
+
 /* Respaldo: lo que paga cada letra al vencimiento. Estos números son fijos
    desde que el Tesoro las emite y no cambian nunca, así que una vez
    verificados valen para siempre. Están acá para que la calculadora siga
@@ -3742,7 +3760,11 @@ function lecArmar(ticker, vence, pago, precioVivo, precioCierre) {
     precioCierre,
     enVivo: !!precioVivo,
     tipo: esLecap(ticker) ? 'LECAP' : 'BONCAP',
-    dias: lecDiasHasta(vence),
+    /* dias = los que se le muestran a la persona: cuánto falta para tener
+       la plata en la mano, contando sábados y domingos.
+       diasCalc = los que la plata trabaja, para sacar las tasas. */
+    dias:     lecDiasHasta(vence),
+    diasCalc: lecDiasMercado(vence),
   };
 }
 
@@ -3768,11 +3790,11 @@ function lecDepurar(lista) {
 
   const sanas = lista.filter(l =>
     isFinite(l.pago) && isFinite(l.precioCierre) &&
-    l.pago > 0 && l.precioCierre > 0 && l.dias > 0 &&
+    l.pago > 0 && l.precioCierre > 0 && l.diasCalc > 0 &&
     l.pago > l.precioCierre);
   if (!sanas.length) return [];
 
-  const tems = sanas.map(l => temDe(l.pago, l.precioCierre, l.dias)).sort((a, b) => a - b);
+  const tems = sanas.map(l => temDe(l.pago, l.precioCierre, l.diasCalc)).sort((a, b) => a - b);
   const mediana = tems[Math.floor(tems.length / 2)];
   const aceptable = t => t > 0 && t > mediana * 0.5 && t < mediana * 1.4;
 
@@ -3781,9 +3803,9 @@ function lecDepurar(lista) {
     /* Si el precio del momento da un disparate (una punta cruzada, una
        letra sin operar), se prueba con el cierre antes de descartarla. */
     let precio = l.precio;
-    if (!aceptable(temDe(l.pago, precio, l.dias))) precio = l.precioCierre;
+    if (!aceptable(temDe(l.pago, precio, l.diasCalc))) precio = l.precioCierre;
 
-    if (aceptable(temDe(l.pago, precio, l.dias))) {
+    if (aceptable(temDe(l.pago, precio, l.diasCalc))) {
       buenas.push({ ...l, precio, enVivo: precio !== l.precioCierre });
     } else {
       console.info('[Tasita] letra no mostrada, su rendimiento no cierra con el resto:', l.ticker);
@@ -3838,7 +3860,7 @@ async function cargarLetras() {
 
   /* Las vencidas se caen solas y se revisa que los números cierren,
      cualquiera haya sido la fuente */
-  LETRAS = lecDepurar(lista.filter(l => l.dias > 0)).sort((a, b) => a.dias - b.dias);
+  LETRAS = lecDepurar(lista.filter(l => l.diasCalc > 0)).sort((a, b) => a.dias - b.dias);
 
   if (!LETRAS.length) {
     letrasLoaded = false;   // permite reintentar al volver a entrar
@@ -3859,12 +3881,16 @@ function lecCuentas(l, monto) {
   const invertido  = cantidad * precioUnit;
   const aCobrar    = cantidad * pagoUnit;
   const directa    = l.pago / l.precio - 1;              // no depende del monto
+  /* Las tasas se anualizan con los días que la plata trabaja de verdad, no
+     con los del almanaque: si no, la misma ganancia repartida en más días
+     daría una tasa más baja que la real. */
+  const d = Math.max(1, l.diasCalc);
   return {
     cantidad, invertido, aCobrar,
     ganancia: aCobrar - invertido,
     directa,
-    tna: directa * 365 / l.dias,
-    tem: Math.pow(1 + directa, 30 / l.dias) - 1,
+    tna: directa * 365 / d,
+    tem: Math.pow(1 + directa, 30 / d) - 1,
   };
 }
 
