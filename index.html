@@ -49,7 +49,11 @@
     html {
       background-color: #4b88ff; /* color inferior del degradado — evita blanco en overscroll de iOS */
       overscroll-behavior: none;
+      /* "clip" corta igual que "hidden" pero no rompe los bloques que quedan
+         fijos al hacer scroll (el panel de Letras). "hidden" queda primero
+         como respaldo para navegadores viejos que no entiendan "clip". */
       overflow-x: hidden;
+      overflow-x: clip;
     }
     html, body { max-width: 100%; }
 
@@ -63,11 +67,13 @@
       --accent-text: #00e8ff;
       --text-main: #dce4f0;
       --text-sub:  rgba(255,255,255,0.42);
+      --letras-bg: #000810;   /* fondo liso de la solapa Letras */
     }
 
     body {
       min-height: 100vh;
       overflow-x: hidden;
+      overflow-x: clip;
       background: linear-gradient(to bottom, #000810 0%, #070e1a 60%, #4b88ff 100%);
       background-attachment: fixed;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -988,6 +994,155 @@
     }
     .dcalc-error { color: #ff5555; }
 
+
+    /* ─── Letras (LECAP / BONCAP) ─── */
+
+    /* El monto y la ganancia quedan clavados arriba mientras se recorre
+       la lista. Lleva el mismo degradado del fondo, también fijo al
+       viewport, así las tarjetas que pasan por detrás no se transparentan
+       y no se nota ningún corte de color. */
+    /* Todo este bloque va lo más compacto posible: cada píxel que ocupa
+       es una letra menos que se ve en la lista de abajo */
+    #tab-letras .sec-header { margin-bottom: 18px; }
+    /* En Letras el fondo es de un solo color, sin degradado. Así el bloque
+       anclado arriba lleva exactamente ese mismo color y no se nota ningún
+       corte, en ninguna pantalla. Las otras solapas no se tocan. */
+    html.fondo-letras,
+    body.fondo-letras { background: var(--letras-bg); }
+
+    .lec-fijo {
+      position: sticky; top: 0; z-index: 20;
+      padding: 10px 0 12px;
+      background: var(--letras-bg);
+    }
+    /* El monto va algo más ancho que la ganancia: ahí se escribe.
+       minmax(0,…) evita que el ancho propio del input estire la columna
+       y empuje la caja de la ganancia fuera de la pantalla */
+    .lec-top {
+      display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr);
+      gap: 10px; margin-bottom: 10px;
+    }
+    .lec-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px;
+    }
+    .lec-box-label {
+      font-size: 12px; color: var(--text-sub); font-weight: 600;
+      margin-bottom: 9px; text-align: center;
+    }
+
+    /* El signo $ y el número se centran como un solo conjunto: el ancho del
+       campo se ajusta al número que se escribe (lo hace ajustarAnchoMonto) */
+    .lec-input-wrap {
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,232,255,0.30);
+      border-radius: 11px; padding: 9px 11px;
+    }
+    .lec-input-wrap:focus-within { border-color: var(--accent-text); }
+    .lec-peso { font-size: 16px; font-weight: 700; color: var(--accent-text); flex-shrink: 0; }
+    .lec-input {
+      flex: 0 1 auto; width: auto; min-width: 0; max-width: 100%;
+      background: none; border: none; outline: none;
+      color: var(--text-main); font-family: inherit; text-align: center;
+      font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    }
+
+    /* Caja de ganancia: es el número que importa */
+    .lec-box.lec-gain-box {
+      background: rgba(0,232,255,0.07);
+      border-color: rgba(0,232,255,0.35);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+    }
+    /* Lo primero que se ve es cuánta plata gana; el % va debajo */
+    .lec-gain-main {
+      font-size: 23px; font-weight: 800; color: var(--accent-text);
+      letter-spacing: -0.8px; line-height: 1.1;
+      white-space: nowrap;
+    }
+    /* El porcentaje de la caja va en blanco: el verde es solo para el monto
+       y el celeste para las ganancias de la lista */
+    .lec-gain-sub { font-size: 14.5px; font-weight: 600; color: #ffffff; margin-top: 4px; }
+
+    .lec-stats {
+      display: flex; align-items: center;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 13px 15px;
+    }
+    .lec-stat { flex: 1; min-width: 0; }
+    .lec-stat.lec-stat-medio { text-align: center; }
+    /* El total va centrado en su columna: con el texto pegado al borde
+       izquierdo quedaba todo el aire junto del lado de afuera */
+    .lec-stat.lec-stat-wide {
+      flex: 1.4; border-left: 1px solid var(--border);
+      padding: 0 14px; text-align: center;
+    }
+    .lec-stat-label { font-size: 11.5px; color: var(--text-sub); font-weight: 600; margin-bottom: 3px; }
+    .lec-stat-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
+
+    .lec-list-title {
+      font-size: 12.5px; font-weight: 700; color: var(--text-main);
+      margin: 11px 0 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .lec-list-title span { font-size: 11.5px; color: var(--text-sub); font-weight: 500; }
+
+    .lec-list { display: flex; flex-direction: column; gap: 6px; }
+    .lec-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 13px; cursor: pointer;
+      transition: background .18s, border-color .18s;
+    }
+    .lec-item:hover { background: rgba(255,255,255,0.07); }
+    .lec-item.sel {
+      background: rgba(0,232,255,0.07);
+      border-color: rgba(0,232,255,0.45);
+    }
+
+    .lec-id { flex-shrink: 0; min-width: 76px; }
+    .lec-ticker { font-size: 14.5px; font-weight: 800; color: var(--text-main); letter-spacing: 0.2px; }
+    .lec-badge {
+      display: inline-block; margin-top: 4px;
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.4px;
+      border-radius: 5px; padding: 2px 6px;
+      color: var(--accent-text); background: rgba(0,232,255,0.12);
+      border: 1px solid rgba(0,232,255,0.30);
+    }
+    .lec-vto { font-size: 11.5px; color: var(--text-sub); margin-top: 5px; white-space: nowrap; }
+
+    /* TNA y TEM se reparten el espacio del medio en partes iguales,
+       así la TEM no queda pegada a la TNA */
+    .lec-mid { flex: 1; display: flex; gap: 8px; min-width: 0; }
+    .lec-mid > div { flex: 1; min-width: 0; }
+    .lec-mini-label { font-size: 10px; color: var(--text-sub); font-weight: 600; letter-spacing: 0.3px; }
+    .lec-mini-val { font-size: 13px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+
+    .lec-right { flex-shrink: 0; text-align: right; display: flex; align-items: center; gap: 7px; }
+    /* En la lista va solo el porcentaje, en el celeste de la casa: el mismo
+       que lleva la TNA en Billeteras y en Plazos Fijos. El verde queda
+       reservado para un solo número, el de la caja de arriba. */
+    .lec-item-pct {
+      font-size: 15.5px; font-weight: 800; letter-spacing: -0.3px;
+      white-space: nowrap; color: var(--accent-text);
+    }
+    .lec-chev { color: var(--text-sub); flex-shrink: 0; }
+
+    .lec-estado { text-align: center; padding: 26px 10px; font-size: 13px; color: var(--text-sub); }
+
+    /* Aclaración al pie: una línea, sin recuadro ni adornos */
+    .lec-pie {
+      margin: 16px 2px 0; text-align: center;
+      font-size: 11px; line-height: 1.5; color: var(--text-sub);
+    }
+
+    /* Celulares angostos: la tarjeta de cada letra se apila */
+    @media (max-width: 380px) {
+      .lec-mid { gap: 9px; }
+      .lec-id { min-width: 68px; }
+      .lec-gain-pct { font-size: 22px; }
+    }
+
   </style>
 </head>
 <body>
@@ -1060,6 +1215,14 @@
           </svg>
           Dólares
         </div>
+        <div class="menu-option" onclick="openBilleterasUSD()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="13" rx="2.5"/>
+            <path d="M2 10.5h20"/>
+            <circle cx="12" cy="14.5" r="1.8"/>
+          </svg>
+          Billeteras USD
+        </div>
         <div class="menu-option" onclick="openPresupuesto()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
@@ -1129,6 +1292,74 @@
           <div class="faq-a">Un broker es una sociedad de bolsa habilitada para operar en el mercado de capitales en tu nombre. A través de un broker podés comprar y vender acciones, CEDEARs, bonos y otros instrumentos financieros. La diferencia principal con una billetera virtual es que el broker te da acceso a inversiones más complejas, mientras que la billetera rinde sobre tu saldo en pesos de forma automática.</div>
         </div>
       </section>
+      <footer class="social-footer">
+        <a class="social-link ig" href="https://www.instagram.com/rodrigogalarzaa" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5.5" fill="url(#ig-bg)"/>
+            <rect x="4.5" y="4.5" width="15" height="15" rx="4" stroke="white" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="3.8" stroke="white" stroke-width="1.8"/>
+            <circle cx="17.2" cy="6.8" r="1.3" fill="white"/>
+          </svg>
+          @rodrigogalarzaa
+        </a>
+        <a class="social-link tt" href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="23" height="23" rx="5" fill="#010101"/>
+            <path transform="translate(1.5,0)" fill="#ee1d52" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path transform="translate(-1.5,0)" fill="#69c9d0" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            <path fill="white" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+          </svg>
+          @rodrigogalarzaa
+        </a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ══ Billeteras USD overlay ══ -->
+  <div class="broker-overlay" id="billeterasUsdOverlay">
+    <div class="broker-inner">
+
+      <!-- Logo Tasita (toca → vuelve al inicio) -->
+      <div class="header" style="padding-bottom:16px; cursor:pointer;" onclick="closeBilleterasUSD()">
+        <div class="logo">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"
+               stroke="#dce4f0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <clipPath id="cc-usd">
+                <path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/>
+              </clipPath>
+            </defs>
+            <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+            <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+            <path d="M16.746 16.726a3 3 0 1 0 .252-5.555"/>
+            <g clip-path="url(#cc-usd)">
+              <rect x="4"   y="16.5" width="3" height="5"   rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="8.5" y="14"   width="3" height="7.5" rx="0.5" fill="#00e8ff" stroke="none"/>
+              <rect x="13"  y="11.5" width="3" height="10"  rx="0.5" fill="#00e8ff" stroke="none"/>
+            </g>
+          </svg>
+          <span class="logo-name">Tasita</span>
+        </div>
+      </div>
+
+      <!-- Botón volver -->
+      <button class="broker-back" onclick="closeBilleterasUSD()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Volver
+      </button>
+
+      <div class="sec-header">
+        <h2 class="sec-title">
+          <span class="sec-emoji">💵</span>
+          Billeteras en dólares
+        </h2>
+      </div>
+
+      <div id="billeteras-usd-list" class="wallet-list"></div>
+
       <footer class="social-footer">
         <a class="social-link ig" href="https://www.instagram.com/rodrigogalarzaa" target="_blank">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1544,7 +1775,7 @@
   <nav class="tab-bar" role="tablist">
     <div class="tab active" data-tab="billeteras" role="tab">BILLETERAS</div>
     <div class="tab"        data-tab="plazos"     role="tab">PLAZOS FIJOS</div>
-    <div class="tab"        data-tab="dolar"      role="tab">DÓLAR</div>
+    <div class="tab"        data-tab="letras"     role="tab">LETRAS</div>
   </nav>
 
   <!-- ══════════════════════════════
@@ -1606,16 +1837,63 @@
   <!-- ══════════════════════════════
        DÓLAR
   ══════════════════════════════ -->
-  <section class="tab-content" id="tab-dolar" role="tabpanel">
+  <section class="tab-content" id="tab-letras" role="tabpanel">
 
     <div class="sec-header">
       <h2 class="sec-title">
-        <span class="sec-emoji">💵</span>
-        Billeteras en dólares
+        <span class="sec-emoji">📄</span>
+        Letras (LECAP)
       </h2>
     </div>
 
-    <div id="billeteras-usd-list" class="wallet-list"></div>
+    <!-- Este bloque queda clavado arriba: la persona baja por la lista,
+         va tocando letras y sigue viendo cuánto gana con cada una -->
+    <div class="lec-fijo">
+
+    <!-- Monto + ganancia directa (lo que importa) -->
+    <div class="lec-top">
+      <div class="lec-box">
+        <div class="lec-box-label">Monto a invertir</div>
+        <div class="lec-input-wrap">
+          <span class="lec-peso">$</span>
+          <input id="lec-monto" class="lec-input" type="text" inputmode="numeric"
+                 value="1.000.000" aria-label="Monto a invertir">
+        </div>
+      </div>
+      <div class="lec-box lec-gain-box">
+        <div class="lec-box-label">Ganancia directa</div>
+        <div class="lec-gain-main"><span id="lec-gain-ars">—</span></div>
+        <div class="lec-gain-sub" id="lec-gain-pct">—</div>
+      </div>
+    </div>
+
+    <!-- TNA / TEM / total -->
+    <div class="lec-stats">
+      <div class="lec-stat">
+        <div class="lec-stat-label">TNA</div>
+        <div class="lec-stat-val" id="lec-tna">—</div>
+      </div>
+      <div class="lec-stat lec-stat-medio">
+        <div class="lec-stat-label">Días</div>
+        <div class="lec-stat-val" id="lec-dias">—</div>
+      </div>
+      <div class="lec-stat lec-stat-wide">
+        <div class="lec-stat-label">Total a recibir</div>
+        <div class="lec-stat-val" id="lec-total">—</div>
+      </div>
+    </div>
+
+    </div><!-- /lec-fijo -->
+
+    <div class="lec-list-title">
+      Opciones disponibles
+    </div>
+
+    <div id="lec-list" class="lec-list">
+      <div class="lec-estado">Cargando letras…</div>
+    </div>
+
+    <p class="lec-pie">Herramienta informativa, con fines de aprendizaje. No contempla las comisiones de cada broker.</p>
 
   </section>
 
@@ -1844,8 +2122,14 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(c =>
     c.classList.toggle('active', c.id === 'tab-' + name));
   if (name === 'plazos' && !plazosLoaded) loadPlazos();
-  document.getElementById('main-faq').style.display  = name === 'dolar' ? 'none' : '';
-  document.getElementById('calcBtn').style.display   = name === 'dolar' ? 'none' : '';
+  if (name === 'letras' && !letrasLoaded) cargarLetras();
+  /* Fondo liso solo en Letras: Billeteras y Plazos Fijos conservan el degradado */
+  document.documentElement.classList.toggle('fondo-letras', name === 'letras');
+  document.body.classList.toggle('fondo-letras', name === 'letras');
+  /* En Letras se esconden las preguntas frecuentes (hablan de billeteras y
+     plazos fijos) y la calculadora de rendimiento. */
+  document.getElementById('main-faq').style.display  = name === 'letras' ? 'none' : '';
+  document.getElementById('calcBtn').style.display   = name === 'letras' ? 'none' : '';
   gaEvent(name);
 }
 document.querySelectorAll('.tab').forEach(t =>
@@ -2892,7 +3176,7 @@ function useBrokerInCalc(pct) {
 ════════════════════════════════════════════════════════ */
 function showCalcBubble() {
   // No mostrar en pestaña dólar
-  if (document.getElementById('tab-dolar').classList.contains('active'))     return;
+  if (document.getElementById('tab-letras').classList.contains('active'))    return;
   // No mostrar si la calc ya está abierta
   if (document.getElementById('calcPanel').classList.contains('open'))       return;
   if (document.getElementById('calcBrokerPanel').classList.contains('open')) return;
@@ -3341,6 +3625,22 @@ function closeDolarOverlay() {
   showCalcBtn();
 }
 
+
+/* ─── Billeteras USD (antes era una solapa, ahora vive en el menú) ─── */
+function openBilleterasUSD() {
+  closeMenu();
+  closeCalc();
+  hideCalcBtn();
+  document.getElementById('billeterasUsdOverlay').classList.add('open');
+  renderBilleterasUSD();
+  gaEvent('billeteras_usd');
+}
+
+function closeBilleterasUSD() {
+  document.getElementById('billeterasUsdOverlay').classList.remove('open');
+  showCalcBtn();
+}
+
 function openPresupuesto() {
   closeMenu();
   closeCalc();
@@ -3393,6 +3693,329 @@ function renderBilleterasUSD() {
       : `<div class="wallet-item">${inner}</div>`;
   }).join('');
 }
+
+/* ════════════════════════════════════════════════════════
+   LETRAS DEL TESORO — LECAPs y BONCAPs
+
+   Cada letra paga un monto fijo y ya conocido en su fecha de
+   vencimiento. Ese número no se publica en ninguna API, así que
+   se deduce del precio y la tasa efectiva anual que informa
+   ArgentinaDatos: pagoFinal = precio × (1+TEA)^(días/365).
+   Verificado el 23/10/2026 contra el flujo de fondos de Rava.
+
+   El precio se pide en vivo a data912 (las LECAP y las BONCAP
+   viven en dos endpoints distintos). Si no contesta, se usa el
+   cierre anterior de ArgentinaDatos y la pantalla igual funciona.
+════════════════════════════════════════════════════════ */
+const LEC_BASE_URL  = 'https://api.argentinadatos.com/v1/finanzas/letras';
+const LEC_VIVO_URLS = ['https://data912.com/live/arg_notes',
+                       'https://data912.com/live/arg_bonds'];
+
+/* Solo letras a tasa fija en pesos: S… son LECAP, T… son BONCAP.
+   Deja afuera duales, CER y TAMAR, que se calculan distinto. */
+const esLecap  = t => /^S\d{2}[A-Z]\d$/.test(t);
+const esBoncap = t => /^T\d{2}[A-Z]\d$/.test(t);
+
+let LETRAS      = [];
+let letraSel    = null;
+let letrasLoaded = false;
+
+const MESES_LEC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+function lecFechaCorta(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${a}`;
+}
+function lecPct(n)  { return n.toLocaleString('es-AR', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '%'; }
+function lecPesos(n) { return '$ ' + Math.round(n).toLocaleString('es-AR'); }
+
+/* Lo que la persona escribió en el campo, como número */
+function lecMonto() {
+  const txt = document.getElementById('lec-monto').value.replace(/\./g, '').replace(/[^\d]/g, '');
+  return parseInt(txt || '0', 10);
+}
+
+async function lecPreciosVivos() {
+  try {
+    const partes = await Promise.all(LEC_VIVO_URLS.map(u => fetchTimeout(u, 8000).then(r => r.json())));
+    const precios = {};
+    partes.flat().forEach(t => { if (t && t.c > 0) precios[t.symbol] = t.c; });
+    return precios;
+  } catch (_) {
+    return {};   // sin precio en vivo se usa el cierre: nunca queda la pantalla vacía
+  }
+}
+
+/* Cuántos días faltan hasta el vencimiento, contados contra el día de hoy.
+   Se calcula acá y no se toma el de la API: la API publica una vez por día,
+   así que un fin de semana, un feriado o una demora dejarían el número
+   viejo y la ganancia saldría mal. Contándolo solo, cada día que pasa la
+   cuenta se corrige sola aunque del otro lado no se haya movido nada. */
+function lecDiasHasta(fechaISO) {
+  const [a, m, d] = fechaISO.split('-').map(Number);
+  const hoy  = new Date();
+  const cero = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  return Math.round((new Date(a, m - 1, d) - cero) / 86400000);
+}
+
+/* Días que la plata está invertida de verdad, que son los que valen para
+   sacar las tasas. La compra no se cierra el mismo día: se cierra el día
+   hábil siguiente. Por eso un viernes el plazo arranca el lunes, y los
+   días para la cuenta son tres menos que los del almanaque.
+
+   Comprobado el 23/10/2026: así contados, los días dan exactamente los
+   mismos que informa la fuente, en las ocho letras.
+
+   (No contempla feriados: un feriado puede correr el arranque un día más.
+   Sobre una tasa anual el efecto es de centésimas.) */
+function lecDiasMercado(fechaISO) {
+  const hoy = new Date();
+  const liq = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
+  while (liq.getDay() === 0 || liq.getDay() === 6) liq.setDate(liq.getDate() + 1);
+  const [a, m, d] = fechaISO.split('-').map(Number);
+  return Math.round((new Date(a, m - 1, d) - liq) / 86400000);
+}
+
+/* Respaldo: lo que paga cada letra al vencimiento. Estos números son fijos
+   desde que el Tesoro las emite y no cambian nunca, así que una vez
+   verificados valen para siempre. Están acá para que la calculadora siga
+   andando con el precio en vivo aunque la fuente de las tasas no conteste.
+   Verificados el 23/10/2026 contra el flujo de fondos de Rava. */
+const LETRAS_RESPALDO = {
+  S30O6: { vence: '2026-10-30', pago: 135.2783 },
+  S13N6: { vence: '2026-11-13', pago: 109.6512 },
+  S30N6: { vence: '2026-11-30', pago: 129.8875 },
+  T15E7: { vence: '2027-01-15', pago: 161.1026 },
+  S29E7: { vence: '2027-01-29', pago: 111.6857 },
+  T30A7: { vence: '2027-04-30', pago: 157.3422 },
+  T31Y7: { vence: '2027-05-31', pago: 152.1864 },
+  T30J7: { vence: '2027-06-30', pago: 156.0342 },
+};
+
+function lecArmar(ticker, vence, pago, precioVivo, precioCierre) {
+  return {
+    ticker, vence, pago,
+    precio: precioVivo || precioCierre,
+    precioCierre,
+    enVivo: !!precioVivo,
+    tipo: esLecap(ticker) ? 'LECAP' : 'BONCAP',
+    /* dias = los que se le muestran a la persona: cuánto falta para tener
+       la plata en la mano, contando sábados y domingos.
+       diasCalc = los que la plata trabaja, para sacar las tasas. */
+    dias:     lecDiasHasta(vence),
+    diasCalc: lecDiasMercado(vence),
+  };
+}
+
+/* ── Control de calidad ──────────────────────────────────────────────
+   Antes de mostrar nada se revisa que los números cierren. Vale mil veces
+   más que falte una letra a que aparezca un rendimiento inventado: la
+   gente decide con esto dónde pone su plata.
+
+   Se descarta la letra que:
+     · no tenga precio, pago o vencimiento usables;
+     · pague menos de lo que cuesta (sería pérdida segura: dato roto);
+     · rinda por mes bastante más que el resto. Ese es el caso de "todas al
+       22% y de la nada una al 35%". Se compara contra la mediana del día,
+       así el filtro se adapta solo cuando las tasas del mercado suben o
+       bajan. El margen es apretado para arriba (1,4 veces la mediana) y
+       ancho para abajo (la mitad): una tasa inflada es la que arrastra a
+       alguien a poner la plata, una tasa baja de más no engaña a nadie.
+
+   Se compara la tasa MENSUAL y no la anual porque es la única que se
+   puede comparar entre una letra a 7 días y una a 250. */
+function lecDepurar(lista) {
+  const temDe = (pago, precio, dias) => Math.pow(pago / precio, 30 / dias) - 1;
+
+  const sanas = lista.filter(l =>
+    isFinite(l.pago) && isFinite(l.precioCierre) &&
+    l.pago > 0 && l.precioCierre > 0 && l.diasCalc > 0 &&
+    l.pago > l.precioCierre);
+  if (!sanas.length) return [];
+
+  /* La banda se arma solo con las que tienen plazo suficiente: a una letra a
+     dos días del vencimiento, una ganancia chiquita llevada a 30 días da un
+     número enorme, y eso ensuciaría la mediana. */
+  const CORTA = 10;   // días
+  const tems = sanas.filter(l => l.diasCalc >= CORTA)
+                    .map(l => temDe(l.pago, l.precioCierre, l.diasCalc)).sort((a, b) => a - b);
+  const mediana = tems.length ? tems[Math.floor(tems.length / 2)] : null;
+
+  /* Y tampoco se les aplica: por lo mismo, su tasa mensual se dispara sola y
+     el filtro las sacaba de la lista días antes de que vencieran, que fue
+     justo lo que pasó al probar el paso del tiempo. A esas les alcanza con
+     los otros dos controles: que paguen más de lo que cuestan y que sus dos
+     tasas coincidan. */
+  const aceptable = (t, dias) =>
+    t > 0 && (dias < CORTA || mediana === null || (t > mediana * 0.5 && t < mediana * 1.4));
+
+  const buenas = [];
+  sanas.forEach(l => {
+    /* Si el precio del momento da un disparate (una punta cruzada, una
+       letra sin operar), se prueba con el cierre antes de descartarla. */
+    let precio = l.precio;
+    if (!aceptable(temDe(l.pago, precio, l.diasCalc), l.diasCalc)) precio = l.precioCierre;
+
+    if (aceptable(temDe(l.pago, precio, l.diasCalc), l.diasCalc)) {
+      buenas.push({ ...l, precio, enVivo: precio !== l.precioCierre });
+    } else {
+      console.info('[Tasita] letra no mostrada, su rendimiento no cierra con el resto:', l.ticker);
+    }
+  });
+  return buenas;
+}
+
+async function cargarLetras() {
+  letrasLoaded = true;
+  const cont = document.getElementById('lec-list');
+
+  /* El precio en vivo se pide siempre: es lo que hace que una caída del
+     mercado se vea en la ganancia el mismo día. */
+  const vivos = await lecPreciosVivos();
+  let lista = [];
+
+  try {
+    const res = await fetchTimeout(LEC_BASE_URL, 9000);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+
+    lista = (data.letras || [])
+      .filter(l => esLecap(l.ticker) || esBoncap(l.ticker))
+      .map(l => {
+        /* El pago se deduce con el precio de cierre y SU tasa, y con los días
+           que usó la propia fuente: son tres datos que vienen juntos y son
+           consistentes entre sí. Mezclarlos con los días de hoy daría un
+           pago distinto cada día, y el pago no cambia nunca.
+
+           El mismo pago está escondido dos veces: una en la tasa efectiva y
+           otra en la nominal. Se calcula por los dos caminos y tienen que
+           dar lo mismo. Si no coinciden, algún dato de esa letra está mal y
+           no se muestra: antes que publicar un rendimiento dudoso, preferimos
+           que falte. */
+        const dias   = l.diasAlVencimiento;
+        const porTEA = l.precioArs * Math.pow(1 + l.teaPorcentaje/100, dias/365);
+        const porTNA = l.precioArs * (1 + (l.tnaPorcentaje/100) * dias/365);
+        if (!(porTEA > 0) || Math.abs(porTEA - porTNA) / porTEA > 0.01) {
+          console.info('[Tasita] letra no mostrada, sus dos tasas no coinciden:', l.ticker);
+          return null;
+        }
+        return lecArmar(l.ticker, l.fechaVencimiento, porTEA, vivos[l.ticker], l.precioArs);
+      })
+      .filter(Boolean);
+  } catch (e) {
+    /* Sin las tasas, se arma con los pagos ya verificados y el precio en vivo */
+    lista = Object.entries(LETRAS_RESPALDO)
+      .filter(([t]) => vivos[t])
+      .map(([t, v]) => lecArmar(t, v.vence, v.pago, vivos[t], vivos[t]));
+  }
+
+  /* Las vencidas se caen solas y se revisa que los números cierren,
+     cualquiera haya sido la fuente */
+  LETRAS = lecDepurar(lista.filter(l => l.diasCalc > 0)).sort((a, b) => a.dias - b.dias);
+
+  if (!LETRAS.length) {
+    letrasLoaded = false;   // permite reintentar al volver a entrar
+    cont.innerHTML = '<div class="lec-estado">No se pudieron cargar las letras.<br>Probá de nuevo en un rato.</div>';
+    return;
+  }
+  letraSel = letraSel && LETRAS.some(l => l.ticker === letraSel) ? letraSel : LETRAS[0].ticker;
+  renderLetras();
+}
+
+/* Cuentas de una letra para el monto que se puso.
+   Las letras se compran por unidades enteras, así que se redondea
+   para abajo y se muestra lo que realmente se termina invirtiendo. */
+function lecCuentas(l, monto) {
+  const precioUnit = l.precio / 100;
+  const pagoUnit   = l.pago   / 100;
+  const cantidad   = Math.floor(monto / precioUnit);
+  const invertido  = cantidad * precioUnit;
+  const aCobrar    = cantidad * pagoUnit;
+  const directa    = l.pago / l.precio - 1;              // no depende del monto
+  /* Las tasas se anualizan con los días que la plata trabaja de verdad, no
+     con los del almanaque: si no, la misma ganancia repartida en más días
+     daría una tasa más baja que la real. */
+  const d = Math.max(1, l.diasCalc);
+  return {
+    cantidad, invertido, aCobrar,
+    ganancia: aCobrar - invertido,
+    directa,
+    tna: directa * 365 / d,
+    tem: Math.pow(1 + directa, 30 / d) - 1,
+  };
+}
+
+function renderLetras() {
+  if (!LETRAS.length) return;
+  const monto = lecMonto();
+  const sel   = LETRAS.find(l => l.ticker === letraSel) || LETRAS[0];
+  const c     = lecCuentas(sel, monto);
+
+  // Panel de arriba: siempre la letra elegida
+  document.getElementById('lec-gain-pct').textContent = '+' + lecPct(c.directa * 100);
+  const elGanancia = document.getElementById('lec-gain-ars');
+  elGanancia.textContent = lecPesos(c.ganancia);
+  /* Con montos muy grandes el número no entra en la caja: se achica solo */
+  const largo = elGanancia.textContent.length;
+  elGanancia.parentElement.style.fontSize =
+    largo >= 12 ? '16px' : largo >= 11 ? '19px' : '23px';
+  document.getElementById('lec-tna').textContent      = lecPct(c.tna * 100);
+  document.getElementById('lec-dias').textContent     = sel.dias;
+  document.getElementById('lec-total').textContent    = lecPesos(c.aCobrar);
+
+  document.getElementById('lec-list').innerHTML = LETRAS.map(l => {
+    const k = lecCuentas(l, monto);
+    return `
+    <div class="lec-item${l.ticker === letraSel ? ' sel' : ''}" onclick="elegirLetra('${l.ticker}')">
+      <div class="lec-id">
+        <div class="lec-ticker">${l.ticker}</div>
+        <div><span class="lec-badge">${l.tipo}</span></div>
+        <div class="lec-vto">${lecFechaCorta(l.vence)}</div>
+      </div>
+      <div class="lec-mid">
+        <div>
+          <div class="lec-mini-label">TNA</div>
+          <div class="lec-mini-val">${lecPct(k.tna * 100)}</div>
+        </div>
+        <div>
+          <div class="lec-mini-label">TEM</div>
+          <div class="lec-mini-val">${lecPct(k.tem * 100)}</div>
+        </div>
+      </div>
+      <div class="lec-right">
+        <div>
+          <div class="lec-item-pct">+${lecPct(k.directa * 100)}</div>
+        </div>
+        <svg class="lec-chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function elegirLetra(ticker) {
+  letraSel = ticker;
+  renderLetras();
+  gaEvent('letra_' + ticker);
+}
+
+/* El campo se agranda o achica con lo que se escribe, así el signo $ y el
+   número quedan siempre centrados en la caja como un solo bloque */
+function ajustarAnchoMonto() {
+  const inp = document.getElementById('lec-monto');
+  inp.size = Math.max(6, inp.value.length);
+}
+
+/* El campo de monto se escribe con puntos de miles mientras se tipea */
+document.getElementById('lec-monto').addEventListener('input', (e) => {
+  const n = parseInt(e.target.value.replace(/[^\d]/g, '') || '0', 10);
+  e.target.value = n ? n.toLocaleString('es-AR') : '';
+  ajustarAnchoMonto();
+  renderLetras();
+});
+ajustarAnchoMonto();
 
 /* ─── Arranque ─── */
 renderBilleteras();
