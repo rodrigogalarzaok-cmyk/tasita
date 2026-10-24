@@ -1133,6 +1133,12 @@
 
     .lec-estado { text-align: center; padding: 26px 10px; font-size: 13px; color: var(--text-sub); }
 
+    /* Aclaración al pie: una línea, sin recuadro ni adornos */
+    .lec-pie {
+      margin: 16px 2px 0; text-align: center;
+      font-size: 11px; line-height: 1.5; color: var(--text-sub);
+    }
+
     /* Celulares angostos: la tarjeta de cada letra se apila */
     @media (max-width: 380px) {
       .lec-mid { gap: 9px; }
@@ -1888,6 +1894,8 @@
     <div id="lec-list" class="lec-list">
       <div class="lec-estado">Cargando letras…</div>
     </div>
+
+    <p class="lec-pie">Herramienta informativa, con fines de aprendizaje. No contempla las comisiones de cada broker.</p>
 
   </section>
 
