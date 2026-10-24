@@ -3794,18 +3794,30 @@ function lecDepurar(lista) {
     l.pago > l.precioCierre);
   if (!sanas.length) return [];
 
-  const tems = sanas.map(l => temDe(l.pago, l.precioCierre, l.diasCalc)).sort((a, b) => a - b);
-  const mediana = tems[Math.floor(tems.length / 2)];
-  const aceptable = t => t > 0 && t > mediana * 0.5 && t < mediana * 1.4;
+  /* La banda se arma solo con las que tienen plazo suficiente: a una letra a
+     dos días del vencimiento, una ganancia chiquita llevada a 30 días da un
+     número enorme, y eso ensuciaría la mediana. */
+  const CORTA = 10;   // días
+  const tems = sanas.filter(l => l.diasCalc >= CORTA)
+                    .map(l => temDe(l.pago, l.precioCierre, l.diasCalc)).sort((a, b) => a - b);
+  const mediana = tems.length ? tems[Math.floor(tems.length / 2)] : null;
+
+  /* Y tampoco se les aplica: por lo mismo, su tasa mensual se dispara sola y
+     el filtro las sacaba de la lista días antes de que vencieran, que fue
+     justo lo que pasó al probar el paso del tiempo. A esas les alcanza con
+     los otros dos controles: que paguen más de lo que cuestan y que sus dos
+     tasas coincidan. */
+  const aceptable = (t, dias) =>
+    t > 0 && (dias < CORTA || mediana === null || (t > mediana * 0.5 && t < mediana * 1.4));
 
   const buenas = [];
   sanas.forEach(l => {
     /* Si el precio del momento da un disparate (una punta cruzada, una
        letra sin operar), se prueba con el cierre antes de descartarla. */
     let precio = l.precio;
-    if (!aceptable(temDe(l.pago, precio, l.diasCalc))) precio = l.precioCierre;
+    if (!aceptable(temDe(l.pago, precio, l.diasCalc), l.diasCalc)) precio = l.precioCierre;
 
-    if (aceptable(temDe(l.pago, precio, l.diasCalc))) {
+    if (aceptable(temDe(l.pago, precio, l.diasCalc), l.diasCalc)) {
       buenas.push({ ...l, precio, enVivo: precio !== l.precioCierre });
     } else {
       console.info('[Tasita] letra no mostrada, su rendimiento no cierra con el resto:', l.ticker);
