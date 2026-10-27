@@ -1173,6 +1173,47 @@
     .apoyo-btn svg { flex-shrink: 0; }
     .apoyo-txt { font-size: 11.5px; color: var(--text-sub); text-align: center; }
 
+    /* ─── Cartel para colaborar ─── */
+    .colab-fondo {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,4,10,0.72);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; animation: fadein .25s ease;
+    }
+    .colab-fondo.open { display: flex; }
+    .colab-card {
+      position: relative; width: 100%; max-width: 330px;
+      background: linear-gradient(160deg, #081a2e, #04101f);
+      border: 1px solid rgba(0,232,255,0.30);
+      border-radius: 20px; padding: 26px 22px 22px;
+      text-align: center;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+    }
+    .colab-x {
+      position: absolute; top: 9px; right: 9px;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); border: none;
+      color: var(--text-sub); font-size: 19px; line-height: 1;
+      cursor: pointer; transition: background .18s, color .18s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .colab-x:hover { background: rgba(255,255,255,0.13); color: var(--text-main); }
+    .colab-ico { color: var(--accent-text); margin-bottom: 11px; }
+    .colab-txt {
+      font-size: 14px; line-height: 1.55; color: var(--text-main);
+      margin-bottom: 18px;
+    }
+    .colab-txt b { color: var(--accent-text); font-weight: 700; }
+    .colab-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px 18px;
+      background: var(--accent-btn); color: #010609;
+      border-radius: 13px; text-decoration: none;
+      font-size: 14.5px; font-weight: 800; letter-spacing: 0.2px;
+      transition: filter .18s;
+    }
+    .colab-btn:hover { filter: brightness(1.08); }
+
   </style>
 </head>
 <body>
@@ -4132,6 +4173,45 @@ document.getElementById('lec-monto').addEventListener('input', (e) => {
 });
 ajustarAnchoMonto();
 
+
+/* ════════════════════════════════════════════════════════
+   CARTEL PARA COLABORAR
+
+   Sale una sola vez, al minuto de estar usando la página, y solo si
+   la persona no está en el medio de otra cosa. Si la cierra, no vuelve
+   nunca más: no tiene que sentirse una publicidad.
+════════════════════════════════════════════════════════ */
+const COLAB_KEY = 'tasita_colab_cerrado';
+
+function colabYaCerrado() {
+  try { return localStorage.getItem(COLAB_KEY) === '1'; } catch (_) { return false; }
+}
+
+function cerrarColaborar(e) {
+  if (e && e.target !== e.currentTarget) return;   // clic adentro de la tarjeta: no cierra
+  document.getElementById('colabFondo').classList.remove('open');
+  document.body.style.overflow = '';
+  try { localStorage.setItem(COLAB_KEY, '1'); } catch (_) {}
+}
+
+function mostrarColaborar() {
+  if (colabYaCerrado()) return;
+  /* No interrumpir: si está mirando un apartado, la calculadora o un
+     cartel, se espera medio minuto más y se vuelve a intentar. */
+  const ocupada =
+    document.querySelector('.broker-overlay.open') ||
+    document.querySelector('.modal-backdrop.open') ||
+    (document.getElementById('calcPanel') || {}).classList?.contains('open') ||
+    (document.getElementById('colabFondo') || {}).classList?.contains('open');
+  if (ocupada) { setTimeout(mostrarColaborar, 30000); return; }
+
+  document.getElementById('colabFondo').classList.add('open');
+  gaEvent('colaborar_cartel');
+}
+
+/* Un minuto desde que entró */
+if (!colabYaCerrado()) setTimeout(mostrarColaborar, 60000);
+
 /* ─── Arranque ─── */
 renderBilleteras();
 renderBilleterasUSD();
@@ -4142,5 +4222,22 @@ refreshFromArgentinaDatos();
 /* Dólar: cargar en segundo plano para que la tarjeta resumen se llene */
 fetchDolar();
 </script>
+  <!-- Cartel para colaborar: sale al minuto de uso, una sola vez -->
+  <div class="colab-fondo" id="colabFondo" onclick="cerrarColaborar(event)">
+    <div class="colab-card" onclick="event.stopPropagation()">
+      <button class="colab-x" onclick="cerrarColaborar()" aria-label="Cerrar">&times;</button>
+      <svg class="colab-ico" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+        <path d="M12 3a2.4 2.4 0 0 0-1 2a2.4 2.4 0 0 0 1 2"/>
+        <path d="M3 10h14v5a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-5"/>
+        <path d="M16.7 16.7a3 3 0 1 0 .3-5.5"/>
+      </svg>
+      <p class="colab-txt"><b>Tasita es gratis siempre.</b><br>Si te ayudó, podés colaborar a que siga funcionando.</p>
+      <a class="colab-btn" href="https://link.mercadopago.com.ar/tasitaa" target="_blank"
+         rel="noopener noreferrer" onclick="cerrarColaborar()">Colaborar</a>
+    </div>
+  </div>
+
 </body>
 </html>
