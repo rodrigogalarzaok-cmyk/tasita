@@ -34,7 +34,7 @@ const PAGINAS = [
   {
     carpeta: 'sobre-tasita',
     titulo: 'Sobre Tasita — Quién la hizo y para qué',
-    descripcion: 'Tasita la creó Rodrigo Galarza, creador de contenido de finanzas en TikTok e Instagram. Una herramienta gratuita para comparar tasas de billeteras, plazos fijos, letras y dólar en Argentina.',
+    descripcion: 'Tasita la creó Rodrigo Galarza, creador de contenido de finanzas. Una herramienta gratuita para comparar tasas de billeteras, plazos fijos, letras y dólar.',
     h1: 'Sobre Tasita',
     cuerpo: `
       <p>Tasita es una herramienta gratuita e independiente para comparar, en una sola pantalla, dónde conviene poner tu plata en Argentina: qué billetera virtual paga más, qué banco ofrece el mejor plazo fijo, cuánto rinden las letras del Tesoro y a cuánto está el dólar.</p>
@@ -146,7 +146,19 @@ const PAGINAS = [
    su propia dirección, se actualizan acá. */
 const MENU = [
   { texto: 'Inicio', href: '/' },
+  { texto: 'Billeteras virtuales', href: '/billeteras/' },
+  { texto: 'Plazos fijos', href: '/plazos-fijos/' },
+  { texto: 'Letras del Tesoro', href: '/letras/' },
+  { texto: 'Dólar', href: '/dolar/' },
+  { texto: 'Brokers', href: '/brokers/' },
+  { texto: 'Billeteras en dólares', href: '/billeteras-dolares/' },
+  { texto: 'Plazos fijos UVA', href: '/plazos-fijos-uva/' },
+  { texto: 'Guías', href: '/guias/' },
+  { texto: 'Presupuesto', href: '/presupuesto/' },
   { texto: 'Sobre Tasita', href: '/sobre-tasita/' },
+];
+/* Las páginas legales van en el pie, no en el menú */
+const LEGALES = [
   { texto: 'Contacto', href: '/contacto/' },
   { texto: 'Términos', href: '/terminos/' },
   { texto: 'Privacidad', href: '/privacidad/' },
@@ -176,12 +188,12 @@ ${items}
 }
 
 function pie(actual) {
-  const links = MENU
+  const links = LEGALES
     .filter(m => m.href !== '/' + actual + '/')
     .map(m => `<a href="${m.href}">${m.texto}</a>`)
     .join('<span>·</span>');
   return `  <footer class="pie">
-    <nav class="pie-links">${links}</nav>
+    <nav class="pie-links"><a href="/sobre-tasita/">Sobre Tasita</a><span>·</span>${links}</nav>
     <div class="redes">
       <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a>
       <a href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank" rel="noopener">TikTok</a>

@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Tasita — Compará billeteras, plazos fijos y dólar</title>
-  <meta name="description" content="Tasita: compará las mejores tasas de billeteras virtuales, plazos fijos bancarios y cotizaciones del dólar en Argentina. Gratis, sin registro." />
+  <title>Tasita — Compará billeteras, plazos fijos, letras y dólar</title>
+  <meta name="description" content="Tasita: compará las mejores tasas de billeteras virtuales, plazos fijos, letras del Tesoro y cotizaciones del dólar en Argentina. Gratis, sin registro." />
+  <link rel="canonical" href="https://tasita.com.ar/" />
   <meta name="robots" content="index, follow" />
   <!-- El .ico va primero y es el que mira Google para la foto del resultado
        de búsqueda: con solo el SVG no mostraba ninguna y la página aparecía
@@ -14,13 +15,13 @@
   <link rel="icon" type="image/svg+xml" href="logo-tasita.svg" />
   <link rel="apple-touch-icon" href="favicon-48.png" />
   <link rel="shortcut icon" href="favicon.ico" />
-  <meta property="og:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
+  <meta property="og:title" content="Tasita — Compará billeteras, plazos fijos, letras y dólar" />
   <meta property="og:description" content="Compará las mejores tasas de billeteras virtuales, plazos fijos bancarios y cotizaciones del dólar en Argentina." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://tasita.com.ar/" />
   <meta property="og:image" content="https://tasita.com.ar/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tasita — Compará billeteras, plazos fijos y dólar" />
+  <meta name="twitter:title" content="Tasita — Compará billeteras, plazos fijos, letras y dólar" />
   <meta name="twitter:description" content="Compará tasas de billeteras virtuales, plazos fijos y dólar en Argentina. Gratis, sin registro." />
   <!-- Cuando Tasita Presupuesto abre esta página, iOS la muestra dentro de su
        propio visor y pinta las barras de arriba y abajo con el color de fondo
@@ -1295,6 +1296,14 @@
           </svg>
           Dólares
         </div>
+        <a class="menu-option" href="/guias/" style="text-decoration:none">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/>
+            <path d="M4 19V5"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+          </svg>
+          Guías
+        </a>
         <div class="menu-option" onclick="openPresupuesto()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
@@ -3591,8 +3600,20 @@
     </div>
   </section>
 
+  <!-- Enlaces a cada sección: son páginas reales, con su propia dirección -->
+  <nav class="legal-footer" aria-label="Secciones de Tasita" style="margin-top:28px; flex-wrap:wrap; row-gap:6px;">
+    <a class="legal-link" href="/billeteras/">Billeteras</a><span>·</span>
+    <a class="legal-link" href="/plazos-fijos/">Plazos fijos</a><span>·</span>
+    <a class="legal-link" href="/letras/">Letras</a><span>·</span>
+    <a class="legal-link" href="/dolar/">Dólar</a><span>·</span>
+    <a class="legal-link" href="/brokers/">Brokers</a><span>·</span>
+    <a class="legal-link" href="/billeteras-dolares/">Billeteras en dólares</a><span>·</span>
+    <a class="legal-link" href="/plazos-fijos-uva/">Plazos UVA</a><span>·</span>
+    <a class="legal-link" href="/guias/">Guías</a>
+  </nav>
+
   <!-- Footer legal -->
-  <div class="legal-footer" style="margin-top:28px;">
+  <div class="legal-footer" style="margin-top:12px;">
     <span>© 2026 Tasita</span>
     <span>·</span>
     <!-- Páginas de verdad, no ventanitas: así Google las encuentra y las
@@ -5730,6 +5751,13 @@ updateSummaryCard(PF_FALLBACK);
 refreshFromArgentinaDatos();
 /* Dólar: cargar en segundo plano para que la tarjeta resumen se llene */
 fetchDolar();
+
+/* Si la dirección trae #letras, #plazos o #billeteras, abre esa pestaña. Lo usan los botones
+   de las páginas de cada sección ("Simular cuánto ganás") para llevar directo al simulador. */
+(function () {
+  var t = location.hash.replace('#', '');
+  if (t === 'letras' || t === 'plazos' || t === 'billeteras') switchTab(t);
+})();
 </script>
   <!-- Cartel para colaborar: sale al minuto de uso, una sola vez -->
   <div class="colab-fondo" id="colabFondo" onclick="cerrarColaborar(event)">

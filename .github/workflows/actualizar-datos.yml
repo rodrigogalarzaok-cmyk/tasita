@@ -44,16 +44,24 @@ jobs:
       - name: Construir los datos
         run: node construir-datos.mjs
 
+      - name: Rearmar las páginas de cada sección con esos datos
+        # Cada sección (/plazos-fijos/, /letras/…) lleva su propia tabla. Se arman a partir de
+        # datos-tasita.json, o sea de datos que ya pasaron todas las validaciones.
+        run: node construir-secciones.mjs
+
       - name: Guardar SOLO si algo cambió
         id: guardar
+        env:
+          ARCHIVOS: index.html datos-tasita.json billeteras plazos-fijos plazos-fijos-uva letras dolar billeteras-dolares brokers presupuesto
         run: |
-          if git diff --quiet -- index.html datos-tasita.json; then
+          git add -N $ARCHIVOS
+          if git diff --quiet -- $ARCHIVOS; then
             echo "Los datos son los mismos: no se guarda nada ni se publica nada."
             echo "cambio=no" >> "$GITHUB_OUTPUT"
           else
             git config user.name "Tasita datos (automático)"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add index.html datos-tasita.json
+            git add $ARCHIVOS
             git commit -m "Datos actualizados"
             git push || (git pull --rebase && git push)
             echo "cambio=si" >> "$GITHUB_OUTPUT"
