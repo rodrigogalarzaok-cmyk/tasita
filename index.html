@@ -4182,18 +4182,29 @@ ajustarAnchoMonto();
    la persona no está en el medio de otra cosa. Si la cierra, no vuelve
    nunca más: no tiene que sentirse una publicidad.
 ════════════════════════════════════════════════════════ */
-const COLAB_KEY = 'tasita_colab_cerrado';
+/* Dos memorias distintas:
+   - COLAB_LISTO: ya colaboró. No se le muestra nunca más.
+   - COLAB_DIA: el día que se le mostró por última vez. Como mucho una vez
+     por día: si lo cerró sin colaborar, vuelve recién al día siguiente. */
+const COLAB_LISTO = 'tasita_colab_listo';
+const COLAB_DIA   = 'tasita_colab_dia';
+
+const colabHoy = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); };
+const colabLeer = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
+const colabGuardar = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
 
 function colabYaCerrado() {
-  try { return localStorage.getItem(COLAB_KEY) === '1'; } catch (_) { return false; }
+  return colabLeer(COLAB_LISTO) === '1' || colabLeer(COLAB_DIA) === colabHoy();
 }
 
 function cerrarColaborar(e) {
   if (e && e.target !== e.currentTarget) return;   // clic adentro de la tarjeta: no cierra
   document.getElementById('colabFondo').classList.remove('open');
   document.body.style.overflow = '';
-  try { localStorage.setItem(COLAB_KEY, '1'); } catch (_) {}
 }
+
+/* Tocar Colaborar: no se le muestra nunca más */
+function colaborarListo() { colabGuardar(COLAB_LISTO, '1'); cerrarColaborar(); }
 
 function mostrarColaborar() {
   if (colabYaCerrado()) return;
@@ -4207,6 +4218,7 @@ function mostrarColaborar() {
   if (ocupada) { setTimeout(mostrarColaborar, 30000); return; }
 
   document.getElementById('colabFondo').classList.add('open');
+  colabGuardar(COLAB_DIA, colabHoy());
   gaEvent('colaborar_cartel');
 }
 
@@ -4236,7 +4248,7 @@ fetchDolar();
       </svg>
       <p class="colab-txt"><b>Tasita es gratis siempre.</b><br>Si te ayudó, podés colaborar a que siga funcionando.</p>
       <a class="colab-btn" href="https://link.mercadopago.com.ar/tasitaa" target="_blank"
-         rel="noopener noreferrer" onclick="cerrarColaborar()">Colaborar</a>
+         rel="noopener noreferrer" onclick="colaborarListo()">Colaborar</a>
     </div>
   </div>
 
