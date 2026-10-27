@@ -1,1 +1,4 @@
 historial-letras.json
+node_modules/
+# Borrador de las páginas por sección: se regenera con construir-secciones.mjs. No se sube hasta la Etapa 4.
+_borrador-secciones/

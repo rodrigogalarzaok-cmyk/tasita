@@ -1,0 +1,21 @@
+{
+  "name": "tasita",
+  "version": "1.0.0",
+  "description": "Tasita: comparador de tasas (herramientas de construcción de datos)",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodrigogalarzaok-cmyk/tasita.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rodrigogalarzaok-cmyk/tasita/issues"
+  },
+  "homepage": "https://github.com/rodrigogalarzaok-cmyk/tasita#readme",
+  "private": true,
+  "dependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

@@ -1,0 +1,69 @@
+# Escribe las tasas adentro del index.html para que Google las vea sin ejecutar
+# JavaScript (ver el comentario largo al principio de construir-datos.mjs).
+#
+# ESTADO ACORDADO CON MARC: por ahora solo se corre A MANO (botón "Run workflow"
+# en la pestaña Actions de GitHub). Después de revisar juntos el resultado de la
+# primera corrida, se descomentan las dos líneas marcadas con  >>>  para dejarlo
+# automático cada 2 horas.
+name: Actualizar datos de Tasita
+
+on:
+  workflow_dispatch:            # botón para correrlo a mano desde GitHub
+  # >>> ACTIVAR DESPUÉS DE LA REVISIÓN: cada 2 horas (hora de GitHub es UTC)
+  # schedule:
+  #   - cron: '17 */2 * * *'
+  # >>> ACTIVAR DESPUÉS DE LA REVISIÓN: si se edita index.html a mano (por ejemplo una tasa de
+  # una billetera), vuelve a escribir los datos sin esperar a la próxima vuelta
+  # push:
+  #   branches: [master]
+  #   paths: ['index.html']
+
+permissions:
+  contents: write    # guardar index.html y datos-tasita.json
+  pages: write       # pedir la publicación
+
+concurrency:
+  group: actualizar-datos
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: America/Argentina/Buenos_Aires    # "hoy" tiene que ser hoy en Argentina, no en UTC
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar lo necesario
+        run: npm ci
+
+      - name: Construir los datos
+        run: node construir-datos.mjs
+
+      - name: Guardar SOLO si algo cambió
+        id: guardar
+        run: |
+          if git diff --quiet -- index.html datos-tasita.json; then
+            echo "Los datos son los mismos: no se guarda nada ni se publica nada."
+            echo "cambio=no" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "Tasita datos (automático)"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html datos-tasita.json
+            git commit -m "Datos actualizados"
+            git push || (git pull --rebase && git push)
+            echo "cambio=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pedir la publicación
+        if: steps.guardar.outputs.cambio == 'si'
+        # Un cambio guardado por un robot a veces no dispara solo la publicación de
+        # GitHub Pages: se la pide a mano para no depender de eso.
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "No se pudo pedir; GitHub la hace igual en unos minutos."
