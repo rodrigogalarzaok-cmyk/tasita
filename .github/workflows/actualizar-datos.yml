@@ -1,19 +1,16 @@
 # Escribe las tasas adentro del index.html para que Google las vea sin ejecutar
 # JavaScript (ver el comentario largo al principio de construir-datos.mjs).
 #
-# ESTADO ACORDADO CON MARC: por ahora solo se corre A MANO (botón "Run workflow"
-# en la pestaña Actions de GitHub). Después de revisar juntos el resultado de la
-# primera corrida, se descomentan las dos líneas marcadas con  >>>  para dejarlo
-# automático cada 2 horas.
+# Corre solo cada 2 horas y también a mano (botón "Run workflow" en la pestaña Actions).
+# Primera corrida manual revisada con Marc el 2026-10-27: todo bien, horario activado.
 name: Actualizar datos de Tasita
 
 on:
   workflow_dispatch:            # botón para correrlo a mano desde GitHub
-  # >>> ACTIVAR DESPUÉS DE LA REVISIÓN: cada 2 horas (hora de GitHub es UTC)
-  # schedule:
-  #   - cron: '17 */2 * * *'
-  # >>> ACTIVAR DESPUÉS DE LA REVISIÓN: si se edita index.html a mano (por ejemplo una tasa de
-  # una billetera), vuelve a escribir los datos sin esperar a la próxima vuelta
+  schedule:
+    - cron: '17 */2 * * *'      # cada 2 horas (la hora de GitHub es UTC)
+  # Para que, si se edita index.html a mano (por ejemplo una tasa de una billetera), vuelva a
+  # escribir los datos sin esperar a la próxima vuelta, se pueden descomentar estas 3 líneas:
   # push:
   #   branches: [master]
   #   paths: ['index.html']
