@@ -2084,33 +2084,20 @@
     </div>
   </section>
 
-  <!-- Contenido oculto: indexable por bots, invisible para usuarios -->
-  <div style="display:none" aria-hidden="true">
-    <section id="sobre-tasita">
-      <h2>Sobre Tasita</h2>
-      <p>Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida.</p>
-      <p>No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.</p>
-      <p>Ante cualquier consulta podés contactarnos por Instagram: @rodrigogalarzaa</p>
-    </section>
-    <section id="privacy">
-      <h2>Política de privacidad</h2>
-      <p>Tasita utiliza Google Analytics para medir el tráfico del sitio de forma anónima y agregada. También utilizamos Google AdSense para mostrar publicidad relevante. Ambos servicios pueden usar cookies para personalizar anuncios según tus intereses y el historial de navegación.</p>
-      <p>No recopilamos datos personales propios. No requerimos registro ni acceso a tus cuentas financieras. Las cookies de terceros (Google) pueden desactivarse desde la configuración de tu navegador o desde adssettings.google.com.</p>
-      <p>Al continuar usando Tasita aceptás el uso de cookies de analítica y publicidad según lo descripto. Para más información sobre la política de privacidad de Google visitá policies.google.com/privacy.</p>
-    </section>
-  </div>
-
   <!-- Footer legal -->
   <div class="legal-footer" style="margin-top:28px;">
     <span>© 2026 Tasita</span>
     <span>·</span>
-    <button class="legal-link" onclick="openModal('sobre')">Sobre Tasita</button>
+    <!-- Páginas de verdad, no ventanitas: así Google las encuentra y las
+         puede leer. Las ventanitas (openModal) siguen existiendo en el
+         código por si se necesitan desde otro lado. -->
+    <a class="legal-link" href="/sobre-tasita/">Sobre Tasita</a>
     <span>·</span>
-    <button class="legal-link" onclick="openModal('contacto')">Contacto</button>
+    <a class="legal-link" href="/contacto/">Contacto</a>
     <span>·</span>
-    <button class="legal-link" onclick="openModal('disclaimer')">Disclaimer</button>
+    <a class="legal-link" href="/disclaimer/">Disclaimer</a>
     <span>·</span>
-    <button class="legal-link" id="privacy-link" onclick="openModal('privacy')">Privacidad</button>
+    <a class="legal-link" id="privacy-link" href="/privacidad/">Privacidad</a>
   </div>
 
   <!-- Footer redes -->
