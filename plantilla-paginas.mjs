@@ -154,7 +154,6 @@ const MENU = [
   { texto: 'Billeteras en dólares', href: '/billeteras-dolares/' },
   { texto: 'Plazos fijos UVA', href: '/plazos-fijos-uva/' },
   { texto: 'Guías', href: '/guias/' },
-  { texto: 'Presupuesto', href: '/presupuesto/' },
   { texto: 'Sobre Tasita', href: '/sobre-tasita/' },
 ];
 /* Las páginas legales van en el pie, no en el menú */

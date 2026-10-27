@@ -253,37 +253,4 @@ export const SECCIONES = [
     guias: ['como-empezar-a-invertir-con-poca-plata', 'que-son-los-cedears', 'que-es-una-lecap'],
   },
 
-  /* ─────────────────────────────────────────────  PRESUPUESTO  */
-  {
-    slug: 'presupuesto', datos: null, emoji: '🎯', texto: 'final', home: '/',
-    titulo: 'Tasita Presupuesto: controlá tus gastos desde el celular',
-    descripcion: 'Tasita Presupuesto es una app para anotar tus ingresos y gastos y ver a dónde se va tu plata cada mes, desde el celular. Sencilla y en español.',
-    h1: 'Tasita Presupuesto: a dónde se va tu plata',
-    intro: [
-      'Antes de pensar en dónde invertir, conviene saber cuánta plata te sobra. Ahí es donde la mayoría se tropieza: llega fin de mes y no queda claro en qué se fue el sueldo. <strong>Tasita Presupuesto</strong> es una aplicación pensada justo para eso, para anotar tus ingresos y tus gastos y ver, de un vistazo, a dónde va tu plata.',
-      'Es una aplicación aparte de este comparador, hecha por el mismo creador. Se abre desde <a href="https://presupuesto.tasita.com.ar">presupuesto.tasita.com.ar</a> y funciona desde el navegador del celular.',
-    ],
-    bloques: [
-      { h2: 'Para qué sirve', p: [
-        'La idea es sencilla: cargás cada ingreso y cada gasto en pocos toques, y la app te los ordena por categoría. Podés ver cuánto gastaste en gastos fijos, en gastos variables y en tarjeta, cómo viene el mes y cuánto te queda. Todo con una pantalla de inicio clara y sin planillas.',
-        'También podés ver los montos en dólares con un solo botón, algo útil en un país donde mucha gente piensa en las dos monedas a la vez.',
-      ]},
-      { h2: 'Por qué conviene llevar un presupuesto', p: [
-        '<strong>Te muestra a dónde va la plata.</strong> Los gastos chicos y repetidos suelen sumar más de lo que parece. Verlos anotados lo hace evidente.',
-        '<strong>Te dice cuánto podés ahorrar.</strong> Sin saber cuánto te sobra, es difícil decidir cuánto poner en una billetera, un plazo fijo o una letra.',
-        '<strong>Te ayuda a cumplir objetivos.</strong> Juntar para un viaje, para un fondo de emergencia o para empezar a invertir es mucho más fácil con un número concreto.',
-      ]},
-      { h2: 'Y después, a hacer rendir lo que ahorrás', p: [
-        'Una vez que sabés cuánto te sobra, el siguiente paso es que esa plata no se quede quieta. Para eso tenés este comparador: mirá <a href="/billeteras/">las billeteras virtuales</a>, <a href="/plazos-fijos/">los plazos fijos</a> y <a href="/letras/">las letras del Tesoro</a>, o empezá por la guía de <a href="/guias/como-empezar-a-invertir-con-poca-plata/">cómo empezar a invertir con poca plata</a>.',
-      ]},
-    ],
-    faq: [
-      { p: '¿Hace falta instalar algo?', r: 'No. Tasita Presupuesto se usa desde el navegador del celular y podés agregarla a la pantalla de inicio para abrirla como cualquier otra app.' },
-      { p: '¿Se conecta con mis cuentas bancarias?', r: 'No: vos cargás los movimientos a mano. No te pedimos acceso a tus cuentas ni a tus claves.' },
-      { p: '¿Se puede ver todo en dólares?', r: 'Sí, hay un botón para pasar los montos de pesos a dólares y volver, en todas las pantallas.' },
-      { p: '¿Es gratis?', r: 'Tiene un período de prueba para que la pruebes sin compromiso. Las condiciones están dentro de la propia aplicación.' },
-    ],
-    guias: ['como-empezar-a-invertir-con-poca-plata', 'como-protegerse-de-la-inflacion', 'plazo-fijo-vs-billetera-virtual'],
-    volver: 'https://presupuesto.tasita.com.ar', volverTexto: 'Abrir Tasita Presupuesto →',
-  },
 ];

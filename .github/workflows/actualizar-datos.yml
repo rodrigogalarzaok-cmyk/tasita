@@ -52,7 +52,7 @@ jobs:
       - name: Guardar SOLO si algo cambió
         id: guardar
         env:
-          ARCHIVOS: index.html datos-tasita.json billeteras plazos-fijos plazos-fijos-uva letras dolar billeteras-dolares brokers presupuesto
+          ARCHIVOS: index.html datos-tasita.json billeteras plazos-fijos plazos-fijos-uva letras dolar billeteras-dolares brokers
         run: |
           git add -N $ARCHIVOS
           if git diff --quiet -- $ARCHIVOS; then

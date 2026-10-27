@@ -29,7 +29,6 @@ export const MENU = [
   ['/billeteras-dolares/', 'Billeteras en dólares'],
   ['/plazos-fijos-uva/', 'Plazos fijos UVA'],
   ['/guias/', 'Guías'],
-  ['/presupuesto/', 'Presupuesto'],
   ['/sobre-tasita/', 'Sobre Tasita'],
 ];
 

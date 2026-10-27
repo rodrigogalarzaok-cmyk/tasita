@@ -16,7 +16,7 @@ export const GUIAS_3 = [
     secciones: [
       { h2: 'Paso 1: sabé cuánto te sobra', p: [
         `Antes de pensar en invertir, tenés que saber cuánta plata te queda a fin de mes. Parece obvio, pero la mayoría no lo sabe con exactitud. Anotá tus ingresos y tus gastos durante un mes: fijos (alquiler, servicios), variables (comida, salidas) y los de tarjeta. Con eso tenés un número real: tu capacidad de ahorro.`,
-        `Si querés una herramienta simple para hacerlo, existe <a href="/presupuesto/">Tasita Presupuesto</a>, hecha justamente para eso. Pero sirve cualquier método, incluso un cuaderno.`,
+        `Para anotar, sirve cualquier método: una planilla, una app del celular o hasta un cuaderno. Lo importante es que lo hagas todos los días.`,
       ]},
       { h2: 'Paso 2: armá un fondo de emergencia', p: [
         `Esto va antes que cualquier inversión. Un fondo de emergencia es plata guardada para imprevistos: que se te rompa algo, que te quedes sin trabajo unos meses, un problema de salud. La regla habitual es juntar entre tres y seis meses de tus gastos.`,
