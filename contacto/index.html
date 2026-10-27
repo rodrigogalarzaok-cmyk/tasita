@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contacto — Tasita</title>
-  <meta name="description" content="Cómo comunicarte con Tasita: correo, Instagram y TikTok. Consultas, sugerencias y correcciones de tasas." />
+  <meta name="description" content="Escribinos a rodrigogalarza.280@gmail.com o por Instagram y TikTok. Consultas, errores en las tasas y sugerencias de entidades que faltan." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://tasita.com.ar/contacto/" />
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -12,7 +12,7 @@
   <link rel="icon" type="image/svg+xml" href="/logo-tasita.svg" />
   <link rel="apple-touch-icon" href="/favicon-48.png" />
   <meta property="og:title" content="Contacto — Tasita" />
-  <meta property="og:description" content="Cómo comunicarte con Tasita: correo, Instagram y TikTok. Consultas, sugerencias y correcciones de tasas." />
+  <meta property="og:description" content="Escribinos a rodrigogalarza.280@gmail.com o por Instagram y TikTok. Consultas, errores en las tasas y sugerencias de entidades que faltan." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://tasita.com.ar/contacto/" />
   <meta property="og:image" content="https://tasita.com.ar/og-image.png" />
@@ -42,23 +42,48 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--text-main);
     display: flex; justify-content: center;
-    padding: 24px 16px 48px;
-    line-height: 1.6;
+    padding: 24px 16px 48px; line-height: 1.6;
   }
   .hoja { width: 100%; max-width: 640px; }
-  .cabecera { display: flex; align-items: center; gap: 11px; padding: 8px 0 26px; text-decoration: none; }
+
+  /* Encabezado: igual que el de la página principal */
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 28px; }
+  .logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
   .logo-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
-  .volver { display: inline-block; margin-bottom: 18px; font-size: 13px; color: var(--accent-text); text-decoration: none; }
-  .volver:hover { text-decoration: underline; }
-  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 18px; }
-  .contenido {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 18px; padding: 22px;
+  .menu-wrap { position: relative; }
+  .menu-btn {
+    background: none; border: none; color: var(--text-sub);
+    cursor: pointer; padding: 4px; border-radius: 6px; transition: color .2s;
   }
+  .menu-btn:hover { color: var(--text-main); }
+  .menu-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 50;
+    min-width: 180px; padding: 6px;
+    background: #0a1420; border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: 0 14px 34px rgba(0,0,0,0.5);
+    display: none; flex-direction: column;
+  }
+  .menu-dropdown.open { display: flex; }
+  .menu-option {
+    padding: 10px 13px; border-radius: 9px;
+    font-size: 14px; color: var(--text-main); text-decoration: none;
+    transition: background .18s;
+  }
+  .menu-option:hover { background: rgba(255,255,255,0.07); }
+  .menu-option.actual { color: var(--accent-text); font-weight: 700; }
+
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 18px; }
+  .contenido { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; }
+  .contenido h2 {
+    font-size: 16px; font-weight: 700; color: var(--accent-text);
+    margin: 24px 0 10px; letter-spacing: -0.2px;
+  }
+  .contenido h2:first-child { margin-top: 0; }
   .contenido p { font-size: 15px; margin-bottom: 14px; color: rgba(255,255,255,0.80); }
   .contenido p:last-child { margin-bottom: 0; }
   .contenido strong { color: var(--text-main); font-weight: 700; }
   .contenido a { color: var(--accent-text); }
+
   .pie { margin-top: 30px; text-align: center; font-size: 12.5px; }
   .pie-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 14px; }
   .pie-links a { color: var(--text-sub); text-decoration: none; }
@@ -72,7 +97,8 @@
 </head>
 <body>
   <div class="hoja">
-    <a class="cabecera" href="/">
+  <header class="header">
+    <a class="logo" href="/">
       <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#dce4f0"
      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
   <defs><clipPath id="cc"><path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/></clipPath></defs>
@@ -88,19 +114,40 @@
 </svg>
       <span class="logo-name">Tasita</span>
     </a>
+    <div class="menu-wrap">
+      <button class="menu-btn" id="menu-btn" aria-label="Menú" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <nav class="menu-dropdown" id="menu-dropdown">
+        <a class="menu-option" href="/">Inicio</a>
+        <a class="menu-option" href="/sobre-tasita/">Sobre Tasita</a>
+        <a class="menu-option actual" href="/contacto/">Contacto</a>
+        <a class="menu-option" href="/terminos/">Términos</a>
+        <a class="menu-option" href="/privacidad/">Privacidad</a>
+        <a class="menu-option" href="/disclaimer/">Aviso legal</a>
+      </nav>
+    </div>
+  </header>
 
-    <a class="volver" href="/">&larr; Volver a Tasita</a>
     <h1>Contacto</h1>
-    <div class="contenido"><p>Si encontraste un error en alguna tasa, querés sugerir una billetera que falta o tenés cualquier consulta, escribinos. Leemos todo.</p>
-      <p><strong>Correo:</strong> <a href="mailto:rodrigogalarza.280@gmail.com">rodrigogalarza.280@gmail.com</a></p>
-      <p><strong>Instagram:</strong> <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a></p>
-      <p><strong>TikTok:</strong> <a href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a></p>
-      <p>Si nos avisás de una tasa desactualizada, contanos de qué entidad se trata y, si podés, desde dónde la viste. Así la corregimos más rápido.</p></div>
-    
+    <div class="contenido"><p>Leemos todos los mensajes. Si querés escribirnos, estos son los medios:</p>
+      <p><strong>Correo:</strong> <a href="mailto:rodrigogalarza.280@gmail.com">rodrigogalarza.280@gmail.com</a><br>
+      <strong>Instagram:</strong> <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a><br>
+      <strong>TikTok:</strong> <a href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a></p>
+
+      <h2>Para qué escribirnos</h2>
+      <p><strong>Encontraste un error en una tasa.</strong> Es lo que más nos sirve. Las tasas cambian seguido y a veces una entidad modifica la suya antes de que lo veamos. Contanos de qué entidad se trata, qué tasa figura en Tasita y cuál es la correcta. Si podés, decinos desde dónde la viste: la app de la billetera, el sitio del banco, lo que sea.</p>
+      <p><strong>Falta una billetera, un banco o un broker.</strong> Si usás una entidad que no está en las listas, avisanos y la miramos. No sumamos cualquiera: tiene que ser una entidad real, con tasa pública y verificable.</p>
+      <p><strong>Tenés una sugerencia.</strong> Una sección nueva, una calculadora, algo que se entienda mal o que no se vea bien en tu celular. Varias de las cosas que hoy tiene Tasita salieron de mensajes de gente que la usa.</p>
+      <p><strong>Querés hacer una consulta.</strong> Sobre cómo funciona algo del sitio o sobre lo que mostramos. Eso sí: no damos recomendaciones personalizadas de inversión ni te podemos decir dónde poner tu plata. No somos asesores financieros.</p>
+
+      <h2>Cuánto tardamos</h2>
+      <p>Tasita la mantiene una sola persona, así que la respuesta puede demorar unos días. Los errores en las tasas son lo que atendemos primero.</p></div>
+
   <footer class="pie">
-    <nav class="pie-links">
-      <a href="/">Inicio</a><span>·</span><a href="/sobre-tasita/">Sobre Tasita</a><span>·</span><a href="/privacidad/">Política de privacidad</a><span>·</span><a href="/disclaimer/">Aviso legal</a>
-    </nav>
+    <nav class="pie-links"><a href="/">Inicio</a><span>·</span><a href="/sobre-tasita/">Sobre Tasita</a><span>·</span><a href="/terminos/">Términos</a><span>·</span><a href="/privacidad/">Privacidad</a><span>·</span><a href="/disclaimer/">Aviso legal</a></nav>
     <div class="redes">
       <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a>
       <a href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank" rel="noopener">TikTok</a>
@@ -108,5 +155,26 @@
     <div class="copy">© 2026 Tasita</div>
   </footer>
   </div>
+
+  <script>
+    /* El menú de las tres rayitas: abre, cierra al tocar afuera y con Escape */
+    (function () {
+      var btn = document.getElementById('menu-btn');
+      var menu = document.getElementById('menu-dropdown');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var abierto = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      });
+      document.addEventListener('click', function () {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+      });
+    })();
+  </script>
 </body>
 </html>

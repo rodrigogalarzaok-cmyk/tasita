@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sobre Tasita — Qué es y quién está detrás</title>
-  <meta name="description" content="Tasita es una herramienta gratuita e independiente para comparar tasas de billeteras virtuales, plazos fijos, letras y dólar en Argentina. Sin registro y sin vender productos financieros." />
+  <title>Sobre Tasita — Quién la hizo y para qué</title>
+  <meta name="description" content="Tasita la creó Rodrigo Galarza, creador de contenido de finanzas en TikTok e Instagram. Una herramienta gratuita para comparar tasas de billeteras, plazos fijos, letras y dólar en Argentina." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://tasita.com.ar/sobre-tasita/" />
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
   <link rel="icon" type="image/svg+xml" href="/logo-tasita.svg" />
   <link rel="apple-touch-icon" href="/favicon-48.png" />
-  <meta property="og:title" content="Sobre Tasita — Qué es y quién está detrás" />
-  <meta property="og:description" content="Tasita es una herramienta gratuita e independiente para comparar tasas de billeteras virtuales, plazos fijos, letras y dólar en Argentina. Sin registro y sin vender productos financieros." />
+  <meta property="og:title" content="Sobre Tasita — Quién la hizo y para qué" />
+  <meta property="og:description" content="Tasita la creó Rodrigo Galarza, creador de contenido de finanzas en TikTok e Instagram. Una herramienta gratuita para comparar tasas de billeteras, plazos fijos, letras y dólar en Argentina." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://tasita.com.ar/sobre-tasita/" />
   <meta property="og:image" content="https://tasita.com.ar/og-image.png" />
@@ -42,23 +42,48 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--text-main);
     display: flex; justify-content: center;
-    padding: 24px 16px 48px;
-    line-height: 1.6;
+    padding: 24px 16px 48px; line-height: 1.6;
   }
   .hoja { width: 100%; max-width: 640px; }
-  .cabecera { display: flex; align-items: center; gap: 11px; padding: 8px 0 26px; text-decoration: none; }
+
+  /* Encabezado: igual que el de la página principal */
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 28px; }
+  .logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
   .logo-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
-  .volver { display: inline-block; margin-bottom: 18px; font-size: 13px; color: var(--accent-text); text-decoration: none; }
-  .volver:hover { text-decoration: underline; }
-  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 18px; }
-  .contenido {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 18px; padding: 22px;
+  .menu-wrap { position: relative; }
+  .menu-btn {
+    background: none; border: none; color: var(--text-sub);
+    cursor: pointer; padding: 4px; border-radius: 6px; transition: color .2s;
   }
+  .menu-btn:hover { color: var(--text-main); }
+  .menu-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 50;
+    min-width: 180px; padding: 6px;
+    background: #0a1420; border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: 0 14px 34px rgba(0,0,0,0.5);
+    display: none; flex-direction: column;
+  }
+  .menu-dropdown.open { display: flex; }
+  .menu-option {
+    padding: 10px 13px; border-radius: 9px;
+    font-size: 14px; color: var(--text-main); text-decoration: none;
+    transition: background .18s;
+  }
+  .menu-option:hover { background: rgba(255,255,255,0.07); }
+  .menu-option.actual { color: var(--accent-text); font-weight: 700; }
+
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 18px; }
+  .contenido { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; }
+  .contenido h2 {
+    font-size: 16px; font-weight: 700; color: var(--accent-text);
+    margin: 24px 0 10px; letter-spacing: -0.2px;
+  }
+  .contenido h2:first-child { margin-top: 0; }
   .contenido p { font-size: 15px; margin-bottom: 14px; color: rgba(255,255,255,0.80); }
   .contenido p:last-child { margin-bottom: 0; }
   .contenido strong { color: var(--text-main); font-weight: 700; }
   .contenido a { color: var(--accent-text); }
+
   .pie { margin-top: 30px; text-align: center; font-size: 12.5px; }
   .pie-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 14px; }
   .pie-links a { color: var(--text-sub); text-decoration: none; }
@@ -72,7 +97,8 @@
 </head>
 <body>
   <div class="hoja">
-    <a class="cabecera" href="/">
+  <header class="header">
+    <a class="logo" href="/">
       <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#dce4f0"
      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
   <defs><clipPath id="cc"><path d="M3 10 H17 V15 a6 6 0 0 1-6 6 H9 a6 6 0 0 1-6-6 V10 Z"/></clipPath></defs>
@@ -88,19 +114,42 @@
 </svg>
       <span class="logo-name">Tasita</span>
     </a>
+    <div class="menu-wrap">
+      <button class="menu-btn" id="menu-btn" aria-label="Menú" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <nav class="menu-dropdown" id="menu-dropdown">
+        <a class="menu-option" href="/">Inicio</a>
+        <a class="menu-option actual" href="/sobre-tasita/">Sobre Tasita</a>
+        <a class="menu-option" href="/contacto/">Contacto</a>
+        <a class="menu-option" href="/terminos/">Términos</a>
+        <a class="menu-option" href="/privacidad/">Privacidad</a>
+        <a class="menu-option" href="/disclaimer/">Aviso legal</a>
+      </nav>
+    </div>
+  </header>
 
-    <a class="volver" href="/">&larr; Volver a Tasita</a>
     <h1>Sobre Tasita</h1>
-    <div class="contenido"><p>Tasita es una herramienta gratuita e independiente creada para ayudar a los argentinos a comparar opciones de ahorro e inversión de forma simple y rápida. En una sola pantalla podés ver qué billetera virtual paga más por tu plata, qué banco ofrece el mejor plazo fijo, cuánto rinden las letras del Tesoro y a cuánto está el dólar.</p>
-      <p>No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad. La información que mostramos proviene de fuentes públicas y se presenta únicamente con fines informativos.</p>
-      <p>La idea nació de una necesidad concreta: para saber dónde conviene poner la plata había que entrar a diez aplicaciones distintas y anotar las tasas a mano. Tasita junta todo eso en un solo lugar, ordenado de mayor a menor, y se actualiza solo.</p>
-      <p>No hace falta registrarse ni dar ningún dato personal. Entrás, mirás y listo.</p>
-      <p>Para consultas o sugerencias escribinos por Instagram: <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a></p></div>
-    
+    <div class="contenido"><p>Tasita es una herramienta gratuita e independiente para comparar, en una sola pantalla, dónde conviene poner tu plata en Argentina: qué billetera virtual paga más, qué banco ofrece el mejor plazo fijo, cuánto rinden las letras del Tesoro y a cuánto está el dólar.</p>
+
+      <h2>Quién la hizo</h2>
+      <p>La creé yo, <strong>Rodrigo Galarza</strong>. Hago contenido de finanzas personales en TikTok e Instagram, como <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a>, donde explico en criollo cosas que suelen contarse difícil: dónde rinde más la plata, cómo funciona un plazo fijo, qué es una letra del Tesoro o cuándo conviene comprar dólares.</p>
+      <p>De tanto responder la misma pregunta —"¿dónde pongo la plata?"— me di cuenta de que faltaba algo más práctico que un video: un lugar donde ver todas las tasas juntas y actualizadas.</p>
+
+      <h2>Por qué la hice</h2>
+      <p>Porque para saber dónde conviene poner la plata había que entrar a diez aplicaciones distintas, anotar las tasas a mano y comparar. Un trabajo que lleva media hora y que al día siguiente ya quedó viejo, porque las tasas cambian todo el tiempo.</p>
+      <p>Tasita junta todo eso en un solo lugar, ordenado de mayor a menor, y se actualiza solo. Lo que antes era media hora ahora son diez segundos.</p>
+
+      <h2>Qué NO es Tasita</h2>
+      <p>No somos un banco, ni una billetera, ni un broker. No vendemos productos financieros ni recibimos comisiones por recomendar ninguna entidad: el orden de las listas lo decide la tasa, no quién paga. La información proviene de fuentes públicas y se presenta con fines informativos.</p>
+      <p>Tampoco hace falta registrarse ni dar ningún dato personal. Entrás, mirás y listo.</p>
+
+      <p>Para consultas o sugerencias, escribime a <a href="mailto:rodrigogalarza.280@gmail.com">rodrigogalarza.280@gmail.com</a> o por <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">Instagram</a>.</p></div>
+
   <footer class="pie">
-    <nav class="pie-links">
-      <a href="/">Inicio</a><span>·</span><a href="/privacidad/">Política de privacidad</a><span>·</span><a href="/contacto/">Contacto</a><span>·</span><a href="/disclaimer/">Aviso legal</a>
-    </nav>
+    <nav class="pie-links"><a href="/">Inicio</a><span>·</span><a href="/contacto/">Contacto</a><span>·</span><a href="/terminos/">Términos</a><span>·</span><a href="/privacidad/">Privacidad</a><span>·</span><a href="/disclaimer/">Aviso legal</a></nav>
     <div class="redes">
       <a href="https://www.instagram.com/rodrigogalarzaa" target="_blank" rel="noopener">@rodrigogalarzaa</a>
       <a href="https://www.tiktok.com/@rodrigogalarzaa" target="_blank" rel="noopener">TikTok</a>
@@ -108,5 +157,26 @@
     <div class="copy">© 2026 Tasita</div>
   </footer>
   </div>
+
+  <script>
+    /* El menú de las tres rayitas: abre, cierra al tocar afuera y con Escape */
+    (function () {
+      var btn = document.getElementById('menu-btn');
+      var menu = document.getElementById('menu-dropdown');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var abierto = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      });
+      document.addEventListener('click', function () {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+      });
+    })();
+  </script>
 </body>
 </html>
