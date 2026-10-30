@@ -3314,6 +3314,27 @@ function gaEvent(seccion) {
     gtag('event', 'ver_seccion', { seccion });
 }
 
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c =>
+    c.classList.toggle('active', c.id === 'tab-' + name));
+  if (name === 'plazos' && !plazosLoaded) loadPlazos();
+  if (name === 'letras' && !letrasLoaded) cargarLetras();
+  /* Fondo liso solo en Letras: Billeteras y Plazos Fijos conservan el degradado */
+  document.documentElement.classList.toggle('fondo-letras', name === 'letras');
+  document.body.classList.toggle('fondo-letras', name === 'letras');
+  /* En Letras se esconden las preguntas frecuentes (hablan de billeteras y
+     plazos fijos) y la calculadora de rendimiento. */
+  document.getElementById('main-faq').style.display  = name === 'letras' ? 'none' : '';
+  document.getElementById('calcBtn').style.display   = name === 'letras' ? 'none' : '';
+  gaEvent(name);
+}
+document.querySelectorAll('.tab').forEach(t =>
+  t.addEventListener('click', () => switchTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b =>
+  b.addEventListener('click', () => switchTab(b.dataset.goto)));
+
 /* ════════════════════════════════════════════════════════
    AVATAR HELPERS
 ════════════════════════════════════════════════════════ */
