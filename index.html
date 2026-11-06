@@ -455,6 +455,7 @@
       z-index: 398; /* justo debajo de la calc (399) */
       background: transparent;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none; /* arrastrar sobre el fondo no mueve las billeteras de atrás */
     }
     .calc-backdrop.open { display: block; }
 
@@ -465,6 +466,10 @@
       border-radius: 20px; padding: 22px 20px;
       z-index: 399; box-shadow: 0 10px 50px rgba(0,0,0,0.7);
       display: none;
+      /* Si no entra en pantalla (por ejemplo con el teclado abierto), se desplaza ella misma,
+         no el fondo. */
+      max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px);
+      overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
     }
     .calc-panel.open { display: block; animation: fadein .2s ease; }
 
@@ -4097,13 +4102,38 @@ function toggleCalc() {
   // Backdrop: visible cuando alguna calc está abierta
   const anyOpen = panel.classList.contains('open');
   document.getElementById('calcBackdrop').classList.toggle('open', anyOpen);
+  ajustarCalc();
 }
+
+/* Con el teclado abierto en el celular, el panel tiene que entrar en la parte que
+   queda visible: se le calcula el alto y la posición con lo que realmente se ve. */
+function ajustarCalc() {
+  const vv = window.visualViewport;
+  ['calcPanel', 'calcBrokerPanel'].forEach(id => {
+    const p = document.getElementById(id);
+    if (!p.classList.contains('open')) { p.style.bottom = ''; p.style.maxHeight = ''; return; }
+    if (!vv) return;
+    const tapado = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const piso = tapado > 80 ? tapado + 12 : 90;      // con teclado, pegado arriba de él
+    p.style.bottom = piso + 'px';
+    p.style.maxHeight = Math.max(160, vv.height - (piso - tapado) - 20) + 'px';
+  });
+}
+if (window.visualViewport) {
+  visualViewport.addEventListener('resize', ajustarCalc);
+  visualViewport.addEventListener('scroll', ajustarCalc);
+}
+document.addEventListener('focusin', e => {
+  if (!e.target.closest || !e.target.closest('.calc-panel')) return;
+  setTimeout(() => { ajustarCalc(); e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 300);
+});
 
 /* Cierra cualquier calc abierta y oculta el backdrop */
 function closeCalc() {
   document.getElementById('calcPanel').classList.remove('open');
   document.getElementById('calcBrokerPanel').classList.remove('open');
   document.getElementById('calcBackdrop').classList.remove('open');
+  ajustarCalc();
 }
 
 /* navOrClose ya no es necesario pero se conserva por si acaso */
