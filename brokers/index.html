@@ -429,6 +429,7 @@
       z-index: 398; /* justo debajo de la calc (399) */
       background: transparent;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none; /* arrastrar sobre el fondo no mueve las billeteras de atrás */
     }
     .calc-backdrop.open { display: block; }
 
@@ -439,6 +440,10 @@
       border-radius: 20px; padding: 22px 20px;
       z-index: 399; box-shadow: 0 10px 50px rgba(0,0,0,0.7);
       display: none;
+      /* Si no entra en pantalla (por ejemplo con el teclado abierto), se desplaza ella misma,
+         no el fondo. */
+      max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px);
+      overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
     }
     .calc-panel.open { display: block; animation: fadein .2s ease; }
 
