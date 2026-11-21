@@ -85,25 +85,25 @@ const gfav  = d => `https://www.google.com/s2/favicons?sz=256&domain=${d}`;
 
 ---
 
-## BILLETERAS_DATA (26 oct 2026) — actualizar desde billeterasvirtuales.com.ar
+## BILLETERAS_DATA (21 nov 2026) — actualizar desde billeterasvirtuales.com.ar
 
 ```javascript
-{ name: 'Fiwind',          tna: 23.00 }
+{ name: 'Fiwind',          tna: 25.00 }
 { name: 'Carrefour Banco', tna: 20.00 }
 { name: 'Lemon Cash',      tna: 20.00 }
 { name: 'Naranja X',       tna: 20.00 }
-{ name: 'Prex',            tna: 19.50 }
+{ name: 'Prex',            tna: 19.00 }
 { name: 'Personal Pay',    tna: 19.50 }
-{ name: 'Claro Pay',       tna: 19.40 }
-{ name: 'Mercado Pago',    tna: 19.16 }
+{ name: 'Claro Pay',       tna: 18.90 }
+{ name: 'Mercado Pago',    tna: 18.92 }
 { name: 'Ualá',            tna: 19.00 }
 { name: 'Cocos Pay',       tna: 18.54 }
-{ name: 'YPF',             tna: 17.66 }
+{ name: 'YPF',             tna: 17.63 }
 { name: 'Taca Taca',       tna: 17.52 }
 { name: 'Banco Galicia',   tna: 17.50 }
-{ name: 'Brubank',         tna: 17.00 }
+{ name: 'Brubank',         tna: 19.00 }
 { name: "Let'sBit",        tna: 16.79 }
-{ name: 'AstroPay',        tna: 16.15 }
+{ name: 'AstroPay',        tna: 15.06 }
 { name: 'Supervielle',     tna: 15.00 }
 ```
 
